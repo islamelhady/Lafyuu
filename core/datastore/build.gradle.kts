@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.androidLibrary)
 }
 
 android {
@@ -21,6 +21,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:network"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)

@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.elhady.lafyuu.core.database"
+    namespace = "com.elhady.lafyuu.core.designsystem"
     compileSdk {
         version = release(37)
     }
