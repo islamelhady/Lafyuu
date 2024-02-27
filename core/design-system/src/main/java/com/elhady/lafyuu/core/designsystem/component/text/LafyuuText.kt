@@ -9,7 +9,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuColor
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTypography
-import java.lang.reflect.Modifier
 
 @Composable
 fun LafyuuText(
