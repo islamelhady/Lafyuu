@@ -5,17 +5,17 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class DataStoreTokenProvider @Inject constructor(
-    private val shoppeDataStore: ShoppeDataStore
+    private val lafyuuDataStore: LafyuuDataStore
 ) : TokenProvider {
-    override fun getAccessToken(): Flow<String?> = shoppeDataStore.accessToken
+    override fun getAccessToken(): Flow<String?> = lafyuuDataStore.accessToken
     
-    override fun getRefreshToken(): Flow<String?> = shoppeDataStore.refreshToken
+    override fun getRefreshToken(): Flow<String?> = lafyuuDataStore.refreshToken
 
     override suspend fun updateTokens(accessToken: String, refreshToken: String) {
-        shoppeDataStore.saveTokens(accessToken, refreshToken)
+        lafyuuDataStore.saveTokens(accessToken, refreshToken)
     }
 
     override suspend fun clearSession() {
-        shoppeDataStore.clearSession()
+        lafyuuDataStore.clearSession()
     }
 }
