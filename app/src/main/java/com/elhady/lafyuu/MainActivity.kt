@@ -8,14 +8,15 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.feature.auth.presentation.navigation.AUTH_GRAPH_ROUTE
 import com.elhady.lafyuu.feature.auth.presentation.navigation.authGraph
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
@@ -23,14 +24,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            setContent {
-                val isAuthenticated by viewModel.isAuthenticated.collectAsStateWithLifecycle()
+            val isAuthenticated by viewModel.isAuthenticated.collectAsStateWithLifecycle()
 
-                LafyuuTheme {
-                    MainApp(
-                        isAuthenticated = isAuthenticated
-                    )
-                }
+            LafyuuTheme {
+                MainApp(
+                    isAuthenticated = isAuthenticated
+                )
             }
         }
     }

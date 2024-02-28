@@ -8,9 +8,7 @@ plugins {
 
 android {
     namespace = "com.elhady.lafyuu"
-    compileSdk {
-        version = release(37)
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.elhady.lafyuu"

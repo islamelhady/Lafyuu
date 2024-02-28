@@ -8,9 +8,7 @@ plugins {
 
 android {
     namespace = "com.elhady.lafyuu.core.network"
-    compileSdk {
-        version = release(37)
-    }
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 26
@@ -49,6 +47,7 @@ dependencies {
     implementation(libs.javax.inject)
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
 }

@@ -5,9 +5,7 @@ plugins {
 
 android {
     namespace = "com.elhady.lafyuu.core.database"
-    compileSdk {
-        version = release(37)
-    }
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 26
