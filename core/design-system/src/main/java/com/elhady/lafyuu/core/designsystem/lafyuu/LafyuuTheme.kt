@@ -8,11 +8,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 fun LafyuuTheme(
     colorScheme: LafyuuColor = lightColorScheme,
     corner: Corner = defaultCorner,
+    space: Space = defaultSpace,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
         LocalColor provides colorScheme,
         LocalCorner provides corner,
+        LocalSpace provides space,
         content = content
     )
 }
