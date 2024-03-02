@@ -9,12 +9,15 @@ fun LafyuuTheme(
     colorScheme: LafyuuColor = lightColorScheme,
     corner: Corner = defaultCorner,
     space: Space = defaultSpace,
+    size: Size = defaultSize,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
         LocalColor provides colorScheme,
         LocalCorner provides corner,
         LocalSpace provides space,
-        content = content
-    )
+        LocalSize provides size
+    ){
+        content()
+    }
 }
