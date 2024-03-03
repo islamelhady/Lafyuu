@@ -2,10 +2,11 @@ package com.elhady.lafyuu.core.designsystem.lafyuu
 
 import androidx.compose.ui.unit.dp
 
-val defaultSize: Size = Size(
+val defaultSize = Size(
     none = 0.dp,
-    small = 16.dp,
-    medium = 24.dp,
+    mini = 16.dp,
+    small = 24.dp,
+    medium = 32.dp,
     large = 48.dp,
     extraLarge = 56.dp,
     huge = 80.dp

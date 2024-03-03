@@ -8,5 +8,5 @@ data class Corner(
     val medium: Shape,
     val large: Shape,
     val extraLarge: Shape,
-    val full: Shape
+    val fullRounded: Shape
 )

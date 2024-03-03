@@ -10,5 +10,5 @@ val defaultCorner: Corner = Corner(
     medium = RoundedCornerShape(8.dp),
     large = RoundedCornerShape(12.dp),
     extraLarge = RoundedCornerShape(16.dp),
-    full = RoundedCornerShape(999.dp)
+    fullRounded = RoundedCornerShape(100)
 )

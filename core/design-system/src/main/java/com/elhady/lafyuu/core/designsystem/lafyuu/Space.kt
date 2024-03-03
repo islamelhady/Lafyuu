@@ -4,10 +4,12 @@ import androidx.compose.ui.unit.Dp
 
 data class Space(
     val none: Dp,
+    val mini: Dp,
     val small: Dp,
     val medium: Dp,
     val large: Dp,
     val extraLarge: Dp,
-    val huge: Dp
+    val huge: Dp,
+    val massive: Dp
 )
 
