@@ -1,82 +1,35 @@
 package com.elhady.lafyuu.core.designsystem.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import com.elhady.lafyuu.core.designsystem.lafyuu.Corner
+import com.elhady.lafyuu.core.designsystem.lafyuu.LafyuuColor
+import com.elhady.lafyuu.core.designsystem.lafyuu.LafyuuTypography
+import com.elhady.lafyuu.core.designsystem.lafyuu.Size
+import com.elhady.lafyuu.core.designsystem.lafyuu.Space
+import com.elhady.lafyuu.core.designsystem.lafyuu.defaultCorner
+import com.elhady.lafyuu.core.designsystem.lafyuu.defaultSize
+import com.elhady.lafyuu.core.designsystem.lafyuu.defaultSpace
+import com.elhady.lafyuu.core.designsystem.lafyuu.defaultTypography
+import com.elhady.lafyuu.core.designsystem.lafyuu.lightColorScheme
 
-private val LightColorScheme = lightColorScheme(
-    primary = LafyuuColor.Primary,
-    onPrimary = LafyuuColor.TextOnPrimary,
-    primaryContainer = LafyuuColor.SelectionBlue,
-    onPrimaryContainer = LafyuuColor.Primary,
-
-    secondary = LafyuuColor.AccentPink,
-    onSecondary = LafyuuColor.TextOnPrimary,
-    secondaryContainer = LafyuuColor.OfferPink,
-    onSecondaryContainer = LafyuuColor.AccentPink,
-
-    background = LafyuuColor.Background,
-    onBackground = LafyuuColor.TextPrimary,
-
-    surface = LafyuuColor.Background,
-    onSurface = LafyuuColor.TextPrimary,
-
-    surfaceVariant = LafyuuColor.Surface,
-    onSurfaceVariant = LafyuuColor.TextSecondary,
-
-    error = LafyuuColor.Error,
-    onError = LafyuuColor.TextOnPrimary,
-
-    outline = LafyuuColor.Border,
-    outlineVariant = LafyuuColor.Divider
-)
-
-private val DarkColorScheme = darkColorScheme(
-    primary = LafyuuColor.Primary,
-    onPrimary = LafyuuColor.TextOnPrimary,
-
-    primaryContainer = LafyuuColor.PrimaryContainer,
-    onPrimaryContainer = LafyuuColor.OnPrimaryContainer,
-
-    secondary = LafyuuColor.AccentPink,
-    onSecondary = LafyuuColor.TextOnPrimary,
-
-    secondaryContainer = LafyuuColor.SecondaryContainer,
-    onSecondaryContainer = LafyuuColor.OnSecondaryContainer,
-
-    background = LafyuuColor.Background,
-    onBackground = LafyuuColor.OnBackground,
-
-    surface = LafyuuColor.Surface,
-    onSurface = LafyuuColor.OnSurface,
-
-    surfaceVariant = LafyuuColor.SurfaceVariant,
-    onSurfaceVariant = LafyuuColor.OnSurfaceVariant,
-
-    error = LafyuuColor.Error,
-    onError = LafyuuColor.Error,
-
-    outline = LafyuuColor.Outline,
-    outlineVariant = LafyuuColor.OutlineVariant,
-)
 
 @Composable
 fun LafyuuTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    colorScheme: LafyuuColor = lightColorScheme,
+    corner: Corner = defaultCorner,
+    space: Space = defaultSpace,
+    size: Size = defaultSize,
+    typography: LafyuuTypography = defaultTypography,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) {
-        DarkColorScheme
-    } else {
-        LightColorScheme
+    CompositionLocalProvider(
+        LocalColor provides colorScheme,
+        LocalCorner provides corner,
+        LocalSpace provides space,
+        LocalSize provides size,
+        LocalTypography provides typography
+    ){
+        content()
     }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = LafyuuTypography.Material,
-        shapes = LafyuuShapes.Material,
-        content = content
-    )
 }
