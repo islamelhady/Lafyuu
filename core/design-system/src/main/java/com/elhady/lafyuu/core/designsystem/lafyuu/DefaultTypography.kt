@@ -8,8 +8,8 @@ import androidx.compose.ui.unit.sp
 import com.elhady.lafyuu.core.designsystem.R
 
 val poppinsFontFamily = FontFamily(
-    Font(R.font.raleway_regular, FontWeight.Normal),
-    Font(R.font.raleway_bold, FontWeight.Bold)
+    Font(R.font.poppins_regular, FontWeight.Normal),
+    Font(R.font.poppins_bold, FontWeight.Bold)
 )
 
 
