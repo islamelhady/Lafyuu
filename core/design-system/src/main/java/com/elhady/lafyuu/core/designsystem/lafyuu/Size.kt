@@ -9,6 +9,12 @@ data class Size(
     val medium: Dp,
     val large: Dp,
     val extraLarge: Dp,
-    val huge: Dp
+    val huge: Dp,
+    val iconSmall: Dp,
+    val iconMedium: Dp,
+    val iconLarge: Dp,
+    val InputFieldHeight: Dp,
+    val ProductThumbnail: Dp,
+    val OtpBoxSize: Dp
 )
 

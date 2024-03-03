@@ -3,7 +3,7 @@ package com.elhady.lafyuu.core.designsystem.lafyuu
 import androidx.compose.ui.graphics.Color
 
 val lightColorScheme: LafyuuColor = LafyuuColor(
-    blue = Color(0xFF40BFFF),
+    blue = Color(0xFF3FBFFE),
     red = Color(0xFFFB7181),
     yellow = Color(0xFFFFC833),
     green = Color(0xFF53D1B6),
