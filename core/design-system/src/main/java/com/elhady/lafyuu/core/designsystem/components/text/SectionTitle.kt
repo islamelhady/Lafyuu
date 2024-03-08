@@ -24,7 +24,7 @@ fun SectionTitle(
     ) {
         Text(
             text = title,
-            style = Theme.typography.heading4,
+            style = Theme.typography.heading5,
             color = Theme.color.neutralDark
         )
 
@@ -34,7 +34,8 @@ fun SectionTitle(
             ) {
                 Text(
                     text = actionText,
-                    style = Theme.typography.mediumTextBold
+                    style = Theme.typography.linkText,
+                    color = Theme.color.blue
                 )
             }
         }
