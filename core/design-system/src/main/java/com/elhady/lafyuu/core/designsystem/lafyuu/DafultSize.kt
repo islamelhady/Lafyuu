@@ -15,7 +15,8 @@ val defaultSize = Size(
     iconMedium = 16.dp,
     iconLarge = 32.dp,
     inputFieldHeight = 48.dp,
-    productThumbnail = 100.dp,
+    smallButtonWidth = 92.dp,
+    smallButtonHeight = 50.dp,
     quantityButtonWidth = 104.dp,
     quantityLabelWidth = 40.dp
 )

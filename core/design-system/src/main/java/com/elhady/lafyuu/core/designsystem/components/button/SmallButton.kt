@@ -1,6 +1,8 @@
 package com.elhady.lafyuu.core.designsystem.components.button
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -21,8 +23,11 @@ fun SmallButton(
     BaseButton(
         caption = caption,
         onClick = onClick,
-        modifier = modifier.width(99.dp),
-        isEnabled = isEnabled
+        modifier = modifier
+            .width(Theme.size.smallButtonWidth)
+            .height(Theme.size.smallButtonHeight),
+        isEnabled = isEnabled,
+        hasShadow = true
     )
 }
 

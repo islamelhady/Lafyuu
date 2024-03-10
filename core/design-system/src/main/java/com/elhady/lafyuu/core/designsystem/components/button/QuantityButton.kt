@@ -60,7 +60,7 @@ fun LafyuuQuantityButton(
         ) {
             Text(
                 text = quantity.toString(),
-                style = Theme.typography.largeCaptionRegular12,
+                style = Theme.typography.largeCaptionRegular,
                 color = Theme.color.neutralGrey,
             )
         }

@@ -15,7 +15,8 @@ data class Size(
     val iconMedium: Dp,
     val iconLarge: Dp,
     val inputFieldHeight: Dp,
-    val productThumbnail: Dp,
+    val smallButtonWidth: Dp,
+    val smallButtonHeight: Dp,
     val quantityButtonWidth: Dp,
     val quantityLabelWidth: Dp
 )
