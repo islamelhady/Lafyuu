@@ -15,9 +15,10 @@ data class LafyuuTypography(
     val mediumTextRegular: TextStyle,
     val normalTextBold: TextStyle,
     val normalTextRegular: TextStyle,
-    val largeCaptionBold12: TextStyle,
-    val largeCaptionRegular12: TextStyle,
-    val largeCaptionBold10: TextStyle,
-    val largeCaptionRegular10: TextStyle,
-    val linkText: TextStyle,
+    val largeCaptionBold: TextStyle,
+    val largeCaptionRegular: TextStyle,
+    val smallCaptionBold: TextStyle,
+    val smallCaptionRegular: TextStyle,
+    val largeLinkBold: TextStyle,
+    val largeLinkRegular: TextStyle
 )

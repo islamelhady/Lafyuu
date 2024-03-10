@@ -38,23 +38,23 @@ internal val defaultTypography = LafyuuTypography(
     heading4 = TextStyle(
         fontFamily = poppinsFontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 18.sp,
+        fontSize = 16.sp, // تعديل من 18 إلى 16
         letterSpacing = 0.5.sp,
-        lineHeight = 27.sp
+        lineHeight = 24.sp // تعديل من 27 إلى 24
     ),
     heading5 = TextStyle(
-        fontFamily = poppinsFontFamily,
-        fontWeight = FontWeight.Bold,
-        fontSize = 16.sp,
-        letterSpacing = 0.5.sp,
-        lineHeight = 24.sp
-    ),
-    heading6 = TextStyle(
         fontFamily = poppinsFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 14.sp,
         letterSpacing = 0.5.sp,
         lineHeight = 21.sp
+    ),
+    heading6 = TextStyle(
+        fontFamily = poppinsFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 10.sp,
+        letterSpacing = 0.5.sp,
+        lineHeight = 15.sp
     ),
     largeTextBold = TextStyle(
         fontFamily = poppinsFontFamily,
@@ -98,37 +98,44 @@ internal val defaultTypography = LafyuuTypography(
         letterSpacing = 0.5.sp,
         lineHeight = 21.6.sp
     ),
-    largeCaptionBold12 = TextStyle(
+    largeCaptionBold = TextStyle(
         fontFamily = poppinsFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 12.sp,
         letterSpacing = 0.5.sp,
         lineHeight = 18.sp
     ),
-    largeCaptionRegular12 = TextStyle(
+    largeCaptionRegular = TextStyle(
         fontFamily = poppinsFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         letterSpacing = 0.5.sp,
         lineHeight = 18.sp
     ),
-    largeCaptionBold10 = TextStyle(
+    smallCaptionBold = TextStyle(
         fontFamily = poppinsFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 10.sp,
         letterSpacing = 0.5.sp,
         lineHeight = 15.sp
     ),
-    largeCaptionRegular10 = TextStyle(
+    smallCaptionRegular = TextStyle(
         fontFamily = poppinsFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 10.sp,
         letterSpacing = 0.5.sp,
         lineHeight = 15.sp
     ),
-    linkText = TextStyle(
+    largeLinkBold = TextStyle(
         fontFamily = poppinsFontFamily,
         fontWeight = FontWeight.Bold,
+        fontSize = 12.sp,
+        letterSpacing = 0.5.sp,
+        lineHeight = 18.sp
+    ),
+    largeLinkRegular = TextStyle(
+        fontFamily = poppinsFontFamily,
+        fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         letterSpacing = 0.5.sp,
         lineHeight = 18.sp
