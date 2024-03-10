@@ -12,6 +12,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 fun InfoRow(
     label: String,
     value: String,
+    isTotal: Boolean = false
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -19,13 +20,13 @@ fun InfoRow(
     ) {
         LafyuuText(
             text = label,
-            style = Theme.typography.normalTextRegular,
-            color = Theme.color.neutralGrey
+            style = if (isTotal) Theme.typography.mediumTextBold else Theme.typography.normalTextRegular,
+            color = if (isTotal) Theme.color.neutralDark else Theme.color.neutralGrey
         )
         LafyuuText(
             text = value,
-            style = Theme.typography.normalTextRegular,
-            color = Theme.color.neutralDark
+            style = if (isTotal) Theme.typography.mediumTextBold else Theme.typography.normalTextRegular,
+            color = if (isTotal) Theme.color.blue else Theme.color.neutralDark
         )
     }
 }
