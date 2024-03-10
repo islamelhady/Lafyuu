@@ -34,7 +34,7 @@ fun SectionTitle(
             ) {
                 Text(
                     text = actionText,
-                    style = Theme.typography.linkText,
+                    style = Theme.typography.largeLinkBold,
                     color = Theme.color.blue
                 )
             }

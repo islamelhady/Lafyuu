@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
-fun BodyText(
+fun Hint(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = Theme.color.neutralGrey
@@ -14,7 +14,7 @@ fun BodyText(
     LafyuuText(
         text = text,
         modifier = modifier,
-        style = Theme.typography.mediumTextRegular,
+        style = Theme.typography.normalTextRegular,
         color = color
     )
 }

@@ -38,9 +38,9 @@ internal val defaultTypography = LafyuuTypography(
     heading4 = TextStyle(
         fontFamily = poppinsFontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 16.sp, // تعديل من 18 إلى 16
+        fontSize = 16.sp,
         letterSpacing = 0.5.sp,
-        lineHeight = 24.sp // تعديل من 27 إلى 24
+        lineHeight = 24.sp
     ),
     heading5 = TextStyle(
         fontFamily = poppinsFontFamily,
@@ -112,14 +112,14 @@ internal val defaultTypography = LafyuuTypography(
         letterSpacing = 0.5.sp,
         lineHeight = 18.sp
     ),
-    smallCaptionBold = TextStyle(
+    normalCaptionBold = TextStyle(
         fontFamily = poppinsFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 10.sp,
         letterSpacing = 0.5.sp,
         lineHeight = 15.sp
     ),
-    smallCaptionRegular = TextStyle(
+    normalCaptionRegular = TextStyle(
         fontFamily = poppinsFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 10.sp,
