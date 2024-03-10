@@ -55,42 +55,22 @@ fun OrderCard(
         )
         DashedDivider()
 
-        OrderInfoRow(
+        InfoRow(
             label = "Order Status",
             value = order.status
         )
-        OrderInfoRow(
+        InfoRow(
             label = "Items",
             value = "${order.itemsCount} Items purchased"
         )
-        OrderInfoRow(
+        InfoRow(
             label = "Price",
             value = order.price
         )
     }
 }
 
-@Composable
-private fun OrderInfoRow(
-    label: String,
-    value: String,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        LafyuuText(
-            text = label,
-            style = Theme.typography.normalTextRegular,
-            color = Theme.color.neutralGrey
-        )
-        LafyuuText(
-            text = value,
-            style = Theme.typography.normalTextRegular,
-            color = Theme.color.neutralDark
-        )
-    }
-}
+
 
 @Composable
 fun DashedDivider(

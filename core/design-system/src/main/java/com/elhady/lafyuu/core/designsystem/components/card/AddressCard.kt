@@ -52,7 +52,7 @@ fun AddressCard(
                 color = if (isSelected) Theme.color.blue else Theme.color.neutralLight,
                 shape = Theme.corner.small
             )
-            .padding(Theme.space.extraLarge),
+            .padding(Theme.space.large),
         verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
     ) {
         LafyuuText(
