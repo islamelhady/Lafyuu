@@ -52,17 +52,16 @@ fun AddressCard(
                 color = if (isSelected) Theme.color.blue else Theme.color.neutralLight,
                 shape = Theme.corner.small
             )
-            .padding(Theme.space.extraLarge)
+            .padding(Theme.space.extraLarge),
+        verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
     ) {
         LafyuuText(
             text = address.name,
-            modifier = Modifier.padding(bottom = Theme.space.large),
             color = Theme.color.neutralDark,
             style = Theme.typography.heading5
         )
         LafyuuText(
             text = address.address,
-            modifier = Modifier.padding(bottom = Theme.space.large),
             style = Theme.typography.normalTextRegular,
             color = Theme.color.neutralGrey
         )
@@ -74,7 +73,7 @@ fun AddressCard(
         Row(
             modifier = Modifier.padding(top = Theme.space.large),
             horizontalArrangement = Arrangement.spacedBy(Theme.space.extraLarge),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             SmallButton(
                 caption = "Edit",
@@ -86,7 +85,6 @@ fun AddressCard(
                 imageVector = Trash,
                 contentDescription = "Trash",
                 tint = Theme.color.neutralGrey,
-                modifier = Modifier.padding(start = Theme.space.medium)
             )
         }
     }
