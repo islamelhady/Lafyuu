@@ -12,8 +12,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,16 +32,22 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 @Composable
 fun NotificationMark(
     hasNotification: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     Box(modifier = modifier) {
-        content()
+        IconButton(
+            onClick = onClick,
+            modifier = Modifier.size(28.dp)
+        ) {
+            content()
+        }
         if (hasNotification) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .offset(x = 2.dp, y = (-2).dp)
+                    .offset(x = (-1).dp, y = 1.dp)
                     .size(8.dp)
                     .clip(CircleShape)
                     .background(Theme.color.red)
@@ -57,16 +68,13 @@ private fun AllOtherComponentsPreview() {
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
 
+                var hasNotification by remember { mutableStateOf(true) }
                 SectionTitle("Notification Mark")
                 Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-                    NotificationMark(hasNotification = true) {
-                        Icon(
-                            Notification,
-                            contentDescription = null,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-                    NotificationMark(hasNotification = false) {
+                    NotificationMark(
+                        hasNotification = hasNotification,
+                        onClick = { hasNotification = !hasNotification }
+                    ) {
                         Icon(
                             Notification,
                             contentDescription = null,
