@@ -40,7 +40,6 @@ fun TrackingStepper(
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        // Circles + Lines
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -89,7 +88,6 @@ fun TrackingStepper(
             modifier = Modifier.height(Theme.space.extraExtraSmall)
         )
 
-        // Labels
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
