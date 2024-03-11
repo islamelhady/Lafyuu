@@ -1,5 +1,7 @@
 package com.elhady.lafyuu.feature.auth.presentation.login
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,25 +13,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.elhady.lafyuu.core.designsystem.component.button.LafyuuButton
-import com.elhady.lafyuu.core.designsystem.component.button.LafyuuTextButton
-import com.elhady.lafyuu.core.designsystem.component.input.LafyuuPasswordField
-import com.elhady.lafyuu.core.designsystem.component.input.LafyuuTextField
+import com.elhady.lafyuu.core.designsystem.R
+import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
+import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
+import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
+import com.elhady.lafyuu.core.designsystem.theme.Theme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -84,44 +87,50 @@ internal fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
+            Image(
+                painter = painterResource(R.drawable.logo),
+                contentDescription = "Logo",
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
+            LafyuuText(
                 text = "Welcome Back",
-                style = MaterialTheme.typography.headlineLarge,
+                style = Theme.typography.heading4,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            Text(
+            LafyuuText(
                 text = "Login to your account",
-                style = MaterialTheme.typography.bodyLarge,
+                style = Theme.typography.normalTextRegular,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            LafyuuTextField(
+            EmailTextField(
                 value = uiState.email,
                 onValueChange = { onEvent(LoginUiEvent.EmailChanged(it)) },
-                label = "Email",
+                placeholder = "Email",
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
-            LafyuuPasswordField(
+            PasswordTextField(
                 value = uiState.password,
                 onValueChange = { onEvent(LoginUiEvent.PasswordChanged(it)) },
-                label = "Password",
+                placeholder = "Password",
                 modifier = Modifier.fillMaxWidth()
             )
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-                LafyuuTextButton(
+                LafyuuText(
                     text = "Forgot Password?",
-                    onClick = onNavigateToForgotPassword
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .clickable { onNavigateToForgotPassword() }
                 )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            LafyuuButton(
-                text = "Login",
+            DefaultButton(
+                caption = "Login",
                 onClick = { onEvent(LoginUiEvent.LoginClicked) },
-                loading = uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -132,10 +141,12 @@ internal fun LoginScreen(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Don't have an account?")
-                LafyuuTextButton(
+                LafyuuText(
+                    text = "Don't have an account?"
+                )
+                LafyuuText(
                     text = "Register",
-                    onClick = onNavigateToRegister
+                    modifier = Modifier.clickable { onNavigateToRegister() }
                 )
             }
         }
