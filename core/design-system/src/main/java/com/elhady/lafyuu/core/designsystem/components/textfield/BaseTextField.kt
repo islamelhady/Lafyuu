@@ -12,8 +12,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 enum class LafyuuFieldState { Default, Active, Error }
@@ -26,6 +28,7 @@ internal fun BaseTextField(
     modifier: Modifier = Modifier,
     state: LafyuuFieldState = LafyuuFieldState.Default,
     errorMessage: String? = null,
+    readOnly: Boolean = false,
     leadingContent: @Composable (() -> Unit)? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -42,7 +45,7 @@ internal fun BaseTextField(
             value = value,
             onValueChange = onValueChange,
             placeholder = {
-                Text(
+                LafyuuText(
                     text = placeholder,
                     style = Theme.typography.normalTextRegular
                 )
@@ -50,6 +53,7 @@ internal fun BaseTextField(
             leadingIcon = leadingContent,
             trailingIcon = trailingContent,
             singleLine = true,
+            readOnly = readOnly,
             isError = state == LafyuuFieldState.Error,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             visualTransformation = visualTransformation,
@@ -65,7 +69,7 @@ internal fun BaseTextField(
         )
         if (state == LafyuuFieldState.Error && errorMessage != null) {
             Spacer(Modifier.height(Theme.space.extraExtraSmall))
-            Text(
+            LafyuuText(
                 text = errorMessage,
                 style = Theme.typography.normalTextBold,
                 color = Theme.color.error

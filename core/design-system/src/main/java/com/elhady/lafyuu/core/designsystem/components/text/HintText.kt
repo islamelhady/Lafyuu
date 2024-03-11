@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
-fun Hint(
+fun HintText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = Theme.color.neutralGrey
