@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import com.elhady.lafyuu.core.designsystem.components.text.HintText
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
@@ -45,7 +46,7 @@ internal fun BaseTextField(
             value = value,
             onValueChange = onValueChange,
             placeholder = {
-                LafyuuText(
+                HintText(
                     text = placeholder,
                     style = Theme.typography.normalTextRegular
                 )
