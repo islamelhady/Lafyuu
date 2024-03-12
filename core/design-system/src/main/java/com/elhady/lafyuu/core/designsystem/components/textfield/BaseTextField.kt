@@ -11,6 +11,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -90,6 +91,7 @@ internal fun BaseTextField(
     leadingIcon: ImageVector? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
     visualTransformation: VisualTransformation = VisualTransformation.None,
+    tint: Color = Theme.color.neutralGrey,
     trailingContent: @Composable (() -> Unit)? = null
 ) {
     BaseTextField(
@@ -104,7 +106,7 @@ internal fun BaseTextField(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = Theme.color.neutralGrey
+                    tint = tint
                 )
             }
         },
