@@ -16,7 +16,7 @@ fun SingleTopAppBar(
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
 ) {
-    LafyuuAppBar(
+    LafyuuTopBar(
         modifier = modifier,
         leading = {
             leadingIcon?.let {

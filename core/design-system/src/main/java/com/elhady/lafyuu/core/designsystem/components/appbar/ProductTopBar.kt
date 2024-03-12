@@ -15,7 +15,7 @@ import com.elhady.lafyuu.core.designsystem.icons.Search
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
-fun ProductTopAppBar(
+fun ProductTopBar(
     modifier: Modifier = Modifier,
     title: String,
     leadingIcon: ImageVector? = null,
@@ -26,7 +26,7 @@ fun ProductTopAppBar(
     onSearchClick: () -> Unit = {},
     contentDescription: String? = null,
 ) {
-    LafyuuAppBar(
+    LafyuuTopBar(
         modifier = modifier,
         leading = {
             leadingIcon?.let {
@@ -67,11 +67,11 @@ fun ProductTopAppBar(
 
 @Preview(showBackground = true)
 @Composable
-fun ProductTopAppBarPreview() {
+fun ProductTopBarPreview() {
     Column(
         Modifier.padding(Theme.space.large)
     ) {
-        ProductTopAppBar(
+        ProductTopBar(
             title = "Nike Air Max 270 Rea",
             onLeadingClick = {},
             leadingIcon = Left,
@@ -82,7 +82,7 @@ fun ProductTopAppBarPreview() {
             contentDescription = null,
         )
 
-        ProductTopAppBar(
+        ProductTopBar(
             title = "Ship to",
             onLeadingClick = {},
             leadingIcon = Left,

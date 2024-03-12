@@ -19,7 +19,7 @@ import com.elhady.lafyuu.core.designsystem.icons.Notification
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
-fun SearchBarWithNotification(
+fun SearchTopBarWithNotification(
     searchValue: String,
     onSearchValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -31,7 +31,7 @@ fun SearchBarWithNotification(
     hasNotification: Boolean = false,
     onNotificationClick: () -> Unit
 ) {
-    LafyuuAppBar(
+    LafyuuTopBar(
         modifier = modifier,
         leading = {
             leadingIcon?.let {
@@ -93,9 +93,9 @@ fun IconClick(
 
 @Preview(showBackground = true)
 @Composable
-private fun SearchBarWithNotificationPreview() {
+private fun SearchTopBarWithNotificationPreview() {
     var search by remember { mutableStateOf("") }
-    SearchBarWithNotification(
+    SearchTopBarWithNotification(
         searchValue = search,
         onSearchValueChange = { search = it },
         onClearSearchClick = { search = "" },

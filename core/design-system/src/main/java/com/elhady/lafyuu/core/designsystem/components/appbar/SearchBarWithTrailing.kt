@@ -29,7 +29,7 @@ fun SearchBarWithTrailing(
     filterIcon: ImageVector? = null,
     onFilterClick: () -> Unit = {},
 ) {
-    LafyuuAppBar(
+    LafyuuTopBar(
         modifier = modifier,
         leading = {
             leadingIcon?.let {
