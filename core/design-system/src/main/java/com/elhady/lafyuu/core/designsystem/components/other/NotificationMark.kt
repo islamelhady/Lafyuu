@@ -39,7 +39,6 @@ fun NotificationMark(
     Box(modifier = modifier) {
         IconButton(
             onClick = onClick,
-            modifier = Modifier.size(28.dp)
         ) {
             content()
         }
@@ -47,7 +46,7 @@ fun NotificationMark(
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .offset(x = (-1).dp, y = 1.dp)
+                    .offset(x = (-12).dp, y = 12.dp)
                     .size(8.dp)
                     .clip(CircleShape)
                     .background(Theme.color.red)
