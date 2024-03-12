@@ -76,7 +76,8 @@ fun IconClick(
     icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    tint: Color = Theme.color.neutralGrey
+    tint: Color = Theme.color.neutralGrey,
+    contentDescription: String? = null
 ) {
     IconButton(
         onClick = onClick
@@ -84,13 +85,13 @@ fun IconClick(
         Icon(
             imageVector = icon,
             modifier = modifier,
-            contentDescription = "Icon Top Bar",
+            contentDescription = contentDescription,
             tint = tint
         )
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun SearchBarWithNotificationPreview() {
     var search by remember { mutableStateOf("") }
