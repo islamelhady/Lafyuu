@@ -32,7 +32,6 @@ fun RatingBar(
     rating: Float,
     modifier: Modifier = Modifier,
     iconSize: Dp = Theme.size.iconSmall,
-    compact: Boolean = false,
     maxStar: Int = 5
 ) {
     Row(modifier) {
@@ -42,13 +41,6 @@ fun RatingBar(
                 contentDescription = null,
                 modifier = Modifier.size(iconSize),
                 tint = if (index < rating.roundToInt()) Theme.color.yellow else Theme.color.neutralLight
-            )
-        }
-        if (!compact) {
-            Text(
-                text = " ${"%.1f".format(rating)}",
-                style = Theme.typography.largeCaptionRegular,
-                color = Theme.color.neutralGrey
             )
         }
     }
@@ -69,8 +61,7 @@ private fun RatingBarPreview() {
 
                 RatingBar(rating = 4.0f, iconSize = Theme.size.iconSmall)
                 RatingBar(rating = 4.0f, iconSize = Theme.size.iconMedium)
-                RatingBar(rating = 4.0f, iconSize = Theme.size.iconLarge, compact = true)
-
+                RatingBar(rating = 4.0f, iconSize = Theme.size.iconLarge)
             }
         }
     }
