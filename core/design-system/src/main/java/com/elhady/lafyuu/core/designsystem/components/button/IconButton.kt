@@ -19,7 +19,7 @@ fun IconButton(
     modifier: Modifier = Modifier,
     shape: Shape = Theme.corner.small,
     loading: (@Composable () -> Unit)? = null,
-){
+) {
     BaseButton(
         modifier = modifier.size(Theme.size.huge),
         onClick = onClick,
@@ -27,15 +27,15 @@ fun IconButton(
         loading = loading,
         hasBorder = true,
         borderColor = borderColor,
-        containerColor = Color.Transparent,
+        containerColor = Theme.color.backgroundWhite,
         contentColor = Theme.color.neutralGrey,
         shape = shape
     )
 }
 
-@Preview(name = "Icon Button")
+@Preview(name = "Icon Button", showBackground = true)
 @Composable
-private fun PreviewIconButton(){
+private fun PreviewIconButton() {
     LafyuuTheme() {
         IconButton(
             icon = Plus,
