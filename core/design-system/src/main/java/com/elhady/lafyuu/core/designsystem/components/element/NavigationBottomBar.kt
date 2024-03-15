@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -114,7 +115,12 @@ private fun RowScope.TabItem(
                 colorFilter = ColorFilter.tint(contentColor)
             )
             if (tab.badgeCount != null && tab.badgeCount > 0) {
-                NotificationMarkCount(tab.badgeCount)
+                NotificationMarkCount(
+                    badgeCount = tab.badgeCount,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = 9.dp, y = (-9).dp)
+                )
             }
         }
         if (isSelected) {

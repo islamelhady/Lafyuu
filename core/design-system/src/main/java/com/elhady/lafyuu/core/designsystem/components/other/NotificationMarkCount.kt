@@ -3,8 +3,6 @@ package com.elhady.lafyuu.core.designsystem.components.other
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -16,13 +14,12 @@ import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
-fun BoxScope.NotificationMarkCount(
-    badgeCount: Int
+fun NotificationMarkCount(
+    badgeCount: Int,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
-            .align(Alignment.TopEnd)
-            .offset(x = 9.dp, y = (-9).dp)
+        modifier = modifier
             .size(20.dp)
             .clip(CircleShape)
             .background(Theme.color.red)
