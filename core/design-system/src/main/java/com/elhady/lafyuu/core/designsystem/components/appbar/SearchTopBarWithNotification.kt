@@ -72,7 +72,7 @@ fun SearchTopBarWithNotification(
 }
 
 @Composable
-fun IconClick(
+internal fun IconClick(
     icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -80,11 +80,12 @@ fun IconClick(
     contentDescription: String? = null
 ) {
     IconButton(
-        onClick = onClick
+        onClick = onClick,
+        modifier = modifier
     ) {
         Icon(
             imageVector = icon,
-            modifier = modifier,
+            modifier = Modifier,
             contentDescription = contentDescription,
             tint = tint
         )

@@ -77,7 +77,7 @@ fun NavigationBottomBar(
                 shadow = Shadow(
                     radius = 12.dp,
                     offset = DpOffset(x = 0.dp, y = (-4).dp),
-                    color = Theme.color.blue.copy(alpha = 0.08f)
+                    color = Theme.color.blue.copy(alpha = 0.1f)
                 )
             )
             .background(color = Theme.color.backgroundWhite)
