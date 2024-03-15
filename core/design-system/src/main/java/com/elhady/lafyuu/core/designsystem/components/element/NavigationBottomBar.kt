@@ -3,25 +3,17 @@ package com.elhady.lafyuu.core.designsystem.components.element
 import Home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -37,9 +29,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import com.elhady.lafyuu.core.designsystem.components.other.NotificationMarkCount
 import com.elhady.lafyuu.core.designsystem.components.text.HintText
-import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
-import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.icons.Cart
 import com.elhady.lafyuu.core.designsystem.icons.Offer
 import com.elhady.lafyuu.core.designsystem.icons.Search
@@ -123,26 +114,7 @@ private fun RowScope.TabItem(
                 colorFilter = ColorFilter.tint(contentColor)
             )
             if (tab.badgeCount != null && tab.badgeCount > 0) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 9.dp, y = (-9).dp)
-                        .size(20.dp)
-                        .clip(CircleShape)
-                        .background(Theme.color.red)
-                        .border(
-                            width = 2.dp,
-                            color = Theme.color.backgroundWhite,
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    LafyuuText(
-                        text = tab.badgeCount.toString(),
-                        style = Theme.typography.normalTextBold,
-                        color = Theme.color.backgroundWhite
-                    )
-                }
+                NotificationMarkCount(tab.badgeCount)
             }
         }
         if (isSelected) {
