@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,6 +25,7 @@ fun ProductTopBar(
     onTrailingClick: () -> Unit,
     searchIcon: ImageVector? = null,
     onSearchClick: () -> Unit = {},
+    trailingIconTint: Color? = null,
     contentDescription: String? = null,
 ) {
     LafyuuTopBar(
@@ -44,11 +46,13 @@ fun ProductTopBar(
                         onClick = onSearchClick,
                     )
                 }
+
                 trailingIcon?.let {
                     IconClick(
                         icon = it,
                         onClick = onTrailingClick,
-                        contentDescription = contentDescription
+                        contentDescription = contentDescription,
+                        tint = trailingIconTint ?: Theme.color.neutralGrey
                     )
                 }
             }
@@ -87,6 +91,7 @@ fun ProductTopBarPreview() {
             onLeadingClick = {},
             leadingIcon = Left,
             trailingIcon = Plus,
+            trailingIconTint = Theme.color.blue,
             onTrailingClick = {},
             contentDescription = null,
         )
