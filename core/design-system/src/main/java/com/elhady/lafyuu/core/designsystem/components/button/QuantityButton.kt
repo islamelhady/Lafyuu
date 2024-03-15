@@ -25,10 +25,10 @@ import com.elhady.lafyuu.core.designsystem.icons.PlusMini
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
-fun LafyuuQuantityButton(
+fun QuantityButton(
     quantity: Int,
-    onDecrease: () -> Unit,
-    onIncrease: () -> Unit,
+    onDecrement: () -> Unit,
+    onIncrement: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -44,7 +44,7 @@ fun LafyuuQuantityButton(
     ) {
         QuantityButton(
             icon = MinusMini,
-            onClick = onDecrease,
+            onClick = onDecrement,
             modifier = Modifier
                 .width(Theme.size.medium)
                 .fillMaxHeight(),
@@ -66,7 +66,7 @@ fun LafyuuQuantityButton(
         }
         QuantityButton(
             icon = PlusMini,
-            onClick = onIncrease,
+            onClick = onIncrement,
             modifier = Modifier
                 .width(Theme.size.medium)
                 .fillMaxHeight()
@@ -91,14 +91,14 @@ private fun QuantityButton(
 
 @Preview(showBackground = true)
 @Composable
-fun LafyuuQuantityButtonPreview() {
-    var num: Int by remember { mutableIntStateOf(0) }
-    LafyuuQuantityButton(
+fun QuantityButtonPreview() {
+    var num: Int by remember { mutableIntStateOf(1) }
+    QuantityButton(
         quantity = num,
-        onDecrease = {
+        onDecrement = {
             num--
         },
-        onIncrease = {
+        onIncrement = {
             num++
         },
     )
