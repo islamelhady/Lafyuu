@@ -1,11 +1,9 @@
 package com.elhady.lafyuu.core.designsystem.components.textfield
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -58,7 +56,7 @@ internal fun BaseTextField(
             leadingIcon = leadingContent,
             trailingIcon = trailingContent,
             minLines = minLines,
-            singleLine = true,
+            singleLine = minLines == 1,
             readOnly = readOnly,
             isError = state == LafyuuFieldState.Error,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
@@ -68,16 +66,12 @@ internal fun BaseTextField(
                 focusedBorderColor = Theme.color.blue,
                 unfocusedBorderColor = unfocusedBorderColor,
                 errorBorderColor = Theme.color.error,
-
-                ),
+                cursorColor = Theme.color.blue,
+                errorCursorColor = Theme.color.error
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(textAreaSize)
-                .border(
-                    width = Theme.size.border,
-                    color = unfocusedBorderColor,
-                    shape = Theme.corner.small
-                )
         )
         if (state == LafyuuFieldState.Error && errorMessage != null) {
             Spacer(Modifier.height(Theme.space.extraExtraSmall))
