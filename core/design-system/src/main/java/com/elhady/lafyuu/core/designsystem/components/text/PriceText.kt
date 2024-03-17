@@ -19,18 +19,17 @@ fun PriceText(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
+        LafyuuText(
             text = price,
             style = Theme.typography.mediumTextBold,
             color = Theme.color.blue
         )
 
         oldPrice?.let {
-            Text(
+            LafyuuText(
                 text = it,
-                style = Theme.typography.normalTextRegular,
+                style = Theme.typography.normalTextRegular.copy(textDecoration = TextDecoration.LineThrough),
                 color = Theme.color.neutralGrey,
-                textDecoration = TextDecoration.LineThrough
             )
         }
     }

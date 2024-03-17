@@ -88,13 +88,13 @@ private fun ScreenSkeletonPreview() {
             },
             content = {},
             toast = {
-                ToastMessage(
-                    status = ToastStatus.SUCCESS,
-                    isVisible = false,
-                    title = "Success",
-                    description = "Book Added to favourites",
-                    onClickClose = {}
-                )
+//                ToastMessage(
+//                    status = ToastStatus.SUCCESS,
+//                    isVisible = false,
+//                    title = "Success",
+//                    description = "Book Added to favourites",
+//                    onClickClose = {}
+//                )
             }
         )
     }
