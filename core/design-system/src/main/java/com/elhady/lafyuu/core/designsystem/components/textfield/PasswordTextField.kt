@@ -53,7 +53,6 @@ fun PasswordTextField(
                 Icon(
                     imageVector = if (isVisible) Invisibility else Visibility,
                     contentDescription = if (isVisible) "Hide password" else "Show password",
-                    tint = Theme.color.neutralGrey
                 )
             }
         },

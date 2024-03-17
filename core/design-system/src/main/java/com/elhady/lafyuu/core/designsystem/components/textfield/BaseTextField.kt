@@ -67,7 +67,10 @@ internal fun BaseTextField(
                 unfocusedBorderColor = unfocusedBorderColor,
                 errorBorderColor = Theme.color.error,
                 cursorColor = Theme.color.blue,
-                errorCursorColor = Theme.color.error
+                errorCursorColor = Theme.color.error,
+                focusedLeadingIconColor = Theme.color.blue,
+                unfocusedLeadingIconColor = Theme.color.neutralGrey,
+                errorLeadingIconColor = Theme.color.error
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -95,7 +98,6 @@ internal fun BaseTextField(
     leadingIcon: ImageVector? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    tint: Color = Theme.color.neutralGrey,
     trailingContent: @Composable (() -> Unit)? = null
 ) {
     BaseTextField(
@@ -110,7 +112,6 @@ internal fun BaseTextField(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = tint
                 )
             }
         },

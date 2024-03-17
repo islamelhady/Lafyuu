@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,8 +55,7 @@ fun PhoneNumberTextField(
             ) {
                 Icon(
                     imageVector = Phone,
-                    contentDescription = null,
-                    tint = Theme.color.neutralGrey
+                    contentDescription = null
                 )
                 countryCode?.let {
                     LafyuuText(
@@ -85,7 +87,6 @@ private fun PhoneNumberPreview() {
                 PhoneNumberTextField(
                     value = phone,
                     onValueChange = { phone = it },
-                    state = LafyuuFieldState.Default
                 )
                 var phoneFilled by remember { mutableStateOf("1141148538") }
                 PhoneNumberTextField(

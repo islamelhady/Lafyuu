@@ -3,6 +3,7 @@ package com.elhady.lafyuu.core.designsystem.components.search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,8 +33,13 @@ fun SearchBar(
         modifier = modifier.padding(
             vertical = Theme.space.medium
         ),
-        tint = Theme.color.blue,
-        leadingIcon = Search,
+        leadingContent = {
+            Icon(
+                imageVector = Search,
+                contentDescription = null,
+                tint = Theme.color.blue
+            )
+        },
         trailingContent = {
             if (value.isNotEmpty()) {
                 IconClick(
