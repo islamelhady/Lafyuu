@@ -11,7 +11,9 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
@@ -35,7 +37,8 @@ internal fun BaseTextField(
     leadingContent: @Composable (() -> Unit)? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    trailingContent: @Composable (() -> Unit)? = null
+    trailingContent: @Composable (() -> Unit)? = null,
+    shape: Shape = Theme.corner.small,
 ) {
     val unfocusedBorderColor = when (state) {
         LafyuuFieldState.Default -> Theme.color.neutralLight
@@ -61,7 +64,7 @@ internal fun BaseTextField(
             isError = state == LafyuuFieldState.Error,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             visualTransformation = visualTransformation,
-            shape = Theme.corner.small,
+            shape = shape,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Theme.color.blue,
                 unfocusedBorderColor = unfocusedBorderColor,
@@ -74,7 +77,8 @@ internal fun BaseTextField(
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(textAreaSize)
+                .height(textAreaSize),
+            textStyle = Theme.typography.normalTextBold.copy(color = Theme.color.neutralGrey)
         )
         if (state == LafyuuFieldState.Error && errorMessage != null) {
             Spacer(Modifier.height(Theme.space.extraExtraSmall))
