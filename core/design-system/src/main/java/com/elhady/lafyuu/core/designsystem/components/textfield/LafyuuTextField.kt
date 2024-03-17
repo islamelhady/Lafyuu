@@ -10,10 +10,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
@@ -24,7 +22,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 enum class LafyuuFieldState { Default, Active, Error }
 
 @Composable
-internal fun BaseTextField(
+internal fun LafyuuTextField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
@@ -92,7 +90,7 @@ internal fun BaseTextField(
 }
 
 @Composable
-internal fun BaseTextField(
+internal fun LafyuuTextField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
@@ -104,7 +102,7 @@ internal fun BaseTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingContent: @Composable (() -> Unit)? = null
 ) {
-    BaseTextField(
+    LafyuuTextField(
         value = value,
         onValueChange = onValueChange,
         placeholder = placeholder,

@@ -28,7 +28,7 @@ fun EmailTextField(
     state: LafyuuFieldState = LafyuuFieldState.Default,
     errorMessage: String? = "Oops! Your Email Is Not Correct"
 ) {
-    BaseTextField(
+    LafyuuTextField(
         value = value,
         onValueChange = onValueChange,
         placeholder = placeholder,

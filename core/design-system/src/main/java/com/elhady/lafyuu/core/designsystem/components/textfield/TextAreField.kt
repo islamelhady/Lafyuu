@@ -30,7 +30,7 @@ fun TextAreaField(
     textAreaSize: Dp = 160.dp,
     errorMessage: String? = null,
 ) {
-    BaseTextField(
+    LafyuuTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier

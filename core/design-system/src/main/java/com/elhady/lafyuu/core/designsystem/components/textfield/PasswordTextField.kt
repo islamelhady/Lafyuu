@@ -8,7 +8,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +24,6 @@ import com.elhady.lafyuu.core.designsystem.icons.Invisibility
 import com.elhady.lafyuu.core.designsystem.icons.Password
 import com.elhady.lafyuu.core.designsystem.icons.Visibility
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
-import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 
 @Composable
@@ -39,7 +37,7 @@ fun PasswordTextField(
 ) {
     var isVisible by remember { mutableStateOf(false) }
 
-    BaseTextField(
+    LafyuuTextField(
         value = value,
         onValueChange = onValueChange,
         placeholder = placeholder,

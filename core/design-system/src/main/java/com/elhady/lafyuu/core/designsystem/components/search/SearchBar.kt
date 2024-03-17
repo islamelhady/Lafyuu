@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.elhady.lafyuu.core.designsystem.components.appbar.IconClick
-import com.elhady.lafyuu.core.designsystem.components.textfield.BaseTextField
+import com.elhady.lafyuu.core.designsystem.components.textfield.LafyuuTextField
 import com.elhady.lafyuu.core.designsystem.icons.Search
 import com.elhady.lafyuu.core.designsystem.icons.X
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
@@ -26,7 +26,7 @@ fun SearchBar(
     modifier: Modifier = Modifier,
     placeholder: String = "Search Product"
 ) {
-    BaseTextField(
+    LafyuuTextField(
         value = value,
         onValueChange = onValueChange,
         placeholder = placeholder,

@@ -37,7 +37,7 @@ fun SelectField(
         onExpandedChange = { expanded = it },
         modifier = modifier
     ) {
-        BaseTextField(
+        LafyuuTextField(
             value = selectedOption.ifEmpty { label },
             onValueChange = {},
             placeholder = label,

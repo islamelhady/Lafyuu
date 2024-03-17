@@ -27,7 +27,7 @@ fun DefaultTextField(
     state: LafyuuFieldState = LafyuuFieldState.Default,
     errorMessage: String? = null
 ) {
-    BaseTextField(
+    LafyuuTextField(
         value = value,
         onValueChange = onValueChange,
         placeholder = placeholder,

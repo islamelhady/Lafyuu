@@ -31,7 +31,7 @@ fun DateTextField(
     modifier: Modifier = Modifier,
     placeholder: String = "24/09/2020"
 ) {
-    BaseTextField(
+    LafyuuTextField(
         value = value,
         onValueChange = {},
         readOnly = true,
