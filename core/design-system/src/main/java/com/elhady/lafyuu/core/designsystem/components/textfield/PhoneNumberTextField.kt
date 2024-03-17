@@ -2,6 +2,7 @@ package com.elhady.lafyuu.core.designsystem.components.textfield
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -12,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,29 +28,40 @@ fun PhoneNumberTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    countryCode: String? = null,
+    countryCode: String? = "+20",
     placeholder: String = "Phone Number",
     state: LafyuuFieldState = LafyuuFieldState.Default,
     errorMessage: String? = null
 ) {
     BaseTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { input ->
+            val digitsOnly = input.filter { it.isDigit() }.take(10)
+            onValueChange(digitsOnly)
+        },
         placeholder = placeholder,
         state = state,
         errorMessage = errorMessage,
         keyboardType = KeyboardType.Phone,
+        visualTransformation = PhoneNumberVisualTransformation(),
         leadingContent = {
-            Icon(
-                imageVector = Phone,
-                contentDescription = null,
-                tint = Theme.color.neutralGrey
-            )
-            countryCode?.let {
-                LafyuuText(
-                    countryCode,
-                    style = Theme.typography.mediumTextRegular
+            Row(
+                modifier = Modifier.padding(start = Theme.space.medium),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Phone,
+                    contentDescription = null,
+                    tint = Theme.color.neutralGrey
                 )
+                countryCode?.let {
+                    LafyuuText(
+                        countryCode,
+                        style = Theme.typography.mediumTextRegular,
+                        color = Theme.color.neutralGrey
+                    )
+                }
             }
         },
         modifier = modifier
@@ -74,7 +87,7 @@ private fun PhoneNumberPreview() {
                     onValueChange = { phone = it },
                     state = LafyuuFieldState.Default
                 )
-                var phoneFilled by remember { mutableStateOf("0 114 114 8538") }
+                var phoneFilled by remember { mutableStateOf("1141148538") }
                 PhoneNumberTextField(
                     value = phoneFilled,
                     onValueChange = { phoneFilled = it },
