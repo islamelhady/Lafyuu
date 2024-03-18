@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -23,12 +22,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
+import com.elhady.lafyuu.core.designsystem.components.element.OrDivider
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
@@ -75,14 +76,13 @@ internal fun LoginScreen(
     onNavigateToForgotPassword: () -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { innerPadding ->
+    LafyuuScaffold(
+        toast = { SnackbarHost(snackbarHostState) }
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(24.dp)
+                .padding(Theme.space.extraLarge)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -90,17 +90,17 @@ internal fun LoginScreen(
             Image(
                 painter = painterResource(R.drawable.logo),
                 contentDescription = "Logo",
-                modifier = Modifier.padding(bottom = 32.dp)
+                modifier = Modifier.padding(bottom = Theme.space.huge)
             )
             LafyuuText(
-                text = "Welcome Back",
+                text = "Welcome to Lafyuu",
                 style = Theme.typography.heading4,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = Theme.space.small)
             )
             LafyuuText(
-                text = "Login to your account",
+                text = "Sign in to continue",
                 style = Theme.typography.normalTextRegular,
-                modifier = Modifier.padding(bottom = 32.dp)
+                modifier = Modifier.padding(bottom = Theme.space.huge)
             )
 
             EmailTextField(
@@ -109,7 +109,7 @@ internal fun LoginScreen(
                 placeholder = "Email",
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Theme.space.large))
             PasswordTextField(
                 value = uiState.password,
                 onValueChange = { onEvent(LoginUiEvent.PasswordChanged(it)) },
@@ -121,12 +121,12 @@ internal fun LoginScreen(
                 LafyuuText(
                     text = "Forgot Password?",
                     modifier = Modifier
-                        .padding(top = 16.dp)
+                        .padding(top = Theme.space.large)
                         .clickable { onNavigateToForgotPassword() }
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(Theme.space.extraLarge))
 
             DefaultButton(
                 caption = "Login",
@@ -134,7 +134,9 @@ internal fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Theme.space.large))
+
+            OrDivider()
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -142,11 +144,14 @@ internal fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 LafyuuText(
-                    text = "Don't have an account?"
+                    text = "Don't have an account? "
                 )
                 LafyuuText(
                     text = "Register",
-                    modifier = Modifier.clickable { onNavigateToRegister() }
+                    modifier = Modifier.clickable { onNavigateToRegister() },
+                    style = Theme.typography.normalTextBold.copy(
+                        textDecoration = TextDecoration.Underline
+                    )
                 )
             }
         }
