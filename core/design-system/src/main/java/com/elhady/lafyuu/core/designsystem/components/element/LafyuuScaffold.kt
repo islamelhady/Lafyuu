@@ -23,7 +23,7 @@ import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
-fun ScreenSkeleton(
+fun LafyuuScaffold(
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     toast: @Composable () -> Unit = {},
@@ -60,14 +60,14 @@ fun ScreenSkeleton(
 
 @Preview
 @Composable
-private fun ScreenSkeletonPreview() {
+private fun LafyuuScaffoldPreview() {
     val tabs: List<TabBarItem> by remember {
         mutableStateOf(
             defaultTabBarItems
         )
     }
     LafyuuTheme() {
-        ScreenSkeleton(
+        LafyuuScaffold(
             topBar = {
                 ProductTopBar(
                     title = "Nike Air Max 270 Rea",
