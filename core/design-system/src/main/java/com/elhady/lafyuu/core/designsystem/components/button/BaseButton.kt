@@ -87,7 +87,7 @@ internal fun BaseButton(
             )
         }
         if (hasContentSpacing) {
-            Spacer(Modifier.width(Theme.space.extraSmall))
+            Spacer(Modifier.width(Theme.space.small))
         }
         if (isLoading) {
             loading?.invoke()

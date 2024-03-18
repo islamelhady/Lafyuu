@@ -16,7 +16,7 @@ fun LabelButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     containerColor: Color = Color.Transparent,
-    borderColor: Color = Theme.color.neutralGrey,
+    borderColor: Color = Theme.color.neutralLight,
     isLoading: Boolean = false,
     hasBorder: Boolean = false,
     contentColor: Color = Theme.color.blue,

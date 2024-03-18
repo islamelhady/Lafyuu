@@ -16,6 +16,9 @@ fun TextIconButton(
     onClick: () -> Unit,
     isLoading: Boolean = false,
     loading: (@Composable () -> Unit)? = null,
+    containerColor: Color = Color.Transparent,
+    contentColor: Color = Theme.color.neutralGrey,
+    hasBorder: Boolean = true,
 ) {
     BaseButton(
         modifier = modifier,
@@ -25,11 +28,11 @@ fun TextIconButton(
         iconTint = null,
         loading = loading,
         isLoading = isLoading,
-        hasBorder = true,
-        containerColor = Color.Transparent,
+        hasBorder = hasBorder,
+        containerColor = containerColor,
         disableContainerColor = Color.Transparent,
-        contentColor = Theme.color.neutralGrey,
-        disableContentColor = Theme.color.neutralGrey
+        contentColor = contentColor,
+        disableContentColor = Theme.color.neutralGrey,
     )
 }
 
