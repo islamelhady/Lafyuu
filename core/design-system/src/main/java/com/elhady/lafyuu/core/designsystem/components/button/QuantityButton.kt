@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -20,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.icons.MinusMini
 import com.elhady.lafyuu.core.designsystem.icons.PlusMini
 import com.elhady.lafyuu.core.designsystem.theme.Theme
@@ -46,7 +46,7 @@ fun QuantityButton(
             icon = MinusMini,
             onClick = onDecrement,
             modifier = Modifier
-                .width(Theme.size.medium)
+                .weight(1f)
                 .fillMaxHeight(),
         )
         Box(
@@ -58,7 +58,7 @@ fun QuantityButton(
                 ),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
+            LafyuuText(
                 text = quantity.toString(),
                 style = Theme.typography.largeCaptionRegular,
                 color = Theme.color.neutralGrey,
@@ -68,7 +68,7 @@ fun QuantityButton(
             icon = PlusMini,
             onClick = onIncrement,
             modifier = Modifier
-                .width(Theme.size.medium)
+                .weight(1f)
                 .fillMaxHeight()
         )
     }
@@ -85,6 +85,7 @@ private fun QuantityButton(
         modifier = modifier,
         borderColor = Color.Transparent,
         icon = icon,
+        iconSize = Theme.size.iconSmall,
         shape = Theme.corner.none
     )
 }
@@ -96,7 +97,9 @@ fun QuantityButtonPreview() {
     QuantityButton(
         quantity = num,
         onDecrement = {
-            num--
+            if (num > 0) {
+                num--
+            }
         },
         onIncrement = {
             num++

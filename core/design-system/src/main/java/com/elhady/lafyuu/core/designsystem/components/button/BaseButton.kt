@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
@@ -22,8 +23,11 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
+import com.elhady.lafyuu.core.designsystem.lafyuu.Size
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
@@ -31,11 +35,13 @@ internal fun BaseButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     icon: ImageVector? = null,
+    iconSize: Dp = Theme.size.iconMedium,
     loading: (@Composable () -> Unit)? = null,
     caption: String? = null,
     isLoading: Boolean = false,
     isEnabled: Boolean = true,
     hasBorder: Boolean = false,
+    paddingHorizontal: Dp = Theme.space.large,
     style: TextStyle = Theme.typography.mediumTextBold,
     borderColor: Color = Theme.color.neutralLight,
     containerColor: Color = Theme.color.blue,
@@ -77,7 +83,7 @@ internal fun BaseButton(
             .clickable(isClickable) {
                 onClick()
             }
-            .padding(horizontal = Theme.space.medium),
+            .padding(horizontal = paddingHorizontal),
 
         horizontalArrangement = Arrangement.Center
     ) {
@@ -85,6 +91,7 @@ internal fun BaseButton(
             Image(
                 imageVector = it,
                 contentDescription = "button icon",
+                modifier = Modifier.size(iconSize),
                 colorFilter = finalIconTint?.let { tint -> ColorFilter.tint(tint) }
             )
         }
@@ -95,9 +102,10 @@ internal fun BaseButton(
             loading?.invoke()
         } else {
             caption?.let {
-                BasicText(
+                LafyuuText(
                     text = it,
-                    style = style.copy(color = textAndIconColor),
+                    style = style,
+                    color = textAndIconColor
                 )
             }
         }

@@ -26,9 +26,10 @@ fun LafyuuText(
     Text(
         text = text,
         modifier = modifier,
-        style = style.copy(color = color),
+        style = style,
         onTextLayout = onTextLayout,
         softWrap = softWrap,
+        color = color,
         maxLines = maxLines,
         minLines = minLines,
         overflow = overflow,
