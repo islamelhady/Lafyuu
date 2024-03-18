@@ -45,6 +45,7 @@ fun FilterReviewBar(
                     onClick = { onFilterSelected(stars) },
                     containerColor = if (isSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
                     contentColor = if (isSelected) Theme.color.blue else Theme.color.neutralGrey,
+                    style = if (isSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
                     hasBorder = true,
                 )
             } else {
@@ -54,6 +55,7 @@ fun FilterReviewBar(
                     onClick = { onFilterSelected(stars) },
                     containerColor = if (isSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
                     contentColor = if (isSelected) Theme.color.blue else Theme.color.neutralGrey,
+                    style = if (isSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
                     hasBorder = true,
                 )
             }

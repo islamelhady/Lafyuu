@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
@@ -22,6 +23,7 @@ fun LabelButton(
     contentColor: Color = Theme.color.blue,
     loading: (@Composable () -> Unit)? = null,
     isEnabled: Boolean = true,
+    style: TextStyle = Theme.typography.normalCaptionRegular
 ) {
     BaseButton(
         modifier = modifier,
@@ -34,6 +36,7 @@ fun LabelButton(
         borderColor = borderColor,
         containerColor = containerColor,
         contentColor = contentColor,
+        style = style
     )
 }
 

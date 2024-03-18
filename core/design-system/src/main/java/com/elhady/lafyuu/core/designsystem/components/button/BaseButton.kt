@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.elhady.lafyuu.core.designsystem.theme.Theme
@@ -35,6 +36,7 @@ internal fun BaseButton(
     isLoading: Boolean = false,
     isEnabled: Boolean = true,
     hasBorder: Boolean = false,
+    style: TextStyle = Theme.typography.mediumTextBold,
     borderColor: Color = Theme.color.neutralLight,
     containerColor: Color = Theme.color.blue,
     disableContainerColor: Color = Theme.color.backgroundWhite,
@@ -95,7 +97,7 @@ internal fun BaseButton(
             caption?.let {
                 BasicText(
                     text = it,
-                    style = Theme.typography.mediumTextBold.copy(color = textAndIconColor),
+                    style = style.copy(color = textAndIconColor),
                 )
             }
         }

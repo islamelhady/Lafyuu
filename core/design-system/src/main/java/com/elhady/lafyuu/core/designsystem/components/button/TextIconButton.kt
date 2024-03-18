@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
@@ -19,6 +20,7 @@ fun TextIconButton(
     containerColor: Color = Color.Transparent,
     contentColor: Color = Theme.color.neutralGrey,
     hasBorder: Boolean = true,
+    style: TextStyle = Theme.typography.normalCaptionRegular
 ) {
     BaseButton(
         modifier = modifier,
@@ -33,6 +35,7 @@ fun TextIconButton(
         disableContainerColor = Color.Transparent,
         contentColor = contentColor,
         disableContentColor = Theme.color.neutralGrey,
+        style = style
     )
 }
 
