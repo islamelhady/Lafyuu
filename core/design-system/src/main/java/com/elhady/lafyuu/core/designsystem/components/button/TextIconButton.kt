@@ -22,7 +22,7 @@ fun TextIconButton(
     hasBorder: Boolean = true,
     style: TextStyle = Theme.typography.normalCaptionRegular
 ) {
-    BaseButton(
+    LafyuuButton(
         modifier = modifier,
         onClick = onClick,
         caption = caption,

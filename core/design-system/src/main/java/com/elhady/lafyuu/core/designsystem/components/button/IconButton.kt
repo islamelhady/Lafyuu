@@ -23,7 +23,7 @@ fun IconButton(
     shape: Shape = Theme.corner.small,
     loading: (@Composable () -> Unit)? = null,
 ) {
-    BaseButton(
+    LafyuuButton(
         modifier = modifier.size(Theme.size.huge),
         onClick = onClick,
         icon = icon,

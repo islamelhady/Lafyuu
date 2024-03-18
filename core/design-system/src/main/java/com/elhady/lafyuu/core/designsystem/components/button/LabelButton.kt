@@ -25,7 +25,7 @@ fun LabelButton(
     isEnabled: Boolean = true,
     style: TextStyle = Theme.typography.normalCaptionRegular
 ) {
-    BaseButton(
+    LafyuuButton(
         modifier = modifier,
         onClick = onClick,
         loading = loading,

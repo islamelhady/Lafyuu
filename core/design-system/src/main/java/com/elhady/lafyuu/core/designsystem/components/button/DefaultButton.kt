@@ -14,7 +14,7 @@ fun DefaultButton(
     isLoading: Boolean = false,
     isEnabled: Boolean = true,
 ){
-    BaseButton(
+    LafyuuButton(
         modifier = modifier,
         onClick = onClick,
         caption = caption,
