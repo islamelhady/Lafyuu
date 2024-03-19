@@ -18,16 +18,12 @@ import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
-data class ShippingCardData(
-    val dateShipping: String,
-    val shippingMethod: String,
-    val trackingNumber: String,
-    val address: String
-)
-
 @Composable
 fun ShippingCard(
-    shipping: ShippingCardData,
+    dateShipping: String,
+    shippingMethod: String,
+    trackingNumber: String,
+    address: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -43,13 +39,13 @@ fun ShippingCard(
         verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
     ) {
         InfoRow(
-            label = "Date Shipping", shipping.dateShipping
+            label = "Date Shipping", dateShipping
         )
         InfoRow(
-            label = "Shipping", shipping.shippingMethod
+            label = "Shipping", shippingMethod
         )
         InfoRow(
-            label = "No. Resi", shipping.trackingNumber
+            label = "No. Resi", trackingNumber
         )
         LafyuuText(
             text = "Address",
@@ -57,7 +53,7 @@ fun ShippingCard(
             color = Theme.color.neutralGrey,
         )
         LafyuuText(
-            text = shipping.address,
+            text = address,
             style = Theme.typography.normalTextRegular,
             color = Theme.color.neutralDark,
         )
@@ -80,12 +76,10 @@ private fun AllCardAndListComponentsPreview() {
 
                 SectionTitle("Shipping")
                 ShippingCard(
-                    shipping = ShippingCardData(
-                        dateShipping = "January 16, 2015",
-                        shippingMethod = "POS Reggular",
-                        trackingNumber = "000192848573",
-                        address = "2727 Lakeshore Rd undefined Nampa, Tennessee 78410"
-                    )
+                    dateShipping = "January 16, 2015",
+                    shippingMethod = "POS Reggular",
+                    trackingNumber = "000192848573",
+                    address = "2727 Lakeshore Rd undefined Nampa, Tennessee 78410"
                 )
             }
         }

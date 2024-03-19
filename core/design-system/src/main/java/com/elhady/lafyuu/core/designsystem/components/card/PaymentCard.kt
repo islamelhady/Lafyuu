@@ -9,11 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,7 +29,7 @@ data class PaymentCardData(
 )
 
 @Composable
-fun PaymentCardWidget(
+fun PaymentCard(
     card: PaymentCardData,
     modifier: Modifier = Modifier
 ) {
@@ -89,26 +86,23 @@ fun PaymentCardWidget(
 
 @Preview(showBackground = true, widthDp = 380, heightDp = 400)
 @Composable
-private fun AllCardAndListComponentsPreview() {
+private fun PaymentCardPreview() {
     LafyuuTheme {
-        Surface {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
 
-                SectionTitle("Payment Card")
-                PaymentCardWidget(
-                    card = PaymentCardData(
-                        cardNumberGroups = listOf("6326", "9124", "8124", "9875"),
-                        holderName = "Islam Elhady",
-                        expiryDate = "15/2030"
-                    )
+            SectionTitle("Payment Card")
+            PaymentCard(
+                card = PaymentCardData(
+                    cardNumberGroups = listOf("6326", "9124", "8124", "9875"),
+                    holderName = "Islam Elhady",
+                    expiryDate = "15/2030"
                 )
-
-            }
+            )
         }
     }
 }

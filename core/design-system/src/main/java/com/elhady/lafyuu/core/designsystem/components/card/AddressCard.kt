@@ -4,9 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -30,15 +28,11 @@ import com.elhady.lafyuu.core.designsystem.icons.Trash
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
-data class AddressCardData(
-    val name: String,
-    val address: String,
-    val phone: String
-)
-
 @Composable
 fun AddressCard(
-    address: AddressCardData,
+    name: String,
+    address: String,
+    phone: String,
     onEditClick: () -> Unit,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false
@@ -56,17 +50,17 @@ fun AddressCard(
         verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
     ) {
         LafyuuText(
-            text = address.name,
+            text = name,
             color = Theme.color.neutralDark,
             style = Theme.typography.heading5
         )
         LafyuuText(
-            text = address.address,
+            text = address,
             style = Theme.typography.normalTextRegular,
             color = Theme.color.neutralGrey
         )
         LafyuuText(
-            text = address.phone,
+            text = phone,
             style = Theme.typography.normalTextRegular,
             color = Theme.color.neutralGrey
         )
@@ -107,11 +101,9 @@ private fun AllCardAndListComponentsPreview() {
 
                 SectionTitle("Address Card")
                 AddressCard(
-                    address = AddressCardData(
-                        name = "Islam Elhady",
-                        address = "3711 Spring Hill Rd undefined Tallahassee, Nevada 52874 United States",
-                        phone = "+99 1234567890",
-                    ),
+                    name = "Islam Elhady",
+                    address = "3711 Spring Hill Rd undefined Tallahassee, Nevada 52874 United States",
+                    phone = "+20 114 114 8538",
                     onEditClick = {
                         selected = !selected
                     },

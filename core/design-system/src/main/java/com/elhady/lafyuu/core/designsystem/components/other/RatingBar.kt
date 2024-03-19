@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,15 +56,17 @@ fun RatingBar(
 @Composable
 private fun RatingBarPreview() {
     LafyuuTheme {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            SectionTitle("Rating")
+        Surface() {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                SectionTitle("Rating")
 
-            RatingBar(rating = 4.0f, iconSize = Theme.size.iconSmall)
-            RatingBar(rating = 4.0f, iconSize = Theme.size.iconMedium)
-            RatingBar(rating = 4.0f, iconSize = Theme.size.iconLarge, showRatingText = true)
+                RatingBar(rating = 4.0f, iconSize = Theme.size.iconSmall)
+                RatingBar(rating = 4.0f, iconSize = Theme.size.iconMedium)
+                RatingBar(rating = 4.0f, iconSize = Theme.size.iconLarge, showRatingText = true)
+            }
         }
     }
 }

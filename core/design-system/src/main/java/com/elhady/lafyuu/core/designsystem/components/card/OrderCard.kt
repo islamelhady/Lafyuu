@@ -23,17 +23,13 @@ import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
-data class OrderCardData(
-    val orderCode: String,
-    val orderedAtLabel: String,
-    val status: String,
-    val itemsCount: Int,
-    val price: String
-)
-
 @Composable
 fun OrderCard(
-    order: OrderCardData,
+    orderCode: String,
+    orderedAtLabel: String,
+    status: String,
+    itemsCount: Int,
+    price: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -44,12 +40,12 @@ fun OrderCard(
         verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
     ) {
         LafyuuText(
-            text = order.orderCode,
+            text = orderCode,
             style = Theme.typography.heading5,
             color = Theme.color.neutralDark,
         )
         LafyuuText(
-            text = order.orderedAtLabel,
+            text = orderedAtLabel,
             style = Theme.typography.normalTextRegular,
             color = Theme.color.neutralGrey,
         )
@@ -57,15 +53,15 @@ fun OrderCard(
 
         InfoRow(
             label = "Order Status",
-            value = order.status
+            value = status
         )
         InfoRow(
             label = "Items",
-            value = "${order.itemsCount} Items purchased"
+            value = "${itemsCount} Items purchased"
         )
         InfoRow(
             label = "Price",
-            value = order.price
+            value = price
         )
     }
 }
@@ -116,13 +112,11 @@ private fun AllCardAndListComponentsPreview() {
 
                 SectionTitle("Order")
                 OrderCard(
-                    order = OrderCardData(
-                        orderCode = "LQNSU346JK",
-                        orderedAtLabel = "Order at Lafyuu : August 1, 2017",
-                        status = "Shipping",
-                        itemsCount = 2,
-                        price = "$299,43"
-                    )
+                    orderCode = "LQNSU346JK",
+                    orderedAtLabel = "Order at Lafyuu : August 1, 2017",
+                    status = "Shipping",
+                    itemsCount = 2,
+                    price = "$299,43"
                 )
             }
         }
