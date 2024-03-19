@@ -38,10 +38,7 @@ fun SectionTitle(
                 text = actionText,
                 style = Theme.typography.largeLinkRegular,
                 color = Theme.color.blue,
-                modifier = Modifier.clickable(
-                    onClick = onActionClick,
-                    role = Role.Button
-                )
+                onClick = onActionClick
             )
         }
     }

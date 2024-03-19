@@ -1,9 +1,11 @@
 package com.elhady.lafyuu.core.designsystem.components.text
 
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -14,6 +16,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 fun LafyuuText(
     text: String,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     style: TextStyle = Theme.typography.mediumTextRegular,
     softWrap: Boolean = true,
     onTextLayout: ((TextLayoutResult) -> Unit)? = null,
@@ -25,7 +28,11 @@ fun LafyuuText(
 ) {
     Text(
         text = text,
-        modifier = modifier,
+        modifier = if (onClick != null) {
+            modifier.clickable(role = Role.Button, onClick = onClick)
+        } else {
+            modifier
+        },
         style = style,
         onTextLayout = onTextLayout,
         softWrap = softWrap,
