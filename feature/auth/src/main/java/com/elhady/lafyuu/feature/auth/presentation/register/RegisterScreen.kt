@@ -1,5 +1,9 @@
 package com.elhady.lafyuu.feature.auth.presentation.register
 
+//import com.elhady.lafyuu.core.designsystem.component.button.LafyuuButton
+//import com.elhady.lafyuu.core.designsystem.component.button.LafyuuTextButton
+//import com.elhady.lafyuu.core.designsystem.component.input.LafyuuPasswordField
+//import com.elhady.lafyuu.core.designsystem.component.input.LafyuuTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,10 +30,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.elhady.lafyuu.core.designsystem.component.button.LafyuuButton
-import com.elhady.lafyuu.core.designsystem.component.button.LafyuuTextButton
-import com.elhady.lafyuu.core.designsystem.component.input.LafyuuPasswordField
-import com.elhady.lafyuu.core.designsystem.component.input.LafyuuTextField
+import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
+import com.elhady.lafyuu.core.designsystem.components.textfield.DefaultTextField
+import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -92,41 +96,41 @@ internal fun RegisterScreen(
             )
 
             Row(modifier = Modifier.fillMaxWidth()) {
-                LafyuuTextField(
+                DefaultTextField(
                     value = uiState.firstName,
                     onValueChange = { onEvent(RegisterUiEvent.FirstNameChanged(it)) },
-                    label = "First Name",
+                    placeholder = "First Name",
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                LafyuuTextField(
+                DefaultTextField(
                     value = uiState.lastName,
                     onValueChange = { onEvent(RegisterUiEvent.LastNameChanged(it)) },
-                    label = "Last Name",
+                    placeholder = "Last Name",
                     modifier = Modifier.weight(1f)
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            LafyuuTextField(
+            DefaultTextField(
                 value = uiState.email,
                 onValueChange = { onEvent(RegisterUiEvent.EmailChanged(it)) },
-                label = "Email",
+                placeholder = "Email",
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
-            LafyuuPasswordField(
+            PasswordTextField(
                 value = uiState.password,
                 onValueChange = { onEvent(RegisterUiEvent.PasswordChanged(it)) },
-                label = "Password",
+                placeholder = "Password",
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            LafyuuButton(
-                text = "Register",
+            DefaultButton(
+                caption = "Register",
                 onClick = { onEvent(RegisterUiEvent.RegisterClicked) },
-                loading = uiState.isLoading,
+                isLoading = uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -138,8 +142,8 @@ internal fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Already have an account?")
-                LafyuuTextButton(
-                    text = "Login",
+                LafyuuText(
+                    text = "Sign in",
                     onClick = onNavigateToLogin
                 )
             }
@@ -149,7 +153,7 @@ internal fun RegisterScreen(
 
 @Preview
 @Composable
-fun RegisterScreenPreview(){
+fun RegisterScreenPreview() {
     RegisterScreen(
         uiState = RegisterUiState(),
         onEvent = {},
