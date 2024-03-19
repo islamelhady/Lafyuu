@@ -39,7 +39,6 @@ internal fun LafyuuButton(
     isLoading: Boolean = false,
     isEnabled: Boolean = true,
     hasBorder: Boolean = false,
-    paddingHorizontal: Dp = Theme.space.large,
     style: TextStyle = Theme.typography.mediumTextBold,
     borderColor: Color = Theme.color.neutralLight,
     containerColor: Color = Theme.color.blue,
@@ -81,7 +80,8 @@ internal fun LafyuuButton(
             .clickable(isClickable) {
                 onClick()
             }
-            .padding(horizontal = paddingHorizontal),
+            .padding(horizontal = if (hasContentSpacing) Theme.space.large else Theme.space.none)
+        ,
 
         horizontalArrangement = Arrangement.Center
     ) {

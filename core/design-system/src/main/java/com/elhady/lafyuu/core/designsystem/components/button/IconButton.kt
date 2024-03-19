@@ -8,7 +8,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.elhady.lafyuu.core.designsystem.icons.Plus
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
@@ -28,7 +27,6 @@ fun IconButton(
         onClick = onClick,
         icon = icon,
         iconSize = iconSize,
-        paddingHorizontal = 0.dp,
         loading = loading,
         hasBorder = true,
         borderColor = borderColor,

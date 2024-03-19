@@ -40,8 +40,7 @@ fun SocialButton(
                 color = Theme.color.neutralLight,
                 shape = Theme.corner.small
             )
-            .clickable(enabled = !isLoading) { onClick() }
-            .padding(horizontal = Theme.space.extraLarge),
+            .clickable(enabled = !isLoading) { onClick() },
         contentAlignment = Alignment.Center
     ) {
         if (isLoading) {
@@ -51,6 +50,7 @@ fun SocialButton(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.CenterStart)
+                    .padding(start = Theme.space.extraLarge)
             )
             BasicText(
                 text = caption,
