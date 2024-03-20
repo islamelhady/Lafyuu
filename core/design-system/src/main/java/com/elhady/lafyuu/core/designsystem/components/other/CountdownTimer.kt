@@ -9,14 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
@@ -46,7 +45,7 @@ private fun TimeBox(value: Int) {
             .padding(horizontal = Theme.space.small, vertical = Theme.space.extraSmall),
         contentAlignment = Alignment.Center
     ) {
-        Text(
+        LafyuuText(
             text = value.toString().padStart(2, '0'),
             style = Theme.typography.mediumTextBold,
             color = Theme.color.neutralDark
@@ -56,7 +55,7 @@ private fun TimeBox(value: Int) {
 
 @Composable
 private fun Separator() {
-    Text(
+    LafyuuText(
         text = ":",
         style = Theme.typography.mediumTextBold,
         color = Theme.color.neutralDark,
