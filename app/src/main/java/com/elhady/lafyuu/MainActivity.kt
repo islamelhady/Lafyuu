@@ -9,11 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.feature.auth.presentation.navigation.AUTH_GRAPH_ROUTE
 import com.elhady.lafyuu.feature.auth.presentation.navigation.authGraph
+import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
+import com.elhady.lafyuu.feature.home.navigation.homeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -43,19 +44,17 @@ fun MainApp(
 
     NavHost(
         navController = navController,
-        startDestination = if (isAuthenticated) "home" else AUTH_GRAPH_ROUTE
+        startDestination = if (isAuthenticated) HOME_ROUTE else AUTH_GRAPH_ROUTE
     ) {
         authGraph(
             onNavigateToHome = {
-                navController.navigate("home") {
+                navController.navigate(HOME_ROUTE) {
                     popUpTo(AUTH_GRAPH_ROUTE) { inclusive = true }
                 }
             },
             navController = navController
         )
 
-        composable("home") {
-            // Placeholder for Home Screen
-        }
+        homeScreen()
     }
 }

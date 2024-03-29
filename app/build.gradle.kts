@@ -42,6 +42,7 @@ android {
 dependencies {
     // Modules
     implementation(project(":feature:auth"))
+    implementation(project(":feature:home"))
     implementation(project(":core:design-system"))
 
     // Navigation & Lifecycle
