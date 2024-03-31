@@ -1,9 +1,5 @@
 package com.elhady.lafyuu.feature.auth.presentation.register
 
-//import com.elhady.lafyuu.core.designsystem.component.button.LafyuuButton
-//import com.elhady.lafyuu.core.designsystem.component.button.LafyuuTextButton
-//import com.elhady.lafyuu.core.designsystem.component.input.LafyuuPasswordField
-//import com.elhady.lafyuu.core.designsystem.component.input.LafyuuTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,11 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,13 +20,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.DefaultTextField
+import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
+import com.elhady.lafyuu.core.designsystem.theme.Theme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -72,27 +67,26 @@ internal fun RegisterScreen(
     onNavigateToLogin: () -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { innerPadding ->
+    LafyuuScaffold(
+        toast = { SnackbarHost(snackbarHostState) }
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(24.dp)
+                .padding(Theme.space.extraLarge)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Create Account",
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
+            LafyuuText(
+                text = "Let's Get Started",
+                style = Theme.typography.heading4,
+                modifier = Modifier.padding(bottom = Theme.space.small)
             )
-            Text(
-                text = "Join us to start shopping",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 32.dp)
+            LafyuuText(
+                text = "Create a new account",
+                style = Theme.typography.normalTextRegular,
+                modifier = Modifier.padding(bottom = Theme.space.huge)
             )
 
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -100,51 +94,66 @@ internal fun RegisterScreen(
                     value = uiState.firstName,
                     onValueChange = { onEvent(RegisterUiEvent.FirstNameChanged(it)) },
                     placeholder = "First Name",
+                    errorMessage = uiState.firstNameError,
                     modifier = Modifier.weight(1f)
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(Theme.space.large))
                 DefaultTextField(
                     value = uiState.lastName,
                     onValueChange = { onEvent(RegisterUiEvent.LastNameChanged(it)) },
                     placeholder = "Last Name",
+                    errorMessage = uiState.lastNameError,
                     modifier = Modifier.weight(1f)
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            DefaultTextField(
+            Spacer(modifier = Modifier.height(Theme.space.large))
+            EmailTextField(
                 value = uiState.email,
                 onValueChange = { onEvent(RegisterUiEvent.EmailChanged(it)) },
                 placeholder = "Email",
+                errorMessage = uiState.emailError,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Theme.space.large))
             PasswordTextField(
                 value = uiState.password,
                 onValueChange = { onEvent(RegisterUiEvent.PasswordChanged(it)) },
                 placeholder = "Password",
+                errorMessage = uiState.passwordError,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(Theme.space.large))
+            PasswordTextField(
+                value = uiState.confirmPassword,
+                onValueChange = { onEvent(RegisterUiEvent.ConfirmPasswordChanged(it)) },
+                placeholder = "Password Again",
+                errorMessage = uiState.confirmPasswordError,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(Theme.space.extraLarge))
 
             DefaultButton(
-                caption = "Register",
+                caption = "Sign Up",
                 onClick = { onEvent(RegisterUiEvent.RegisterClicked) },
                 isLoading = uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Theme.space.large))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Already have an account?")
                 LafyuuText(
-                    text = "Sign in",
-                    onClick = onNavigateToLogin
+                    text = "have an account? "
+                )
+                LafyuuText(
+                    text = "Sign In",
+                    onClick = onNavigateToLogin,
+                    style = Theme.typography.normalTextBold
                 )
             }
         }

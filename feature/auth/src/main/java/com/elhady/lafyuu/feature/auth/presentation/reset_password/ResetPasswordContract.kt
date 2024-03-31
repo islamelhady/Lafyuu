@@ -6,7 +6,10 @@ data class ResetPasswordUiState(
     val newPassword: String = "",
     val confirmPassword: String = "",
     val isLoading: Boolean = false,
-    val error: String? = null
+    val otpError: String? = null,
+    val newPasswordError: String? = null,
+    val confirmPasswordError: String? = null,
+    val generalError: String? = null
 )
 
 sealed interface ResetPasswordUiEvent {
