@@ -1,8 +1,8 @@
 package com.elhady.lafyuu.feature.auth.domain.repository
 
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.feature.auth.domain.model.AuthToken
 import com.elhady.lafyuu.feature.auth.domain.model.User
-import com.elhady.lafyuu.core.common.AppResult
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
@@ -14,9 +14,10 @@ interface AuthRepository {
     suspend fun getCurrentUser(): AppResult<User>
     suspend fun forgotPassword(email: String): AppResult<Unit>
     suspend fun resetPassword(email: String, otp: String, password: String): AppResult<Unit>
+    suspend fun changePassword(currentPassword: String, newPassword: String, confirmNewPassword: String): AppResult<Unit>
     suspend fun resendOtp(email: String): AppResult<Unit>
     suspend fun validateOtp(email: String, otp: String): AppResult<Unit>
-    
+
     fun getAccessToken(): Flow<String?>
     fun isAuthenticated(): Flow<Boolean>
 }
