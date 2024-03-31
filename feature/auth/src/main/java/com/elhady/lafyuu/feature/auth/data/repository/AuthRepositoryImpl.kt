@@ -5,6 +5,7 @@ import com.elhady.lafyuu.core.network.error.ApiErrorParser
 import com.elhady.lafyuu.core.network.error.NetworkError
 import com.elhady.lafyuu.feature.auth.data.mapper.toDomain
 import com.elhady.lafyuu.feature.auth.data.remote.AuthApi
+import com.elhady.lafyuu.feature.auth.data.remote.model.ChangePasswordRequest
 import com.elhady.lafyuu.feature.auth.data.remote.model.ForgotPasswordRequest
 import com.elhady.lafyuu.feature.auth.data.remote.model.LoginRequest
 import com.elhady.lafyuu.feature.auth.data.remote.model.MobileLoginRequest
@@ -138,6 +139,19 @@ class AuthRepositoryImpl @Inject constructor(
             val response = authApi.validateOtp(ValidateOtpRequest(email, otp))
             if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
         } catch (e: Exception) { AppResult.Error(throwable = e) }
+    }
+
+    override suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String,
+        confirmNewPassword: String
+    ): AppResult<Unit> {
+        return try {
+            val response = authApi.changePassword(ChangePasswordRequest(currentPassword, newPassword, confirmNewPassword))
+            if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
+        } catch (e: Exception) {
+            AppResult.Error(throwable = e)
+        }
     }
 
     override fun getAccessToken(): Flow<String?> = dataStore.accessToken
