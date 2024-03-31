@@ -4,7 +4,8 @@ data class OtpUiState(
     val email: String = "",
     val otp: String = "",
     val isLoading: Boolean = false,
-    val error: String? = null
+    val otpError: String? = null,
+    val generalError: String? = null
 )
 
 sealed interface OtpUiEvent {
