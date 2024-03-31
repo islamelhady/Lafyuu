@@ -3,7 +3,8 @@ package com.elhady.lafyuu.feature.auth.presentation.forgot_password
 data class ForgotPasswordUiState(
     val email: String = "",
     val isLoading: Boolean = false,
-    val error: String? = null
+    val emailError: String? = null,
+    val generalError: String? = null
 )
 
 sealed interface ForgotPasswordUiEvent {

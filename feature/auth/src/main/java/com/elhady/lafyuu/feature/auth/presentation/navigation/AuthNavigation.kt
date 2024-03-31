@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.elhady.lafyuu.feature.auth.presentation.change_password.ChangePasswordRoute
 import com.elhady.lafyuu.feature.auth.presentation.forgot_password.ForgotPasswordRoute
 import com.elhady.lafyuu.feature.auth.presentation.login.LoginRoute
 import com.elhady.lafyuu.feature.auth.presentation.otp.OtpRoute
@@ -17,6 +18,7 @@ const val REGISTER_ROUTE = "register"
 const val OTP_ROUTE = "otp/{email}"
 const val FORGOT_PASSWORD_ROUTE = "forgot_password"
 const val RESET_PASSWORD_ROUTE = "reset_password/{email}"
+const val CHANGE_PASSWORD_ROUTE = "change_password"
 
 fun NavController.navigateToAuth(navOptions: NavOptions? = null) {
     this.navigate(AUTH_GRAPH_ROUTE, navOptions)
@@ -40,6 +42,10 @@ fun NavController.navigateToForgotPassword(navOptions: NavOptions? = null) {
 
 fun NavController.navigateToResetPassword(email: String, navOptions: NavOptions? = null) {
     this.navigate("reset_password/$email", navOptions)
+}
+
+fun NavController.navigateToChangePassword(navOptions: NavOptions? = null) {
+    this.navigate(CHANGE_PASSWORD_ROUTE, navOptions)
 }
 
 fun NavGraphBuilder.authGraph(
@@ -85,6 +91,11 @@ fun NavGraphBuilder.authGraph(
                         popUpTo(AUTH_GRAPH_ROUTE) { inclusive = false }
                     }
                 }
+            )
+        }
+        composable(route = CHANGE_PASSWORD_ROUTE) {
+            ChangePasswordRoute(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }

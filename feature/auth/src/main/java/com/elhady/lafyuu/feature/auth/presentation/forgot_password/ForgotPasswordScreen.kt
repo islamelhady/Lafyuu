@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
@@ -35,7 +36,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun ForgotPasswordRoute(
     onNavigateBack: () -> Unit,
     onNavigateToResetPassword: (String) -> Unit,
-    viewModel: ForgotPasswordViewModel = hiltViewModel()
+    viewModel: ForgotPasswordViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
