@@ -55,6 +55,9 @@ fun LoginRoute(
                 is LoginUiEffect.ShowError -> {
                     snackbarHostState.showSnackbar(effect.message)
                 }
+                is LoginUiEffect.ShowMessage -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
             }
         }
     }
@@ -107,6 +110,7 @@ internal fun LoginScreen(
                 value = uiState.email,
                 onValueChange = { onEvent(LoginUiEvent.EmailChanged(it)) },
                 placeholder = "Email",
+                errorMessage = uiState.emailError,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(Theme.space.large))
@@ -114,6 +118,7 @@ internal fun LoginScreen(
                 value = uiState.password,
                 onValueChange = { onEvent(LoginUiEvent.PasswordChanged(it)) },
                 placeholder = "Password",
+                errorMessage = uiState.passwordError,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -131,6 +136,7 @@ internal fun LoginScreen(
             DefaultButton(
                 caption = "Login",
                 onClick = { onEvent(LoginUiEvent.LoginClicked) },
+                isLoading = uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
