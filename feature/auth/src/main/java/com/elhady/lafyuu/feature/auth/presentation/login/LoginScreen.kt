@@ -24,8 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
@@ -33,15 +33,16 @@ import com.elhady.lafyuu.core.designsystem.components.element.OrDivider
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
+import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun LoginRoute(
+fun LoginScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToRegister: () -> Unit,
     onNavigateToForgotPassword: () -> Unit,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -52,17 +53,13 @@ fun LoginRoute(
                 LoginUiEffect.NavigateToHome -> onNavigateToHome()
                 LoginUiEffect.NavigateToRegister -> onNavigateToRegister()
                 LoginUiEffect.NavigateToForgotPassword -> onNavigateToForgotPassword()
-                is LoginUiEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
-                }
-                is LoginUiEffect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(effect.message)
-                }
+                is LoginUiEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
+                is LoginUiEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.message)
             }
         }
     }
 
-    LoginScreen(
+    LoginContent(
         uiState = uiState,
         onEvent = viewModel::onEvent,
         onNavigateToRegister = onNavigateToRegister,
@@ -72,12 +69,12 @@ fun LoginRoute(
 }
 
 @Composable
-internal fun LoginScreen(
+private fun LoginContent(
     uiState: LoginUiState,
     onEvent: (LoginUiEvent) -> Unit,
     onNavigateToRegister: () -> Unit,
     onNavigateToForgotPassword: () -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     LafyuuScaffold(
         toast = { SnackbarHost(snackbarHostState) }
@@ -166,12 +163,13 @@ internal fun LoginScreen(
 
 @Preview
 @Composable
-fun LoginScreenPreview() {
-    LoginScreen(
-        uiState = LoginUiState(),
-        onEvent = {},
-        onNavigateToRegister = {},
-        onNavigateToForgotPassword = {},
-        snackbarHostState = remember { SnackbarHostState() }
-    )
+private fun LoginContentPreview() {
+    LafyuuTheme {
+        LoginContent(
+            uiState = LoginUiState(),
+            onEvent = {},
+            onNavigateToRegister = {},
+            onNavigateToForgotPassword = {}
+        )
+    }
 }

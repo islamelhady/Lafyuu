@@ -24,16 +24,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
-import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
+import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun ForgotPasswordRoute(
+fun ForgotPasswordScreen(
     onNavigateBack: () -> Unit,
     onNavigateToResetPassword: (String) -> Unit,
     viewModel: ForgotPasswordViewModel = viewModel()
@@ -53,7 +52,7 @@ fun ForgotPasswordRoute(
         }
     }
 
-    ForgotPasswordScreen(
+    ForgotPasswordContent(
         uiState = uiState,
         onEvent = viewModel::onEvent,
         onNavigateBack = onNavigateBack,
@@ -63,20 +62,18 @@ fun ForgotPasswordRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ForgotPasswordScreen(
+private fun ForgotPasswordContent(
     uiState: ForgotPasswordUiState,
     onEvent: (ForgotPasswordUiEvent) -> Unit,
     onNavigateBack: () -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Forgot Password") },
                 navigationIcon = {
-                    IconButton(
-                        onClick = onNavigateBack
-                    ) {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Left,
                             contentDescription = "Back"
@@ -112,6 +109,7 @@ internal fun ForgotPasswordScreen(
             DefaultButton(
                 caption = "Send Cod",
                 onClick = { onEvent(ForgotPasswordUiEvent.SubmitClicked) },
+                isLoading = uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -120,12 +118,12 @@ internal fun ForgotPasswordScreen(
 
 @Preview
 @Composable
-fun ForgotPasswordScreenPreview() {
-    ForgotPasswordScreen(
-        uiState = ForgotPasswordUiState(),
-        onEvent = {},
-        onNavigateBack = {},
-        snackbarHostState = remember { SnackbarHostState() }
-    )
+private fun ForgotPasswordContentPreview() {
+    LafyuuTheme {
+        ForgotPasswordContent(
+            uiState = ForgotPasswordUiState(),
+            onEvent = {},
+            onNavigateBack = {}
+        )
+    }
 }
-

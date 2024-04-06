@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
@@ -28,9 +29,9 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun ChangePasswordRoute(
+fun ChangePasswordScreen(
     onNavigateBack: () -> Unit,
-    viewModel: ChangePasswordViewModel = hiltViewModel()
+    viewModel: ChangePasswordViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -45,7 +46,7 @@ fun ChangePasswordRoute(
         }
     }
 
-    ChangePasswordScreen(
+    ChangePasswordContent(
         uiState = uiState,
         onEvent = viewModel::onEvent,
         snackbarHostState = snackbarHostState
@@ -53,10 +54,10 @@ fun ChangePasswordRoute(
 }
 
 @Composable
-internal fun ChangePasswordScreen(
+private fun ChangePasswordContent(
     uiState: ChangePasswordUiState,
     onEvent: (ChangePasswordUiEvent) -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     LafyuuScaffold(
         toast = { SnackbarHost(snackbarHostState) }
@@ -116,12 +117,11 @@ internal fun ChangePasswordScreen(
 
 @Preview
 @Composable
-fun ChangePasswordScreenPreview() {
+private fun ChangePasswordContentPreview() {
     LafyuuTheme {
-        ChangePasswordScreen(
+        ChangePasswordContent(
             uiState = ChangePasswordUiState(),
-            onEvent = {},
-            snackbarHostState = remember { SnackbarHostState() }
+            onEvent = {}
         )
     }
 }

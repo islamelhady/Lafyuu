@@ -5,12 +5,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.elhady.lafyuu.feature.auth.presentation.change_password.ChangePasswordRoute
-import com.elhady.lafyuu.feature.auth.presentation.forgot_password.ForgotPasswordRoute
-import com.elhady.lafyuu.feature.auth.presentation.login.LoginRoute
-import com.elhady.lafyuu.feature.auth.presentation.otp.OtpRoute
-import com.elhady.lafyuu.feature.auth.presentation.register.RegisterRoute
-import com.elhady.lafyuu.feature.auth.presentation.reset_password.ResetPasswordRoute
+import com.elhady.lafyuu.feature.auth.presentation.change_password.ChangePasswordScreen
+import com.elhady.lafyuu.feature.auth.presentation.forgot_password.ForgotPasswordScreen
+import com.elhady.lafyuu.feature.auth.presentation.login.LoginScreen
+import com.elhady.lafyuu.feature.auth.presentation.otp.OtpScreen
+import com.elhady.lafyuu.feature.auth.presentation.register.RegisterScreen
+import com.elhady.lafyuu.feature.auth.presentation.reset_password.ResetPasswordScreen
 
 const val AUTH_GRAPH_ROUTE = "auth_graph"
 const val LOGIN_ROUTE = "login"
@@ -57,20 +57,20 @@ fun NavGraphBuilder.authGraph(
         startDestination = LOGIN_ROUTE
     ) {
         composable(route = LOGIN_ROUTE) {
-            LoginRoute(
+            LoginScreen(
                 onNavigateToHome = onNavigateToHome,
                 onNavigateToRegister = { navController.navigateToRegister() },
                 onNavigateToForgotPassword = { navController.navigateToForgotPassword() }
             )
         }
         composable(route = REGISTER_ROUTE) {
-            RegisterRoute(
+            RegisterScreen(
                 onNavigateToLogin = { navController.popBackStack() },
                 onNavigateToOtp = { email -> navController.navigateToOtp(email) }
             )
         }
         composable(route = OTP_ROUTE) {
-            OtpRoute(
+            OtpScreen(
                 onNavigateToLogin = { 
                     navController.navigate(LOGIN_ROUTE) {
                         popUpTo(AUTH_GRAPH_ROUTE) { inclusive = false }
@@ -79,13 +79,13 @@ fun NavGraphBuilder.authGraph(
             )
         }
         composable(route = FORGOT_PASSWORD_ROUTE) {
-            ForgotPasswordRoute(
+            ForgotPasswordScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToResetPassword = { email -> navController.navigateToResetPassword(email) }
             )
         }
         composable(route = RESET_PASSWORD_ROUTE) {
-            ResetPasswordRoute(
+            ResetPasswordScreen(
                 onNavigateToLogin = {
                     navController.navigate(LOGIN_ROUTE) {
                         popUpTo(AUTH_GRAPH_ROUTE) { inclusive = false }
@@ -94,7 +94,7 @@ fun NavGraphBuilder.authGraph(
             )
         }
         composable(route = CHANGE_PASSWORD_ROUTE) {
-            ChangePasswordRoute(
+            ChangePasswordScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

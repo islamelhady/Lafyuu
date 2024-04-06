@@ -22,15 +22,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.PhoneNumberTextField
+import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun ResetPasswordRoute(
+fun ResetPasswordScreen(
     onNavigateToLogin: () -> Unit,
-    viewModel: ResetPasswordViewModel = hiltViewModel()
+    viewModel: ResetPasswordViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -44,7 +46,7 @@ fun ResetPasswordRoute(
         }
     }
 
-    ResetPasswordScreen(
+    ResetPasswordContent(
         uiState = uiState,
         onEvent = viewModel::onEvent,
         snackbarHostState = snackbarHostState
@@ -52,10 +54,10 @@ fun ResetPasswordRoute(
 }
 
 @Composable
-internal fun ResetPasswordScreen(
+private fun ResetPasswordContent(
     uiState: ResetPasswordUiState,
     onEvent: (ResetPasswordUiEvent) -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -114,10 +116,11 @@ internal fun ResetPasswordScreen(
 
 @Preview
 @Composable
-fun ResetPasswordScreenPreview() {
-    ResetPasswordScreen(
-        uiState = ResetPasswordUiState(),
-        onEvent = {},
-        snackbarHostState = remember { SnackbarHostState() }
-    )
+private fun ResetPasswordContentPreview() {
+    LafyuuTheme {
+        ResetPasswordContent(
+            uiState = ResetPasswordUiState(),
+            onEvent = {}
+        )
+    }
 }

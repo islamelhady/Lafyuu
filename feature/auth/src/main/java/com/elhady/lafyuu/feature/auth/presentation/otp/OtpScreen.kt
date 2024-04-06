@@ -24,15 +24,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.PhoneNumberTextField
+import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun OtpRoute(
+fun OtpScreen(
     onNavigateToLogin: () -> Unit,
-    viewModel: OtpViewModel = hiltViewModel()
+    viewModel: OtpViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -47,7 +49,7 @@ fun OtpRoute(
         }
     }
 
-    OtpScreen(
+    OtpContent(
         uiState = uiState,
         onEvent = viewModel::onEvent,
         snackBarHostState = snackBarHostState
@@ -55,10 +57,10 @@ fun OtpRoute(
 }
 
 @Composable
-internal fun OtpScreen(
+private fun OtpContent(
     uiState: OtpUiState,
     onEvent: (OtpUiEvent) -> Unit,
-    snackBarHostState: SnackbarHostState
+    snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) }
@@ -85,9 +87,7 @@ internal fun OtpScreen(
 
             PhoneNumberTextField(
                 value = uiState.otp,
-                onValueChange = { otp -> 
-                    onEvent(OtpUiEvent.OtpChanged(otp))
-                },
+                onValueChange = { onEvent(OtpUiEvent.OtpChanged(it)) },
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
@@ -117,10 +117,11 @@ internal fun OtpScreen(
 
 @Preview
 @Composable
-fun OtpScreenPreview(){
-    OtpScreen(
-        uiState = OtpUiState(),
-        onEvent = {},
-        snackBarHostState = SnackbarHostState()
-    )
+private fun OtpContentPreview() {
+    LafyuuTheme {
+        OtpContent(
+            uiState = OtpUiState(email = "test@example.com"),
+            onEvent = {}
+        )
+    }
 }

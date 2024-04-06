@@ -22,20 +22,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.DefaultTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
+import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun RegisterRoute(
+fun RegisterScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToOtp: (String) -> Unit,
-    viewModel: RegisterViewModel = hiltViewModel()
+    viewModel: RegisterViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -45,14 +47,12 @@ fun RegisterRoute(
             when (effect) {
                 RegisterUiEffect.NavigateToLogin -> onNavigateToLogin()
                 RegisterUiEffect.NavigateToOtp -> onNavigateToOtp(uiState.email)
-                is RegisterUiEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(effect.message)
-                }
+                is RegisterUiEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
             }
         }
     }
 
-    RegisterScreen(
+    RegisterContent(
         uiState = uiState,
         onEvent = viewModel::onEvent,
         onNavigateToLogin = onNavigateToLogin,
@@ -61,11 +61,11 @@ fun RegisterRoute(
 }
 
 @Composable
-internal fun RegisterScreen(
+private fun RegisterContent(
     uiState: RegisterUiState,
     onEvent: (RegisterUiEvent) -> Unit,
     onNavigateToLogin: () -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     LafyuuScaffold(
         toast = { SnackbarHost(snackbarHostState) }
@@ -162,11 +162,12 @@ internal fun RegisterScreen(
 
 @Preview
 @Composable
-fun RegisterScreenPreview() {
-    RegisterScreen(
-        uiState = RegisterUiState(),
-        onEvent = {},
-        onNavigateToLogin = {},
-        snackbarHostState = remember { SnackbarHostState() }
-    )
+private fun RegisterContentPreview() {
+    LafyuuTheme {
+        RegisterContent(
+            uiState = RegisterUiState(),
+            onEvent = {},
+            onNavigateToLogin = {}
+        )
+    }
 }
