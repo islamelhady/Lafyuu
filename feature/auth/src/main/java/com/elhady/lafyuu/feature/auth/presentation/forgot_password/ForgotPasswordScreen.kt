@@ -27,6 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
+import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -47,7 +50,12 @@ fun ForgotPasswordScreen(
                     effect.email
                 )
 
-                is ForgotPasswordUiEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
+                is ForgotPasswordUiEffect.ShowError -> snackbarHostState.showSnackbar(
+                    visuals = LafyuuSnackBarVisuals(
+                        message = effect.message,
+                        type = AlertType.Error
+                    )
+                )
             }
         }
     }
@@ -68,26 +76,12 @@ private fun ForgotPasswordContent(
     onNavigateBack: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Forgot Password") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Left,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { innerPadding ->
+    LafyuuScaffold(
+        snackbarHostState = snackbarHostState
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -107,7 +101,7 @@ private fun ForgotPasswordContent(
             Spacer(modifier = Modifier.height(32.dp))
 
             DefaultButton(
-                caption = "Send Cod",
+                caption = "Send Code",
                 onClick = { onEvent(ForgotPasswordUiEvent.SubmitClicked) },
                 isLoading = uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()

@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.PhoneNumberTextField
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
@@ -59,13 +60,12 @@ private fun ResetPasswordContent(
     onEvent: (ResetPasswordUiEvent) -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { innerPadding ->
+    LafyuuScaffold (
+        snackbarHostState = snackbarHostState
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

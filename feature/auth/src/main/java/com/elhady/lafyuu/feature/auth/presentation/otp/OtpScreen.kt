@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,10 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
+import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.PhoneNumberTextField
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
@@ -43,8 +43,19 @@ fun OtpScreen(
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
                 OtpUiEffect.NavigateToLogin -> onNavigateToLogin()
-                is OtpUiEffect.ShowError -> snackBarHostState.showSnackbar(effect.message)
-                is OtpUiEffect.ShowMessage -> snackBarHostState.showSnackbar(effect.message)
+                is OtpUiEffect.ShowError -> snackBarHostState.showSnackbar(
+                    visuals = LafyuuSnackBarVisuals(
+                        message = effect.message,
+                        type = AlertType.Error
+                    )
+                )
+
+                is OtpUiEffect.ShowMessage -> snackBarHostState.showSnackbar(
+                    visuals = LafyuuSnackBarVisuals(
+                        message = effect.message,
+                        type = AlertType.Success
+                    )
+                )
             }
         }
     }
@@ -62,13 +73,12 @@ private fun OtpContent(
     onEvent: (OtpUiEvent) -> Unit,
     snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackBarHostState) }
-    ) { innerPadding ->
+    LafyuuScaffold(
+        snackbarHostState = snackBarHostState
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
