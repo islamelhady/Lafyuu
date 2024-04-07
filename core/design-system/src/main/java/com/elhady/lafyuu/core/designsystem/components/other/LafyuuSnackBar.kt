@@ -37,7 +37,7 @@ fun LafyuuSnackBar(
 ) {
     val (color, icon) = when (type) {
         AlertType.Success -> Theme.color.green to Check
-        AlertType.Cancel -> Theme.color.error to Close
+        AlertType.Error -> Theme.color.error to Close
         AlertType.Warning -> Theme.color.yellow to Warning
     }
 
@@ -100,7 +100,7 @@ private fun LafyuuSnackBarPreview() {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             LafyuuSnackBar(message = "Saved successfully", type = AlertType.Success)
-            LafyuuSnackBar(message = "An error occurred, try again", type = AlertType.Cancel)
+            LafyuuSnackBar(message = "An error occurred, try again", type = AlertType.Error)
             LafyuuSnackBar(message = "Your request is being processed", type = AlertType.Warning)
         }
     }

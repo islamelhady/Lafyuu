@@ -23,7 +23,7 @@ import com.elhady.lafyuu.core.designsystem.icons.Warning
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
-enum class AlertType { Success, Cancel, Warning }
+enum class AlertType { Success, Error, Warning }
 
 @Composable
 fun AlertIcon(
@@ -32,7 +32,7 @@ fun AlertIcon(
 ) {
     val (color, icon) = when (type) {
         AlertType.Success -> Theme.color.green to Check
-        AlertType.Cancel -> Theme.color.error to Close
+        AlertType.Error -> Theme.color.error to Close
         AlertType.Warning -> Theme.color.yellow to Warning
     }
 
@@ -68,7 +68,7 @@ fun AlertIconPreview() {
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(Theme.space.small)) {
                 AlertIcon(type = AlertType.Success)
-                AlertIcon(type = AlertType.Cancel)
+                AlertIcon(type = AlertType.Error)
                 AlertIcon(type = AlertType.Warning)
             }
         }

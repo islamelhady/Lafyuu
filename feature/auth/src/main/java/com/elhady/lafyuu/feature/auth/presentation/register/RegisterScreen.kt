@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,11 +19,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
+import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.DefaultTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
@@ -47,7 +47,12 @@ fun RegisterScreen(
             when (effect) {
                 RegisterUiEffect.NavigateToLogin -> onNavigateToLogin()
                 RegisterUiEffect.NavigateToOtp -> onNavigateToOtp(uiState.email)
-                is RegisterUiEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
+                is RegisterUiEffect.ShowError -> snackbarHostState.showSnackbar(
+                    visuals = LafyuuSnackBarVisuals(
+                        message = effect.message,
+                        type = AlertType.Error
+                    )
+                )
             }
         }
     }
@@ -68,7 +73,7 @@ private fun RegisterContent(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     LafyuuScaffold(
-        toast = { SnackbarHost(snackbarHostState) }
+        snackbarHostState = snackbarHostState,
     ) {
         Column(
             modifier = Modifier
