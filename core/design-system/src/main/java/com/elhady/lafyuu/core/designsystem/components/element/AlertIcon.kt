@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,7 +17,6 @@ import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.elhady.lafyuu.core.designsystem.components.appbar.IconClick
 import com.elhady.lafyuu.core.designsystem.icons.Check
 import com.elhady.lafyuu.core.designsystem.icons.Close
 import com.elhady.lafyuu.core.designsystem.icons.Warning
@@ -30,16 +30,12 @@ fun AlertIcon(
     type: AlertType,
     modifier: Modifier = Modifier
 ) {
-    val (background, icon) = when (type) {
-        AlertType.Success -> Theme.color.blue to Check
-        AlertType.Cancel -> Theme.color.blue to Close
-        AlertType.Warning -> Theme.color.error to Warning
+    val (color, icon) = when (type) {
+        AlertType.Success -> Theme.color.green to Check
+        AlertType.Cancel -> Theme.color.error to Close
+        AlertType.Warning -> Theme.color.yellow to Warning
     }
-    val shadowColor = when (type) {
-        AlertType.Success -> Theme.color.blue
-        AlertType.Cancel -> Theme.color.blue
-        AlertType.Warning -> Theme.color.error
-    }
+
     Box(
         modifier = modifier
             .dropShadow(
@@ -47,16 +43,15 @@ fun AlertIcon(
                 shadow = Shadow(
                     radius = 30.dp,
                     offset = DpOffset(x = 0.dp, y = 10.dp),
-                    color = shadowColor.copy(alpha = 0.24f)
+                    color = color.copy(alpha = 0.24f)
                 )
             )
             .size(Theme.size.huge)
-            .background(background, shape = CircleShape),
+            .background(color, shape = CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        IconClick(
-            icon,
-            onClick = {},
+        Icon(
+            imageVector = icon,
             contentDescription = type.name,
             tint = Theme.color.backgroundWhite
         )
