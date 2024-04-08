@@ -1,14 +1,12 @@
 package com.elhady.lafyuu.feature.auth.presentation.register
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHostState
@@ -18,12 +16,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerExtraLarge
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerLarge
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerSmall
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.DefaultTextField
@@ -83,16 +87,26 @@ private fun RegisterContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            LafyuuText(
-                text = "Let's Get Started",
-                style = Theme.typography.heading4,
-                modifier = Modifier.padding(bottom = Theme.space.small)
+            Image(
+                painter = painterResource(R.drawable.logo),
+                contentDescription = "Logo",
             )
+            VerticalSpacerLarge()
+            LafyuuText(
+                text = "Let’s Get Started",
+                style = Theme.typography.heading4,
+                color = Theme.color.neutralDark,
+            )
+            VerticalSpacerSmall()
             LafyuuText(
                 text = "Create a new account",
                 style = Theme.typography.normalTextRegular,
-                modifier = Modifier.padding(bottom = Theme.space.huge)
+                color = Theme.color.neutralGrey,
+                modifier = Modifier.padding(horizontal = Theme.space.large),
+                textAlign = TextAlign.Center,
             )
+
+            VerticalSpacerExtraLarge()
 
             Row(modifier = Modifier.fillMaxWidth()) {
                 DefaultTextField(
@@ -102,7 +116,7 @@ private fun RegisterContent(
                     errorMessage = uiState.firstNameError,
                     modifier = Modifier.weight(1f)
                 )
-                Spacer(modifier = Modifier.width(Theme.space.large))
+                VerticalSpacerLarge()
                 DefaultTextField(
                     value = uiState.lastName,
                     onValueChange = { onEvent(RegisterUiEvent.LastNameChanged(it)) },
@@ -111,7 +125,7 @@ private fun RegisterContent(
                     modifier = Modifier.weight(1f)
                 )
             }
-            Spacer(modifier = Modifier.height(Theme.space.large))
+            VerticalSpacerLarge()
             EmailTextField(
                 value = uiState.email,
                 onValueChange = { onEvent(RegisterUiEvent.EmailChanged(it)) },
@@ -119,7 +133,7 @@ private fun RegisterContent(
                 errorMessage = uiState.emailError,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(Theme.space.large))
+            VerticalSpacerLarge()
             PasswordTextField(
                 value = uiState.password,
                 onValueChange = { onEvent(RegisterUiEvent.PasswordChanged(it)) },
@@ -127,7 +141,7 @@ private fun RegisterContent(
                 errorMessage = uiState.passwordError,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(Theme.space.large))
+            VerticalSpacerLarge()
             PasswordTextField(
                 value = uiState.confirmPassword,
                 onValueChange = { onEvent(RegisterUiEvent.ConfirmPasswordChanged(it)) },
@@ -136,7 +150,7 @@ private fun RegisterContent(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(Theme.space.extraLarge))
+            VerticalSpacerExtraLarge()
 
             DefaultButton(
                 caption = "Sign Up",
@@ -145,7 +159,7 @@ private fun RegisterContent(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(Theme.space.large))
+            VerticalSpacerExtraLarge()
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -158,7 +172,7 @@ private fun RegisterContent(
                 LafyuuText(
                     text = "Sign In",
                     onClick = onNavigateToLogin,
-                    style = Theme.typography.normalTextBold
+                    style = Theme.typography.normalTextBold,
                 )
             }
         }

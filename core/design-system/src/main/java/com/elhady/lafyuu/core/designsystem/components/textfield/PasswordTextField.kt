@@ -64,7 +64,7 @@ fun PasswordTextField(
 
 @Preview(showBackground = true, widthDp = 380, heightDp = 800)
 @Composable
-private fun AllFormFieldsPreview() {
+private fun PasswordTextFieldPreview() {
     LafyuuTheme {
         Surface {
             Column(
