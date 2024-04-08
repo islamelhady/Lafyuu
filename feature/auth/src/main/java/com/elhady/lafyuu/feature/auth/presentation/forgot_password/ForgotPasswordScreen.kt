@@ -1,37 +1,38 @@
 package com.elhady.lafyuu.feature.auth.presentation.forgot_password
 
-import Left
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerExtraLarge
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerLarge
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerSmall
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
+import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
+import com.elhady.lafyuu.core.designsystem.theme.Theme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -82,14 +83,31 @@ private fun ForgotPasswordContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = Theme.space.large)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Enter your email address and we will send you a code to reset your password.",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 32.dp)
+            Image(
+                painter = painterResource(R.drawable.logo),
+                contentDescription = "Logo",
             )
+            VerticalSpacerLarge()
+            LafyuuText(
+                text = "Forgot Password?",
+                style = Theme.typography.heading4,
+                color = Theme.color.neutralDark,
+            )
+            VerticalSpacerSmall()
+            LafyuuText(
+                text = "don't worry! Enter your email address and we'll send you a link to reset your password",
+                style = Theme.typography.normalTextRegular,
+                color = Theme.color.neutralGrey,
+                modifier = Modifier.padding(horizontal = Theme.space.large),
+                textAlign = TextAlign.Center,
+            )
+
+            VerticalSpacerExtraLarge()
 
             EmailTextField(
                 value = uiState.email,
@@ -98,13 +116,21 @@ private fun ForgotPasswordContent(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            VerticalSpacerLarge()
 
             DefaultButton(
                 caption = "Send Code",
                 onClick = { onEvent(ForgotPasswordUiEvent.SubmitClicked) },
                 isLoading = uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
+            )
+
+            VerticalSpacerExtraLarge()
+
+            LafyuuText(
+                text = "Back to Login",
+                style = Theme.typography.largeLinkBold,
+                onClick = onNavigateBack,
             )
         }
     }
