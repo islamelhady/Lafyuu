@@ -27,13 +27,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.button.SocialButton
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.element.OrDivider
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerExtraLarge
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerLarge
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerMedium
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerSmall
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
+import com.elhady.lafyuu.core.designsystem.icons.Google
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import kotlinx.coroutines.flow.collectLatest
@@ -60,6 +66,7 @@ fun LoginScreen(
                         type = AlertType.Error
                     )
                 )
+
                 is LoginUiEffect.ShowMessage -> snackbarHostState.showSnackbar(
                     visuals = LafyuuSnackBarVisuals(
                         message = effect.message,
@@ -93,7 +100,7 @@ private fun LoginContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(Theme.space.extraLarge)
+                .padding(horizontal = Theme.space.large)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -101,19 +108,20 @@ private fun LoginContent(
             Image(
                 painter = painterResource(R.drawable.logo),
                 contentDescription = "Logo",
-                modifier = Modifier.padding(bottom = Theme.space.huge)
             )
+            VerticalSpacerLarge()
             LafyuuText(
                 text = "Welcome to Lafyuu",
                 style = Theme.typography.heading4,
-                modifier = Modifier.padding(bottom = Theme.space.small)
+                color = Theme.color.neutralDark,
             )
+            VerticalSpacerSmall()
             LafyuuText(
                 text = "Sign in to continue",
                 style = Theme.typography.normalTextRegular,
+                color = Theme.color.neutralGrey,
                 modifier = Modifier.padding(bottom = Theme.space.huge)
             )
-
             EmailTextField(
                 value = uiState.email,
                 onValueChange = { onEvent(LoginUiEvent.EmailChanged(it)) },
@@ -121,7 +129,7 @@ private fun LoginContent(
                 errorMessage = uiState.emailError,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(Theme.space.large))
+            VerticalSpacerLarge()
             PasswordTextField(
                 value = uiState.password,
                 onValueChange = { onEvent(LoginUiEvent.PasswordChanged(it)) },
@@ -130,16 +138,7 @@ private fun LoginContent(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-                LafyuuText(
-                    text = "Forgot Password?",
-                    modifier = Modifier
-                        .padding(top = Theme.space.large)
-                        .clickable { onNavigateToForgotPassword() }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(Theme.space.extraLarge))
+            VerticalSpacerLarge()
 
             DefaultButton(
                 caption = "Login",
@@ -148,24 +147,41 @@ private fun LoginContent(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(Theme.space.large))
+            VerticalSpacerExtraLarge()
 
             OrDivider()
 
+            SocialButton(
+                icon = Google,
+                caption = "Login with Google",
+                onClick = { onEvent(LoginUiEvent.GoogleLoginClicked("idToken")) },
+                isLoading = uiState.isLoading,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            VerticalSpacerExtraLarge()
+
+            LafyuuText(
+                text = "Forgot Password?",
+                style = Theme.typography.largeLinkBold,
+                onClick = onNavigateToForgotPassword,
+            )
+            VerticalSpacerMedium()
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 LafyuuText(
-                    text = "Don't have an account? "
+                    text = "Don't have an account? ",
+                    style = Theme.typography.mediumTextRegular,
+                    color = Theme.color.neutralGrey,
                 )
                 LafyuuText(
                     text = "Register",
                     modifier = Modifier.clickable { onNavigateToRegister() },
-                    style = Theme.typography.normalTextBold.copy(
-                        textDecoration = TextDecoration.Underline
-                    )
+                    style = Theme.typography.mediumTextBold,
+                    onClick = onNavigateToRegister,
                 )
             }
         }

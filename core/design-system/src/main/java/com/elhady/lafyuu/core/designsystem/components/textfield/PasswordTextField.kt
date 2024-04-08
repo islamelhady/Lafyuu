@@ -24,6 +24,7 @@ import com.elhady.lafyuu.core.designsystem.icons.Invisibility
 import com.elhady.lafyuu.core.designsystem.icons.Password
 import com.elhady.lafyuu.core.designsystem.icons.Visibility
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
+import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 
 @Composable
@@ -50,6 +51,7 @@ fun PasswordTextField(
             IconButton(onClick = { isVisible = !isVisible }) {
                 Icon(
                     imageVector = if (isVisible) Invisibility else Visibility,
+                    tint = Theme.color.neutralGrey,
                     contentDescription = if (isVisible) "Hide password" else "Show password",
                 )
             }
