@@ -5,7 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.elhady.lafyuu.feature.auth.presentation.change_password.ChangePasswordScreen
+import com.elhady.lafyuu.feature.auth.presentation.email_verification.EmailVerificationScreen
 import com.elhady.lafyuu.feature.auth.presentation.forgot_password.ForgotPasswordScreen
 import com.elhady.lafyuu.feature.auth.presentation.login.LoginScreen
 import com.elhady.lafyuu.feature.auth.presentation.otp.OtpScreen
@@ -18,7 +18,7 @@ const val REGISTER_ROUTE = "register"
 const val OTP_ROUTE = "otp/{email}"
 const val FORGOT_PASSWORD_ROUTE = "forgot_password"
 const val RESET_PASSWORD_ROUTE = "reset_password/{email}"
-const val CHANGE_PASSWORD_ROUTE = "change_password"
+const val EMAIL_VERIFICATION_ROUTE = "email_verification"
 
 fun NavController.navigateToAuth(navOptions: NavOptions? = null) {
     this.navigate(AUTH_GRAPH_ROUTE, navOptions)
@@ -44,8 +44,8 @@ fun NavController.navigateToResetPassword(email: String, navOptions: NavOptions?
     this.navigate("reset_password/$email", navOptions)
 }
 
-fun NavController.navigateToChangePassword(navOptions: NavOptions? = null) {
-    this.navigate(CHANGE_PASSWORD_ROUTE, navOptions)
+fun NavController.navigateToEmailVerification(navOptions: NavOptions? = null) {
+    this.navigate(EMAIL_VERIFICATION_ROUTE, navOptions)
 }
 
 fun NavGraphBuilder.authGraph(
@@ -93,9 +93,14 @@ fun NavGraphBuilder.authGraph(
                 }
             )
         }
-        composable(route = CHANGE_PASSWORD_ROUTE) {
-            ChangePasswordScreen(
-                onNavigateBack = { navController.popBackStack() }
+        composable(route = EMAIL_VERIFICATION_ROUTE) {
+            EmailVerificationScreen(
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToLogin = {
+                    navController.navigate(LOGIN_ROUTE) {
+                        popUpTo(AUTH_GRAPH_ROUTE) { inclusive = false }
+                    }
+                }
             )
         }
     }
