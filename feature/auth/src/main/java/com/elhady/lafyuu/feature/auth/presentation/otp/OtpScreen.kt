@@ -124,6 +124,7 @@ private fun OtpContent(
                 isError = uiState.otpError != null,
                 errorMessage = uiState.otpError,
             )
+            VerticalSpacerLarge()
             LafyuuText(
                 text = "Didn't receive code?  ",
                 color = Theme.color.neutralGrey,
