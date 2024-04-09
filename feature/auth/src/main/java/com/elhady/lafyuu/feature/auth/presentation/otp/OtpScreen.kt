@@ -97,7 +97,7 @@ private fun OtpContent(
             )
             VerticalSpacerLarge()
             LafyuuText(
-                text = "Enter OTP",
+                text = "Enter Verification Code",
                 style = Theme.typography.heading4,
                 color = Theme.color.neutralDark,
             )
@@ -123,9 +123,18 @@ private fun OtpContent(
                 onValueChange = { onEvent(OtpUiEvent.OtpChanged(it)) },
                 isError = uiState.otpError != null,
                 errorMessage = uiState.otpError,
-                modifier = Modifier.padding(bottom = 24.dp)
             )
-
+            LafyuuText(
+                text = "Didn't receive code?  ",
+                color = Theme.color.neutralGrey,
+                style = Theme.typography.normalTextRegular
+            )
+            LafyuuText(
+                text = "Resend Code",
+                style = Theme.typography.normalTextBold,
+                onClick = { onEvent(OtpUiEvent.ResendOtpClicked) }
+            )
+            VerticalSpacerExtraLarge()
             DefaultButton(
                 caption = "Verify",
                 onClick = { onEvent(OtpUiEvent.VerifyClicked) },
@@ -135,22 +144,11 @@ private fun OtpContent(
 
             VerticalSpacerExtraLarge()
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                LafyuuText(
-                    text = "Didn't receive code?  ",
-                    color = Theme.color.neutralGrey,
-                    style = Theme.typography.normalTextRegular
-                )
-                LafyuuText(
-                    text = "Resend",
-                    style = Theme.typography.normalTextBold,
-                    onClick = { onEvent(OtpUiEvent.ResendOtpClicked) }
-                )
-            }
+            LafyuuText(
+                text = "Back to Login",
+                style = Theme.typography.normalTextBold,
+                onClick = { onEvent(OtpUiEvent.ResendOtpClicked) }
+            )
         }
     }
 }
