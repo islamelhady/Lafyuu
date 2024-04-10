@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun RegisterScreen(
     onNavigateToLogin: () -> Unit,
-    onNavigateToOtp: (String) -> Unit,
+    onNavigateToEmailVerification: (String) -> Unit,
     viewModel: RegisterViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -50,7 +50,7 @@ fun RegisterScreen(
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
                 RegisterUiEffect.NavigateToLogin -> onNavigateToLogin()
-                RegisterUiEffect.NavigateToOtp -> onNavigateToOtp(uiState.email)
+                is RegisterUiEffect.NavigateToEmailVerification -> onNavigateToEmailVerification(effect.email)
                 is RegisterUiEffect.ShowError -> snackbarHostState.showSnackbar(
                     visuals = LafyuuSnackBarVisuals(
                         message = effect.message,

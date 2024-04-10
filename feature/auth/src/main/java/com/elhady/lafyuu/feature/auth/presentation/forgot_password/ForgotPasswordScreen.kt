@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun ForgotPasswordScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToResetPassword: (String) -> Unit,
+    onNavigateToOtp: (String) -> Unit,
     viewModel: ForgotPasswordViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -47,7 +47,7 @@ fun ForgotPasswordScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
-                is ForgotPasswordUiEffect.NavigateToResetPassword -> onNavigateToResetPassword(
+                is ForgotPasswordUiEffect.NavigateToOtp -> onNavigateToOtp(
                     effect.email
                 )
 

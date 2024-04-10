@@ -62,7 +62,7 @@ class ForgotPasswordViewModel @Inject constructor(
             when (val result = forgotPasswordUseCase(email)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _uiEffect.send(ForgotPasswordUiEffect.NavigateToResetPassword(email))
+                    _uiEffect.send(ForgotPasswordUiEffect.NavigateToOtp(email))
                 }
                 is AppResult.Error -> {
                     val errorMessage = result.message ?: "Request failed"

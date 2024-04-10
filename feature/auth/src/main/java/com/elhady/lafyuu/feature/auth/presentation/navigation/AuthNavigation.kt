@@ -15,10 +15,10 @@ import com.elhady.lafyuu.feature.auth.presentation.reset_password.ResetPasswordS
 const val AUTH_GRAPH_ROUTE = "auth_graph"
 const val LOGIN_ROUTE = "login"
 const val REGISTER_ROUTE = "register"
-const val OTP_ROUTE = "otp/{email}"
+const val EMAIL_VERIFICATION_ROUTE = "email_verification/{email}"
 const val FORGOT_PASSWORD_ROUTE = "forgot_password"
-const val RESET_PASSWORD_ROUTE = "reset_password/{email}"
-const val EMAIL_VERIFICATION_ROUTE = "email_verification"
+const val OTP_ROUTE = "otp/{email}"
+const val RESET_PASSWORD_ROUTE = "reset_password/{email}/{otp}"
 
 fun NavController.navigateToAuth(navOptions: NavOptions? = null) {
     this.navigate(AUTH_GRAPH_ROUTE, navOptions)
@@ -32,20 +32,20 @@ fun NavController.navigateToRegister(navOptions: NavOptions? = null) {
     this.navigate(REGISTER_ROUTE, navOptions)
 }
 
-fun NavController.navigateToOtp(email: String, navOptions: NavOptions? = null) {
-    this.navigate("otp/$email", navOptions)
+fun NavController.navigateToEmailVerification(email: String, navOptions: NavOptions? = null) {
+    this.navigate("email_verification/$email", navOptions)
 }
 
 fun NavController.navigateToForgotPassword(navOptions: NavOptions? = null) {
     this.navigate(FORGOT_PASSWORD_ROUTE, navOptions)
 }
 
-fun NavController.navigateToResetPassword(email: String, navOptions: NavOptions? = null) {
-    this.navigate("reset_password/$email", navOptions)
+fun NavController.navigateToOtp(email: String, navOptions: NavOptions? = null) {
+    this.navigate("otp/$email", navOptions)
 }
 
-fun NavController.navigateToEmailVerification(navOptions: NavOptions? = null) {
-    this.navigate(EMAIL_VERIFICATION_ROUTE, navOptions)
+fun NavController.navigateToResetPassword(email: String, otp: String, navOptions: NavOptions? = null) {
+    this.navigate("reset_password/$email/$otp", navOptions)
 }
 
 fun NavGraphBuilder.authGraph(
@@ -66,12 +66,12 @@ fun NavGraphBuilder.authGraph(
         composable(route = REGISTER_ROUTE) {
             RegisterScreen(
                 onNavigateToLogin = { navController.popBackStack() },
-                onNavigateToOtp = { email -> navController.navigateToOtp(email) }
+                onNavigateToEmailVerification = { email -> navController.navigateToEmailVerification(email) }
             )
         }
-        composable(route = OTP_ROUTE) {
-            OtpScreen(
-                onNavigateToLogin = { 
+        composable(route = EMAIL_VERIFICATION_ROUTE) {
+            EmailVerificationScreen(
+                onNavigateToLogin = {
                     navController.navigate(LOGIN_ROUTE) {
                         popUpTo(AUTH_GRAPH_ROUTE) { inclusive = false }
                     }
@@ -81,11 +81,12 @@ fun NavGraphBuilder.authGraph(
         composable(route = FORGOT_PASSWORD_ROUTE) {
             ForgotPasswordScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToResetPassword = { email -> navController.navigateToResetPassword(email) }
+                onNavigateToOtp = { email -> navController.navigateToOtp(email) }
             )
         }
-        composable(route = RESET_PASSWORD_ROUTE) {
-            ResetPasswordScreen(
+        composable(route = OTP_ROUTE) {
+            OtpScreen(
+                onNavigateToResetPassword = { email, otp -> navController.navigateToResetPassword(email, otp) },
                 onNavigateToLogin = {
                     navController.navigate(LOGIN_ROUTE) {
                         popUpTo(AUTH_GRAPH_ROUTE) { inclusive = false }
@@ -93,9 +94,8 @@ fun NavGraphBuilder.authGraph(
                 }
             )
         }
-        composable(route = EMAIL_VERIFICATION_ROUTE) {
-            EmailVerificationScreen(
-                onNavigateToHome = onNavigateToHome,
+        composable(route = RESET_PASSWORD_ROUTE) {
+            ResetPasswordScreen(
                 onNavigateToLogin = {
                     navController.navigate(LOGIN_ROUTE) {
                         popUpTo(AUTH_GRAPH_ROUTE) { inclusive = false }

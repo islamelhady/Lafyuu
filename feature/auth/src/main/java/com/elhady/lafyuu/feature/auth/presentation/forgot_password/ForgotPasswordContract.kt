@@ -13,6 +13,6 @@ sealed interface ForgotPasswordUiEvent {
 }
 
 sealed interface ForgotPasswordUiEffect {
-    data class NavigateToResetPassword(val email: String) : ForgotPasswordUiEffect
+    data class NavigateToOtp(val email: String) : ForgotPasswordUiEffect
     data class ShowError(val message: String) : ForgotPasswordUiEffect
 }

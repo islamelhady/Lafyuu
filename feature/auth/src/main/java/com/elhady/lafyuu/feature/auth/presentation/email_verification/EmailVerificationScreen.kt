@@ -38,7 +38,6 @@ import java.util.Locale
 
 @Composable
 fun EmailVerificationScreen(
-    onNavigateToHome: () -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: EmailVerificationViewModel = viewModel()
 ) {
@@ -48,7 +47,7 @@ fun EmailVerificationScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
-                EmailVerificationUiEffect.NavigateToHome -> onNavigateToHome()
+                EmailVerificationUiEffect.NavigateToLogin -> onNavigateToLogin()
                 is EmailVerificationUiEffect.ShowError -> snackBarHostState.showSnackbar(
                     visuals = LafyuuSnackBarVisuals(
                         message = effect.message,

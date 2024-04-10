@@ -80,7 +80,7 @@ class EmailVerificationViewModel @Inject constructor(
             when (val result = verifyEmailUseCase(email, otp)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _uiEffect.send(EmailVerificationUiEffect.NavigateToHome)
+                    _uiEffect.send(EmailVerificationUiEffect.NavigateToLogin)
                 }
                 is AppResult.Error -> {
                     val errorMessage = result.message ?: "Verification failed"

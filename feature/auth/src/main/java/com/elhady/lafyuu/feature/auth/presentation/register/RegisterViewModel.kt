@@ -98,7 +98,7 @@ class RegisterViewModel @Inject constructor(
             when (val result = registerUseCase(state.email, state.password, state.firstName, state.lastName)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _uiEffect.send(RegisterUiEffect.NavigateToOtp)
+                    _uiEffect.send(RegisterUiEffect.NavigateToEmailVerification(state.email))
                 }
                 is AppResult.Error -> {
                     val errorMessage = result.message ?: "Registration failed"

@@ -7,7 +7,6 @@ import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.feature.auth.domain.model.ValidationResult
 import com.elhady.lafyuu.feature.auth.domain.usecase.ResetPasswordUseCase
 import com.elhady.lafyuu.feature.auth.domain.validator.ValidateConfirmPassword
-import com.elhady.lafyuu.feature.auth.domain.validator.ValidateOtp
 import com.elhady.lafyuu.feature.auth.domain.validator.ValidatePassword
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -22,15 +21,15 @@ import javax.inject.Inject
 @HiltViewModel
 class ResetPasswordViewModel @Inject constructor(
     private val resetPasswordUseCase: ResetPasswordUseCase,
-    private val validateOtp: ValidateOtp,
     private val validatePassword: ValidatePassword,
     private val validateConfirmPassword: ValidateConfirmPassword,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val email: String = checkNotNull(savedStateHandle["email"])
+    private val otp: String = checkNotNull(savedStateHandle["otp"])
 
-    private val _uiState = MutableStateFlow(ResetPasswordUiState(email = email))
+    private val _uiState = MutableStateFlow(ResetPasswordUiState(email = email, otp = otp))
     val uiState: StateFlow<ResetPasswordUiState> = _uiState.asStateFlow()
 
     private val _uiEffect = Channel<ResetPasswordUiEffect>()
@@ -55,16 +54,14 @@ class ResetPasswordViewModel @Inject constructor(
         if (_uiState.value.isLoading) return
 
         val state = _uiState.value
-        val otpResult = validateOtp(state.otp)
         val passwordResult = validatePassword(state.newPassword)
         val confirmPasswordResult = validateConfirmPassword(state.newPassword, state.confirmPassword)
 
-        val hasError = listOf(otpResult, passwordResult, confirmPasswordResult).any { it is ValidationResult.Error }
+        val hasError = listOf(passwordResult, confirmPasswordResult).any { it is ValidationResult.Error }
 
         if (hasError) {
             _uiState.update {
                 it.copy(
-                    otpError = if (otpResult is ValidationResult.Error.OtpRequired) "OTP is required" else null,
                     newPasswordError = if (passwordResult is ValidationResult.Error.PasswordRequired) "New password is required" else null,
                     confirmPasswordError = when (confirmPasswordResult) {
                         ValidationResult.Error.ConfirmPasswordRequired -> "Confirm password is required"
@@ -78,7 +75,7 @@ class ResetPasswordViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, generalError = null) }
-            when (val result = resetPasswordUseCase(email, state.otp, state.newPassword)) {
+            when (val result = resetPasswordUseCase(email, otp, state.newPassword)) {
                 is AppResult.Success<*> -> {
                     _uiState.update { it.copy(isLoading = false) }
                     _uiEffect.send(ResetPasswordUiEffect.NavigateToLogin)

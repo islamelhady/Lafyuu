@@ -3,11 +3,8 @@ package com.elhady.lafyuu.feature.auth.presentation.otp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.R
@@ -40,6 +36,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun OtpScreen(
+    onNavigateToResetPassword: (String, String) -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: OtpViewModel = viewModel()
 ) {
@@ -49,6 +46,7 @@ fun OtpScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
+                is OtpUiEffect.NavigateToResetPassword -> onNavigateToResetPassword(effect.email, effect.otp)
                 OtpUiEffect.NavigateToLogin -> onNavigateToLogin()
                 is OtpUiEffect.ShowError -> snackBarHostState.showSnackbar(
                     visuals = LafyuuSnackBarVisuals(
@@ -70,6 +68,7 @@ fun OtpScreen(
     OtpContent(
         uiState = uiState,
         onEvent = viewModel::onEvent,
+        onNavigateToLogin = onNavigateToLogin,
         snackBarHostState = snackBarHostState
     )
 }
@@ -78,6 +77,7 @@ fun OtpScreen(
 private fun OtpContent(
     uiState: OtpUiState,
     onEvent: (OtpUiEvent) -> Unit,
+    onNavigateToLogin: () -> Unit = {},
     snackBarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     LafyuuScaffold(
@@ -103,7 +103,7 @@ private fun OtpContent(
             )
             VerticalSpacerSmall()
             LafyuuText(
-                text = "We’ve send a 6-digit verification code to your email address",
+                text = "We've send a 6-digit verification code to your email address",
                 style = Theme.typography.normalTextRegular,
                 color = Theme.color.neutralGrey,
                 textAlign = TextAlign.Center,
@@ -148,7 +148,7 @@ private fun OtpContent(
             LafyuuText(
                 text = "Back to Login",
                 style = Theme.typography.normalTextBold,
-                onClick = { onEvent(OtpUiEvent.ResendOtpClicked) }
+                onClick = onNavigateToLogin
             )
         }
     }

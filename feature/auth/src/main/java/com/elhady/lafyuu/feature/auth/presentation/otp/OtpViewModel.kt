@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.feature.auth.domain.model.ValidationResult
 import com.elhady.lafyuu.feature.auth.domain.usecase.ResendOtpUseCase
-import com.elhady.lafyuu.feature.auth.domain.usecase.VerifyEmailUseCase
+import com.elhady.lafyuu.feature.auth.domain.usecase.ValidateOtpUseCase
 import com.elhady.lafyuu.feature.auth.domain.validator.ValidateOtp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OtpViewModel @Inject constructor(
-    private val verifyEmailUseCase: VerifyEmailUseCase,
+    private val validateOtpUseCase: ValidateOtpUseCase,
     private val resendOtpUseCase: ResendOtpUseCase,
     private val validateOtp: ValidateOtp,
     savedStateHandle: SavedStateHandle
@@ -58,10 +58,10 @@ class OtpViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, generalError = null) }
 
-            when (val result = verifyEmailUseCase(email, otp)) {
+            when (val result = validateOtpUseCase(email, otp)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _uiEffect.send(OtpUiEffect.NavigateToLogin)
+                    _uiEffect.send(OtpUiEffect.NavigateToResetPassword(email, otp))
                 }
                 is AppResult.Error -> {
                     val errorMessage = result.message ?: "Verification failed"

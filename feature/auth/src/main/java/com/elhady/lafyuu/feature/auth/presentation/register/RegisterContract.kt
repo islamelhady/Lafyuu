@@ -26,6 +26,6 @@ sealed interface RegisterUiEvent {
 
 sealed interface RegisterUiEffect {
     data object NavigateToLogin : RegisterUiEffect
-    data object NavigateToOtp : RegisterUiEffect
+    data class NavigateToEmailVerification(val email: String) : RegisterUiEffect
     data class ShowError(val message: String) : RegisterUiEffect
 }

@@ -17,7 +17,7 @@ sealed interface EmailVerificationUiEvent {
 }
 
 sealed interface EmailVerificationUiEffect {
-    data object NavigateToHome : EmailVerificationUiEffect
+    data object NavigateToLogin : EmailVerificationUiEffect
     data class ShowError(val message: String) : EmailVerificationUiEffect
     data class ShowSuccessMessage(val message: String) : EmailVerificationUiEffect
 }
