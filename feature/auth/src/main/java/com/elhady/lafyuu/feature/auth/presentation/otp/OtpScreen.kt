@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,8 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
@@ -38,7 +39,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun OtpScreen(
     onNavigateToResetPassword: (String, String) -> Unit,
     onNavigateToLogin: () -> Unit,
-    viewModel: OtpViewModel = viewModel()
+    viewModel: OtpViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -87,7 +88,8 @@ private fun OtpContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = Theme.space.large)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
