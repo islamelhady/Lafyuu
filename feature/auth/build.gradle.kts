@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.kotlinCompose)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
@@ -59,6 +60,11 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+
+    // Credential Manager & Google ID
+    implementation(libs.credentialmanager)
+    implementation(libs.credentialmanager.playservices)
+    implementation(libs.googleidentity)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
