@@ -100,6 +100,7 @@ private fun ResetPasswordContent(
                 value = uiState.newPassword,
                 onValueChange = { onEvent(ResetPasswordUiEvent.NewPasswordChanged(it)) },
                 placeholder = "New Password",
+                errorMessage = uiState.newPasswordError,
                 modifier = Modifier.fillMaxWidth()
             )
             VerticalSpacerSmall()
@@ -107,6 +108,7 @@ private fun ResetPasswordContent(
                 value = uiState.confirmPassword,
                 onValueChange = { onEvent(ResetPasswordUiEvent.ConfirmPasswordChanged(it)) },
                 placeholder = "Confirm Password",
+                errorMessage = uiState.confirmPasswordError,
                 modifier = Modifier.fillMaxWidth()
             )
 
