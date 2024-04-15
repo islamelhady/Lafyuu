@@ -80,6 +80,9 @@ class RegisterViewModel @Inject constructor(
                     },
                     passwordError = when (passwordResult) {
                         ValidationResult.Error.PasswordRequired -> "Password is required"
+                        ValidationResult.Error.PasswordMissingDigit -> "Password must contain at least one digit"
+                        ValidationResult.Error.PasswordMissingUppercase -> "Password must contain at least one uppercase letter"
+                        ValidationResult.Error.PasswordMissingSpecialChar -> "Password must contain at least one special character"
                         else -> null
                     },
                     confirmPasswordError = when (confirmPasswordResult) {

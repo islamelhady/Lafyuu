@@ -62,7 +62,13 @@ class ResetPasswordViewModel @Inject constructor(
         if (hasError) {
             _uiState.update {
                 it.copy(
-                    newPasswordError = if (passwordResult is ValidationResult.Error.PasswordRequired) "New password is required" else null,
+                    newPasswordError = when (passwordResult) {
+                        ValidationResult.Error.PasswordRequired -> "New password is required"
+                        ValidationResult.Error.PasswordMissingDigit -> "Password must contain at least one digit"
+                        ValidationResult.Error.PasswordMissingUppercase -> "Password must contain at least one uppercase letter"
+                        ValidationResult.Error.PasswordMissingSpecialChar -> "Password must contain at least one special character"
+                        else -> null
+                    },
                     confirmPasswordError = when (confirmPasswordResult) {
                         ValidationResult.Error.ConfirmPasswordRequired -> "Confirm password is required"
                         ValidationResult.Error.PasswordMismatch -> "Passwords do not match"

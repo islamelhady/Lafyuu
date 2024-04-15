@@ -3,13 +3,10 @@ package com.elhady.lafyuu.feature.auth.presentation.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -19,11 +16,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.R
@@ -43,7 +45,11 @@ import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextFiel
 import com.elhady.lafyuu.core.designsystem.icons.Google
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.network.config.NetworkConfig
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -95,6 +101,9 @@ private fun LoginContent(
     onNavigateToForgotPassword: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     LafyuuScaffold(
         snackbarHostState = snackbarHostState
     ) {
@@ -156,7 +165,47 @@ private fun LoginContent(
             SocialButton(
                 icon = Google,
                 caption = "Login with Google",
-                onClick = { onEvent(LoginUiEvent.GoogleLoginClicked("idToken")) },
+                onClick = {
+                    scope.launch {
+                        try {
+                            val credentialManager = CredentialManager.create(context)
+                            val googleIdOption = GetGoogleIdOption.Builder()
+                                .setFilterByAuthorizedAccounts(false)
+                                .setServerClientId(NetworkConfig.GOOGLE_WEB_CLIENT_ID)
+                                .setAutoSelectEnabled(false)
+                                .build()
+
+                            val request = GetCredentialRequest.Builder()
+                                .addCredentialOption(googleIdOption)
+                                .build()
+
+                            val result = credentialManager.getCredential(context, request)
+                            val credential = result.credential
+                            if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                                onEvent(LoginUiEvent.GoogleLoginClicked(googleIdTokenCredential.idToken))
+                            }
+                        } catch (e: GetCredentialCancellationException) {
+                            // User cancelled sign-in, do not trigger error
+                        } catch (e: Exception) {
+                            android.util.Log.e("GoogleSignIn", "Credential Manager error: ${e.javaClass.simpleName}", e)
+                            val errorMessage = when (e) {
+                                is androidx.credentials.exceptions.NoCredentialException ->
+                                    "No Google account found on device. Please sign in to a Google account in Android Settings."
+                                is androidx.credentials.exceptions.GetCredentialProviderConfigurationException ->
+                                    "Google Sign-In configuration error. Verify Web Client ID & SHA-1 in Google Cloud Console."
+                                else ->
+                                    e.localizedMessage ?: "Google Sign-In failed (${e.javaClass.simpleName})"
+                            }
+                            snackbarHostState.showSnackbar(
+                                visuals = LafyuuSnackBarVisuals(
+                                    message = errorMessage,
+                                    type = AlertType.Error
+                                )
+                            )
+                        }
+                    }
+                },
                 isLoading = uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )

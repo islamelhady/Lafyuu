@@ -42,6 +42,14 @@ fun MainApp(
 ) {
     val navController = rememberNavController()
 
+    androidx.compose.runtime.LaunchedEffect(isAuthenticated) {
+        if (isAuthenticated) {
+            navController.navigate(HOME_ROUTE) {
+                popUpTo(AUTH_GRAPH_ROUTE) { inclusive = true }
+            }
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = if (isAuthenticated) HOME_ROUTE else AUTH_GRAPH_ROUTE

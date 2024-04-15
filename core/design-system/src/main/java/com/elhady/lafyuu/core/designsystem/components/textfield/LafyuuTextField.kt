@@ -38,7 +38,13 @@ internal fun LafyuuTextField(
     trailingContent: @Composable (() -> Unit)? = null,
     shape: Shape = Theme.corner.small,
 ) {
-    val unfocusedBorderColor = when (state) {
+    val effectiveState = if (state == LafyuuFieldState.Default && !errorMessage.isNullOrBlank()) {
+        LafyuuFieldState.Error
+    } else {
+        state
+    }
+
+    val unfocusedBorderColor = when (effectiveState) {
         LafyuuFieldState.Default -> Theme.color.neutralLight
         LafyuuFieldState.Active -> Theme.color.blue
         LafyuuFieldState.Error -> Theme.color.error
@@ -59,7 +65,7 @@ internal fun LafyuuTextField(
             minLines = minLines,
             singleLine = minLines == 1,
             readOnly = readOnly,
-            isError = state == LafyuuFieldState.Error,
+            isError = effectiveState == LafyuuFieldState.Error,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             visualTransformation = visualTransformation,
             shape = shape,
@@ -78,7 +84,7 @@ internal fun LafyuuTextField(
                 .height(textAreaSize),
             textStyle = Theme.typography.normalTextBold.copy(color = Theme.color.neutralGrey)
         )
-        if (state == LafyuuFieldState.Error && errorMessage != null) {
+        if (effectiveState == LafyuuFieldState.Error && !errorMessage.isNullOrBlank()) {
             Spacer(Modifier.height(Theme.space.extraExtraSmall))
             LafyuuText(
                 text = errorMessage,

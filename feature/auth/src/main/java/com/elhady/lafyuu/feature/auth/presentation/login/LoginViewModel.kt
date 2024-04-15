@@ -58,12 +58,11 @@ class LoginViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     emailError = when (emailResult) {
-                        ValidationResult.Error.EmailRequired -> "Email is required"
-                        ValidationResult.Error.InvalidEmailFormat -> "Invalid email format"
+                        is ValidationResult.Error -> "Oops! Your Email Is Not Correct"
                         else -> null
                     },
                     passwordError = when (passwordResult) {
-                        ValidationResult.Error.PasswordRequired -> "Password is required"
+                        is ValidationResult.Error -> "Oops! Your Password Is Not Correct"
                         else -> null
                     }
                 )

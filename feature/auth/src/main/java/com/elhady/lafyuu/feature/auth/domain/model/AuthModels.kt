@@ -28,6 +28,9 @@ sealed interface ValidationResult {
         data object EmailRequired : Error
         data object InvalidEmailFormat : Error
         data object PasswordRequired : Error
+        data object PasswordMissingDigit : Error
+        data object PasswordMissingUppercase : Error
+        data object PasswordMissingSpecialChar : Error
         data object ConfirmPasswordRequired : Error
         data object PasswordMismatch : Error
         data object NameRequired : Error

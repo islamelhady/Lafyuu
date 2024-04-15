@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.auth.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.datastore.LafyuuDataStore
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
 import com.elhady.lafyuu.core.network.error.NetworkError
 import com.elhady.lafyuu.feature.auth.data.mapper.toDomain
@@ -14,10 +15,9 @@ import com.elhady.lafyuu.feature.auth.data.remote.model.ResendOtpRequest
 import com.elhady.lafyuu.feature.auth.data.remote.model.ResetPasswordRequest
 import com.elhady.lafyuu.feature.auth.data.remote.model.ValidateOtpRequest
 import com.elhady.lafyuu.feature.auth.data.remote.model.VerifyEmailRequest
-import com.elhady.lafyuu.feature.auth.domain.repository.AuthRepository
 import com.elhady.lafyuu.feature.auth.domain.model.AuthToken
 import com.elhady.lafyuu.feature.auth.domain.model.User
-import com.elhady.lafyuu.core.datastore.LafyuuDataStore
+import com.elhady.lafyuu.feature.auth.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -39,7 +39,7 @@ class AuthRepositoryImpl @Inject constructor(
                 mapError(apiErrorParser.parseError(response))
             }
         } catch (e: Exception) {
-            AppResult.Error(throwable = e)
+            mapError(apiErrorParser.parseException(e))
         }
     }
 
@@ -52,7 +52,7 @@ class AuthRepositoryImpl @Inject constructor(
                 mapError(apiErrorParser.parseError(response))
             }
         } catch (e: Exception) {
-            AppResult.Error(throwable = e)
+            mapError(apiErrorParser.parseException(e))
         }
     }
 
@@ -65,7 +65,7 @@ class AuthRepositoryImpl @Inject constructor(
                 mapError(apiErrorParser.parseError(response))
             }
         } catch (e: Exception) {
-            AppResult.Error(throwable = e)
+            mapError(apiErrorParser.parseException(e))
         }
     }
 
@@ -80,7 +80,7 @@ class AuthRepositoryImpl @Inject constructor(
                 mapError(apiErrorParser.parseError(response))
             }
         } catch (e: Exception) {
-            AppResult.Error(throwable = e)
+            mapError(apiErrorParser.parseException(e))
         }
     }
 
@@ -91,7 +91,6 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(Unit)
             } else {
-                // We still clear session locally
                 AppResult.Success(Unit)
             }
         } catch (e: Exception) {
@@ -109,7 +108,7 @@ class AuthRepositoryImpl @Inject constructor(
                 mapError(apiErrorParser.parseError(response))
             }
         } catch (e: Exception) {
-            AppResult.Error(throwable = e)
+            mapError(apiErrorParser.parseException(e))
         }
     }
 
@@ -117,28 +116,28 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             val response = authApi.forgotPassword(ForgotPasswordRequest(email))
             if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
-        } catch (e: Exception) { AppResult.Error(throwable = e) }
+        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
     }
 
     override suspend fun resetPassword(email: String, otp: String, password: String): AppResult<Unit> {
         return try {
             val response = authApi.resetPassword(ResetPasswordRequest(email, otp, password))
             if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
-        } catch (e: Exception) { AppResult.Error(throwable = e) }
+        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
     }
 
     override suspend fun resendOtp(email: String): AppResult<Unit> {
         return try {
             val response = authApi.resendOtp(ResendOtpRequest(email))
             if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
-        } catch (e: Exception) { AppResult.Error(throwable = e) }
+        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
     }
 
     override suspend fun validateOtp(email: String, otp: String): AppResult<Unit> {
         return try {
             val response = authApi.validateOtp(ValidateOtpRequest(email, otp))
             if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
-        } catch (e: Exception) { AppResult.Error(throwable = e) }
+        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
     }
 
     override suspend fun changePassword(
@@ -150,7 +149,7 @@ class AuthRepositoryImpl @Inject constructor(
             val response = authApi.changePassword(ChangePasswordRequest(currentPassword, newPassword, confirmNewPassword))
             if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
         } catch (e: Exception) {
-            AppResult.Error(throwable = e)
+            mapError(apiErrorParser.parseException(e))
         }
     }
 
@@ -160,11 +159,21 @@ class AuthRepositoryImpl @Inject constructor(
 
     private fun mapError(networkError: NetworkError): AppResult.Error {
         return when (networkError) {
-            is NetworkError.ApiError -> AppResult.Error(message = networkError.details.detail ?: networkError.details.title)
+            is NetworkError.ApiError -> {
+                val details = networkError.details
+                val errorMessage = details.detail
+                    ?: details.title
+                    ?: details.errors?.values?.flatten()?.firstOrNull()
+                    ?: "Request failed"
+                AppResult.Error(message = errorMessage)
+            }
             is NetworkError.Connectivity -> AppResult.Error(message = "No internet connection")
             is NetworkError.Serialization -> AppResult.Error(message = "Server error (Parsing)")
             is NetworkError.Server -> AppResult.Error(message = "Internal server error")
-            is NetworkError.Unknown -> AppResult.Error(throwable = networkError.throwable)
+            is NetworkError.Unknown -> AppResult.Error(
+                message = networkError.throwable.localizedMessage ?: "An unexpected error occurred",
+                throwable = networkError.throwable
+            )
         }
     }
 }

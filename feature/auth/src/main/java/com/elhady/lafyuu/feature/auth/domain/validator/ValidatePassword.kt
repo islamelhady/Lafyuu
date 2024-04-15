@@ -8,6 +8,15 @@ class ValidatePassword @Inject constructor() {
         if (password.isBlank()) {
             return ValidationResult.Error.PasswordRequired
         }
+        if (!password.any { it.isDigit() }) {
+            return ValidationResult.Error.PasswordMissingDigit
+        }
+        if (!password.any { it.isUpperCase() }) {
+            return ValidationResult.Error.PasswordMissingUppercase
+        }
+        if (!password.any { !it.isLetterOrDigit() }) {
+            return ValidationResult.Error.PasswordMissingSpecialChar
+        }
         return ValidationResult.Success
     }
 }
