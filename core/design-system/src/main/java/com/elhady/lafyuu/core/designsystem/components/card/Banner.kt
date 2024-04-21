@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
@@ -26,7 +27,7 @@ import coil.compose.AsyncImage
 @Composable
 fun Banner(
     title: String = "Super Flash Sale",
-    subtitle: String = "50% Off",
+    subtitle: String? = null,
     imageUrl: Any? = R.drawable.img_promo_shoes_red,
     onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -62,21 +63,25 @@ fun Banner(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = Theme.space.extraLarge, vertical = Theme.space.huge),
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.Center
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(Theme.space.small)
                 ) {
                     LafyuuText(
                         text = title,
+                        modifier = Modifier.width(209.dp),
                         style = Theme.typography.heading2,
-                        color = Theme.color.backgroundWhite
+                        color = Theme.color.backgroundWhite,
+                        maxLines = 2
                     )
-                    LafyuuText(
-                        text = subtitle,
-                        style = Theme.typography.heading2,
-                        color = Theme.color.backgroundWhite
-                    )
+                    subtitle?.let {
+                        LafyuuText(
+                            text = it,
+                            style = Theme.typography.normalTextRegular,
+                            color = Theme.color.backgroundWhite
+                        )
+                    }
                 }
             }
         }
@@ -87,8 +92,8 @@ fun Banner(
 @Composable
 fun BannerPreview() {
     Banner(
-        title = "Super Flash Sale",
-        subtitle = "50% Off",
-        imageUrl = R.drawable.img_promo_shoes_red
+        title = "Super Flash Sale 50% Off",
+        subtitle = "We recommend the best for you",
+        imageUrl = R.drawable.img_promo_shoes_close_up
     )
 }
