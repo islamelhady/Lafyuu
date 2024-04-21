@@ -2,7 +2,6 @@ package com.elhady.lafyuu.core.designsystem.components.card
 
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,18 +24,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.appbar.IconClick
 import com.elhady.lafyuu.core.designsystem.components.other.RatingBar
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
-import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.icons.Trash
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
 fun ProductCard(
-    imageUrl: Int,
+    imageUrl: Any?,
     name: String,
     price: String,
     originalPrice: String? = null,
@@ -56,15 +55,17 @@ fun ProductCard(
         Column(
             modifier = Modifier.padding(Theme.space.large)
         ) {
-            Image(
+            AsyncImage(
+                model = imageUrl ?: R.drawable.imp_product_shoes_yellow,
+                contentDescription = name,
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(R.drawable.imp_product_shoes_yellow),
+                error = painterResource(R.drawable.imp_product_shoes_yellow),
                 modifier = Modifier
                     .fillMaxWidth()
                     .size(133.dp)
                     .clip(Theme.corner.small)
-                    .background(Theme.color.neutralLight),
-                painter = painterResource(imageUrl),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
+                    .background(Theme.color.neutralLight)
             )
             LafyuuText(
                 text = name,
@@ -135,7 +136,7 @@ private fun ProductCardsPreview() {
             ) {
 
                 ProductCard(
-                    imageUrl = R.drawable.imp_product_shoes_yellow,
+                    imageUrl = painterResource(R.drawable.imp_product_shoes_yellow),
                     name = "Nike Air Zoom Pegasus 36 Miami",
                     price = "$299,43",
                     rating = 4.0f,
@@ -146,7 +147,7 @@ private fun ProductCardsPreview() {
                 )
 
                 ProductCard(
-                    imageUrl = R.drawable.imp_product_shoes_yellow,
+                    imageUrl = painterResource(R.drawable.imp_product_shoes_yellow),
                     name = "Nike Air Zoom Pegasus 36 Miami",
                     price = "$299,43",
                     discountLabel = "50% OFF",
@@ -155,7 +156,7 @@ private fun ProductCardsPreview() {
                 )
 
                 ProductCard(
-                    imageUrl = R.drawable.imp_product_shoes_yellow,
+                    imageUrl = painterResource(R.drawable.imp_product_shoes_yellow),
                     name = "Nike Air Zoom Pegasus 36 Miami",
                     price = "$299,43",
                     rating = 4.0f,

@@ -1,6 +1,5 @@
 package com.elhady.lafyuu.core.designsystem.components.card
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,21 +18,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.elhady.lafyuu.core.designsystem.R
-import com.elhady.lafyuu.core.designsystem.components.other.CountdownTimer
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+
+import coil.compose.AsyncImage
 
 @Composable
 fun Banner(
     title: String = "Super Flash Sale",
     subtitle: String = "50% Off",
-    hours: String = "08",
-    minutes: String = "34",
-    seconds: String = "52",
-    imageResId: Int,
+    imageUrl: Any? = R.drawable.img_promo_shoes_red,
+    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Card(
+        onClick = { onClick?.invoke() },
+        enabled = onClick != null,
         modifier = modifier
             .fillMaxWidth()
             .height(208.dp),
@@ -43,10 +43,12 @@ fun Banner(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            Image(
-                painter = painterResource(id = imageResId),
+            AsyncImage(
+                model = imageUrl ?: R.drawable.img_promo_shoes_red,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.img_promo_shoes_red),
+                error = painterResource(id = R.drawable.img_promo_shoes_red),
                 modifier = Modifier.fillMaxSize()
             )
 
@@ -60,33 +62,26 @@ fun Banner(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = Theme.space.extraLarge, vertical = Theme.space.huge),
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.Top
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(Theme.space.small)
                 ) {
                     LafyuuText(
                         text = title,
-                        style = Theme.typography.heading4,
+                        style = Theme.typography.heading2,
                         color = Theme.color.backgroundWhite
                     )
                     LafyuuText(
                         text = subtitle,
-                        style = Theme.typography.heading5,
+                        style = Theme.typography.heading2,
                         color = Theme.color.backgroundWhite
                     )
                 }
-
-                CountdownTimer(
-                    hours = hours.toIntOrNull() ?: 0,
-                    minutes = minutes.toIntOrNull() ?: 0,
-                    seconds = seconds.toIntOrNull() ?: 0
-                )
             }
         }
     }
 }
-
 
 @Preview
 @Composable
@@ -94,9 +89,6 @@ fun BannerPreview() {
     Banner(
         title = "Super Flash Sale",
         subtitle = "50% Off",
-        hours = "08",
-        minutes = "34",
-        seconds = "52",
-        imageResId = R.drawable.img_promo_shoes_red
+        imageUrl = R.drawable.img_promo_shoes_red
     )
 }
