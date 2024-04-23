@@ -81,6 +81,39 @@ fun MainApp(
             navController = navController
         )
 
-        homeScreen()
+        homeScreen(
+            onNavigateToProductDetails = { productId ->
+                // Handle navigation to product details
+            },
+            onNavigateToCategory = { categoryId, categoryName ->
+                // Handle navigation to category products
+            },
+            onNavigateToFlashSale = {
+                // Handle navigation to flash sale
+            },
+            onNavigateToMegaSale = {
+                // Handle navigation to mega sale
+            },
+            onNavigateToCategories = {
+                // Handle navigation to categories
+            },
+            onNavigateToNotifications = {
+                // Handle navigation to notifications
+            },
+            onNavigateToWishlist = {
+                // Handle navigation to wishlist
+            },
+            onNavigateToTab = { tabId ->
+                if (navController.graph.findNode(tabId) != null) {
+                    navController.navigate(tabId) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            }
+        )
     }
 }
