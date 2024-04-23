@@ -4,35 +4,41 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.feature.home.domain.model.Product
-import com.elhady.lafyuu.feature.home.domain.usecase.GetCategoriesUseCase
-import com.elhady.lafyuu.feature.home.domain.usecase.GetOffersUseCase
-import com.elhady.lafyuu.feature.home.domain.usecase.GetProductsUseCase
+import com.elhady.lafyuu.feature.home.domain.usecase.GetHomeContentUseCase
+import com.elhady.lafyuu.feature.home.domain.usecase.SearchProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val getOffersUseCase: GetOffersUseCase,
-    private val getProductsUseCase: GetProductsUseCase
+    private val getHomeContentUseCase: GetHomeContentUseCase,
+    private val searchProductsUseCase: SearchProductsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
+    private val _searchQuery = MutableStateFlow("")
 
     private val _effect = Channel<HomeUiEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
     init {
         loadHomeData()
+        observeSearchQuery()
     }
 
     fun onEvent(event: HomeUiEvent) {
@@ -57,76 +63,87 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val categoriesDeferred = async { getCategoriesUseCase() }
-            val offersDeferred = async { getOffersUseCase() }
-            val flashSaleDeferred = async { getProductsUseCase(page = 1, pageSize = 10) }
-            val megaSaleDeferred = async { getProductsUseCase(page = 2, pageSize = 10) }
-            val recommendedDeferred = async { getProductsUseCase(page = 1, pageSize = 20) }
-
-            val categoriesRes = categoriesDeferred.await()
-            val offersRes = offersDeferred.await()
-            val flashSaleRes = flashSaleDeferred.await()
-            val megaSaleRes = megaSaleDeferred.await()
-            val recommendedRes = recommendedDeferred.await()
-
-            val categories = (categoriesRes as? AppResult.Success)?.data ?: emptyList()
-            val offers = (offersRes as? AppResult.Success)?.data ?: emptyList()
-
-            val p1 = (flashSaleRes as? AppResult.Success)?.data ?: emptyList()
-            val p2 = (megaSaleRes as? AppResult.Success)?.data ?: emptyList()
-            val p3 = (recommendedRes as? AppResult.Success)?.data ?: emptyList()
-
-            val allProducts = (p1 + p2 + p3).distinctBy { it.id }
-
-            val flashSaleProducts = p1.ifEmpty { allProducts.take(6) }
-            val megaSaleProducts = p2.ifEmpty { allProducts.take(6) }
-            val recommendedProducts = p3.ifEmpty { allProducts }
-
-            val hasError = (categoriesRes is AppResult.Error) &&
-                    (flashSaleRes is AppResult.Error) &&
-                    (recommendedRes is AppResult.Error)
-
-            val errorMsg = if (hasError) {
-                (categoriesRes as? AppResult.Error)?.message
-                    ?: (flashSaleRes as? AppResult.Error)?.message
-                    ?: (recommendedRes as? AppResult.Error)?.message
-                    ?: (offersRes as? AppResult.Error)?.message
-                    ?: "Failed to load content. Please check your network connection."
-            } else null
-
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    categories = categories,
-                    offers = offers,
-                    flashSaleProducts = flashSaleProducts,
-                    megaSaleProducts = megaSaleProducts,
-                    recommendedProducts = recommendedProducts,
-                    errorMessage = errorMsg
-                )
+            when (val result = getHomeContentUseCase()) {
+                is AppResult.Success -> {
+                    val content = result.data
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            categories = content.categories,
+                            offers = content.offers,
+                            flashSaleProducts = content.flashSaleProducts,
+                            megaSaleProducts = content.megaSaleProducts,
+                            recommendedProducts = content.recommendedProducts,
+                            errorMessage = null
+                        )
+                    }
+                }
+                is AppResult.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.message
+                        )
+                    }
+                }
+                is AppResult.Loading -> {}
             }
         }
     }
 
-    fun onSearchQueryChange(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
-
-        if (query.isBlank()) {
-            _uiState.update { it.copy(isSearching = false, searchResults = emptyList()) }
-            return
-        }
-
+    private fun observeSearchQuery() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isSearching = true) }
-            when (val result = getProductsUseCase(searchTerm = query, pageSize = 20)) {
-                is AppResult.Success -> {
-                    _uiState.update { it.copy(searchResults = result.data) }
+            _searchQuery
+                .debounce(300L)
+                .distinctUntilChanged()
+                .collectLatest { query ->
+                    if (query.isBlank()) {
+                        _uiState.update {
+                            it.copy(
+                                searchQuery = "",
+                                isSearching = false,
+                                searchResults = emptyList()
+                            )
+                        }
+                    } else {
+                        _uiState.update { it.copy(isSearching = true) }
+                        when (val result = searchProductsUseCase(query)) {
+                            is AppResult.Success -> {
+                                _uiState.update {
+                                    it.copy(
+                                        isSearching = false,
+                                        searchResults = result.data
+                                    )
+                                }
+                            }
+                            is AppResult.Error -> {
+                                _uiState.update {
+                                    it.copy(
+                                        isSearching = false,
+                                        searchResults = emptyList()
+                                    )
+                                }
+                            }
+                            is AppResult.Loading -> {}
+                        }
+                    }
                 }
-                is AppResult.Error -> {
-                    _uiState.update { it.copy(searchResults = emptyList()) }
-                }
-                is AppResult.Loading -> {}
+        }
+    }
+
+    fun onSearchQueryChange(query: String) {
+        if (query.isBlank()) {
+            _uiState.update {
+                it.copy(
+                    searchQuery = "",
+                    isSearching = false,
+                    searchResults = emptyList()
+                )
             }
+            _searchQuery.value = ""
+        } else {
+            _uiState.update { it.copy(searchQuery = query, isSearching = true) }
+            _searchQuery.value = query
         }
     }
 
@@ -138,6 +155,7 @@ class HomeViewModel @Inject constructor(
                 searchResults = emptyList()
             )
         }
+        _searchQuery.value = ""
     }
 
     private fun onFavoriteClicked(productId: String) {
