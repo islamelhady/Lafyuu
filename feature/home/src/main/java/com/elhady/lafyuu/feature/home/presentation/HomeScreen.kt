@@ -117,31 +117,44 @@ internal fun HomeScreen(
                 }
 
                 uiState.searchQuery.isNotBlank() -> {
-                    if (uiState.searchResults.isNotEmpty()) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(vertical = Theme.space.large)
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            RecommendedProductsSection(
-                                products = uiState.searchResults,
-                                onProductClick = { onEvent(HomeUiEvent.ProductClicked(it)) }
-                            )
+                    when {
+                        uiState.isSearching -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = Theme.color.blue)
+                            }
                         }
-                    } else if (!uiState.isSearching) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(Theme.space.large),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            LafyuuText(
-                                text = "No products found for \"${uiState.searchQuery}\"",
-                                style = Theme.typography.normalTextRegular,
-                                color = Theme.color.neutralGrey,
-                                textAlign = TextAlign.Center
-                            )
+
+                        uiState.searchResults.isNotEmpty() -> {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(vertical = Theme.space.large)
+                                    .verticalScroll(rememberScrollState())
+                            ) {
+                                RecommendedProductsSection(
+                                    products = uiState.searchResults,
+                                    onProductClick = { onEvent(HomeUiEvent.ProductClicked(it)) }
+                                )
+                            }
+                        }
+
+                        else -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(Theme.space.large),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                LafyuuText(
+                                    text = "No products found for \"${uiState.searchQuery}\"",
+                                    style = Theme.typography.normalTextRegular,
+                                    color = Theme.color.neutralGrey,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
                     }
                 }
