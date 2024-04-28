@@ -2,15 +2,17 @@ package com.elhady.lafyuu.core.designsystem.components.other
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,47 +29,39 @@ import com.elhady.lafyuu.core.designsystem.icons.WomanBag
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
-import coil.compose.AsyncImage
-
 @Composable
 fun ProductCategory(
     label: String,
-    icon: Any?,
+    icon: ImageVector?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Column(
-        modifier = modifier
-            .width(Theme.size.huge)
-            .clickable(onClick = onClick),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(Theme.space.small)
+    Card(
+        onClick = onClick,
+        modifier = modifier.width(Theme.size.huge),
+        shape = Theme.corner.small,
+        colors = CardDefaults.cardColors(containerColor = Theme.color.backgroundWhite),
     ) {
-        Box(
-            modifier = Modifier
-                .size(Theme.size.huge)
-                .clip(CircleShape)
-                .background(Theme.color.backgroundWhite)
-                .border(Theme.size.border, Theme.color.neutralLight, CircleShape)
-                .background(Theme.color.backgroundWhite),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Theme.space.small)
         ) {
-            when (icon) {
-                is ImageVector -> {
+            Box(
+                modifier = Modifier
+                    .size(Theme.size.huge)
+                    .clip(CircleShape)
+                    .background(Theme.color.backgroundWhite)
+                    .border(Theme.size.border, Theme.color.neutralLight, CircleShape)
+                    .background(Theme.color.backgroundWhite),
+                contentAlignment = Alignment.Center
+            ) {
+                icon?.let {
                     Icon(
                         imageVector = icon,
                         contentDescription = label,
                         tint = Theme.color.blue,
                         modifier = Modifier.size(Theme.size.iconLarge)
-                    )
-                }
-                else -> {
-                    AsyncImage(
-                        model = icon,
-                        contentDescription = label,
-                        modifier = Modifier.size(Theme.size.iconLarge),
-                        error = null,
-                        placeholder = null
                     )
                 }
             }
