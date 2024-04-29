@@ -43,6 +43,7 @@ dependencies {
     // Modules
     implementation(project(":feature:auth"))
     implementation(project(":feature:home"))
+    implementation(project(":feature:product"))
     implementation(project(":core:design-system"))
 
     // Navigation & Lifecycle
