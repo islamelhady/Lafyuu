@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":feature:auth"))
     implementation(project(":feature:home"))
     implementation(project(":feature:product"))
+    implementation(project(":feature:cart"))
     implementation(project(":core:design-system"))
 
     // Navigation & Lifecycle
