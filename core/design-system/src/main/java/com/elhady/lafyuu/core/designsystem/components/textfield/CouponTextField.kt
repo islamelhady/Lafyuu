@@ -26,7 +26,7 @@ import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
-fun LafyuuCouponForm(
+fun CouponTextField(
     value: String,
     onValueChange: (String) -> Unit,
     onApplyClick: () -> Unit,
@@ -79,7 +79,7 @@ fun LafyuuCouponForm(
 
 @Preview(showBackground = true)
 @Composable
-private fun AllRemainingFormsPreview() {
+private fun CouponTextFieldPreview() {
     LafyuuTheme {
         Surface {
             Column(
@@ -89,9 +89,9 @@ private fun AllRemainingFormsPreview() {
             ) {
                 SectionTitle("Coupon")
                 var coupon by remember { mutableStateOf("") }
-                LafyuuCouponForm(value = coupon, onValueChange = { coupon = it }, onApplyClick = {})
+                CouponTextField(value = coupon, onValueChange = { coupon = it }, onApplyClick = {})
                 var couponError by remember { mutableStateOf("XzOp014524BDH") }
-                LafyuuCouponForm(
+                CouponTextField(
                     value = couponError,
                     onValueChange = { couponError = it },
                     onApplyClick = {},

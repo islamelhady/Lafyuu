@@ -135,6 +135,17 @@ fun MainApp(
             onNavigateToCheckout = {},
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
+            },
+            onNavigateToTab = { tabId ->
+                if (navController.graph.findNode(tabId) != null) {
+                    navController.navigate(tabId) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
             }
         )
     }
