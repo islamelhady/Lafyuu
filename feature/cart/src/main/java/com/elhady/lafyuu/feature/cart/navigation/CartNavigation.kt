@@ -14,12 +14,14 @@ fun NavController.navigateToCart(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.cartScreen(
     onNavigateToCheckout: () -> Unit,
-    onNavigateToProductDetails: (String) -> Unit
+    onNavigateToProductDetails: (String) -> Unit,
+    onNavigateToTab: (String) -> Unit = {}
 ) {
     composable(route = CART_ROUTE) {
         CartRoute(
             onNavigateToCheckout = onNavigateToCheckout,
-            onNavigateToProductDetails = onNavigateToProductDetails
+            onNavigateToProductDetails = onNavigateToProductDetails,
+            onNavigateToTab = onNavigateToTab
         )
     }
 }
