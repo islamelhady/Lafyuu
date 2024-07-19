@@ -10,6 +10,7 @@ import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.card.PriceDetails
 import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerExtraLarge
 import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerLarge
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerMedium
 import com.elhady.lafyuu.core.designsystem.components.textfield.CouponTextField
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.feature.cart.presentation.CartUiEvent
@@ -31,7 +32,7 @@ fun CartSummarySection(
             onApplyClick = { onEvent(CartUiEvent.ApplyCouponClicked) },
             errorMessage = uiState.couponError,
         )
-        VerticalSpacerLarge()
+        VerticalSpacerMedium()
         val itemsTotal = uiState.items.sumOf { it.totalPrice }
         val discount = uiState.discountAmount ?: 0.0
         val finalTotal = (uiState.finalTotal ?: itemsTotal) - discount
@@ -44,7 +45,7 @@ fun CartSummarySection(
             discount = if (discount > 0) "-${String.format("%.2f", discount)}" else "$0.00",
             totalPrice = "$${String.format("%.2f", if (finalTotal > 0) finalTotal else itemsTotal)}"
         )
-        VerticalSpacerExtraLarge()
+        VerticalSpacerLarge()
         DefaultButton(
             caption = "Check Out",
             isLoading = false,

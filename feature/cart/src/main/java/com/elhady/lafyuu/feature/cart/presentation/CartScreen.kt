@@ -98,92 +98,87 @@ fun CartScreen(
             )
         }
     ) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-        ) {
-            when {
-                uiState.isLoading && uiState.items.isEmpty() -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Theme.color.blue
-                    )
-                }
+        when {
+            uiState.isLoading && uiState.items.isEmpty() -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Theme.color.blue
+                )
+            }
 
-                uiState.error != null && uiState.items.isEmpty() -> {
-                    InfoStateContent(
-                        errorMessage = uiState.error,
-                        onRetryClick = { onEvent(CartUiEvent.RetryClicked) },
-                        errorType = AlertType.Error,
-                        modifier = Modifier.align(Alignment.Center),
-                    )
-                }
+            uiState.error != null && uiState.items.isEmpty() -> {
+                InfoStateContent(
+                    errorMessage = uiState.error,
+                    onRetryClick = { onEvent(CartUiEvent.RetryClicked) },
+                    errorType = AlertType.Error,
+                    modifier = Modifier.align(Alignment.Center),
+                )
+            }
 
-                uiState.items.isEmpty() -> {
-                    InfoStateContent(
-                        errorMessage = "Your Cart is Empty",
-                        onRetryClick = { onEvent(CartUiEvent.LoadCart) },
-                        errorType = AlertType.Success
-                    )
-                }
+            uiState.items.isEmpty() -> {
+                InfoStateContent(
+                    errorMessage = "Your Cart is Empty",
+                    onRetryClick = { onEvent(CartUiEvent.LoadCart) },
+                    errorType = AlertType.Success
+                )
+            }
 
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = Theme.space.large),
-                        verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                    ) {
-                        items(uiState.items, key = { it.itemId }) { item ->
-                            val isUpdating = uiState.updatingItemIds.contains(item.itemId)
-                            WideProductCard(
-                                imageUrl = com.elhady.lafyuu.core.designsystem.R.drawable.img_product_shoes_blue,
-                                name = item.productName,
-                                price = String.format("%.2f", item.finalPricePerUnit),
-                                isFavorite = false,
-                                onFavoriteClick = {},
-                                onDeleteClick = { onEvent(CartUiEvent.RemoveItem(item.itemId)) },
-                                onClick = { onEvent(CartUiEvent.ProductClicked(item.productId)) },
-                                quantityButton = {
-                                    if (isUpdating) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.padding(8.dp),
-                                            color = Theme.color.blue
-                                        )
-                                    } else {
-                                        QuantityButton(
-                                            quantity = item.quantity,
-                                            onDecrement = {
-                                                onEvent(
-                                                    CartUiEvent.DecreaseQuantity(
-                                                        item.itemId,
-                                                        item.quantity
-                                                    )
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = Theme.space.large),
+                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                ) {
+                    items(uiState.items, key = { it.itemId }) { item ->
+                        val isUpdating = uiState.updatingItemIds.contains(item.itemId)
+                        WideProductCard(
+                            imageUrl = com.elhady.lafyuu.core.designsystem.R.drawable.img_product_shoes_blue,
+                            name = item.productName,
+                            price = String.format("%.2f", item.finalPricePerUnit),
+                            isFavorite = false,
+                            onFavoriteClick = {},
+                            onDeleteClick = { onEvent(CartUiEvent.RemoveItem(item.itemId)) },
+                            onClick = { onEvent(CartUiEvent.ProductClicked(item.productId)) },
+                            quantityButton = {
+                                if (isUpdating) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.padding(8.dp),
+                                        color = Theme.color.blue
+                                    )
+                                } else {
+                                    QuantityButton(
+                                        quantity = item.quantity,
+                                        onDecrement = {
+                                            onEvent(
+                                                CartUiEvent.DecreaseQuantity(
+                                                    item.itemId,
+                                                    item.quantity
                                                 )
-                                            },
-                                            onIncrement = {
-                                                onEvent(
-                                                    CartUiEvent.IncreaseQuantity(
-                                                        item.itemId,
-                                                        item.quantity
-                                                    )
+                                            )
+                                        },
+                                        onIncrement = {
+                                            onEvent(
+                                                CartUiEvent.IncreaseQuantity(
+                                                    item.itemId,
+                                                    item.quantity
                                                 )
-                                            }
-                                        )
-                                    }
+                                            )
+                                        }
+                                    )
                                 }
-                            )
-                        }
-                        if (uiState.items.isNotEmpty()) {
-                            item {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(Theme.space.large),
-                                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                                ) {
-                                    CartSummarySection(uiState = uiState, onEvent = onEvent)
-                                }
+                            }
+                        )
+                    }
+                    if (uiState.items.isNotEmpty()) {
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(Theme.space.large),
+                                verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                            ) {
+                                CartSummarySection(uiState = uiState, onEvent = onEvent)
                             }
                         }
                     }
