@@ -11,6 +11,8 @@ import com.elhady.lafyuu.feature.cart.data.remote.model.DeleteItemFromCartReques
 import com.elhady.lafyuu.feature.cart.data.remote.model.UpdateItemRequestDto
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
 import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 class CartRepositoryImpl @Inject constructor(
@@ -18,7 +20,9 @@ class CartRepositoryImpl @Inject constructor(
     private val apiErrorParser: ApiErrorParser
 ) : CartRepository {
 
-    override suspend fun getCart(): AppResult<Cart> {
+    private val mutex = Mutex()
+
+    override suspend fun getCart(): AppResult<Cart> = mutex.withLock {
         return try {
             val response = cartApi.getCart()
             if (response.isSuccessful) {
@@ -36,7 +40,7 @@ class CartRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateItemQuantity(itemId: String, quantity: Int): AppResult<Unit> {
+    override suspend fun updateItemQuantity(itemId: String, quantity: Int): AppResult<Unit> = mutex.withLock {
         return try {
             val response = cartApi.updateCartItem(itemId, UpdateItemRequestDto(quantity))
             if (response.isSuccessful) {
@@ -49,7 +53,7 @@ class CartRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun decrementItem(itemId: String, quantity: Int): AppResult<Unit> {
+    override suspend fun decrementItem(itemId: String, quantity: Int): AppResult<Unit> = mutex.withLock {
         return try {
             val response = cartApi.decrementCartItem(DecrementItemRequestDto(itemId, quantity))
             if (response.isSuccessful) {
@@ -62,7 +66,7 @@ class CartRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun removeItem(itemId: String): AppResult<Unit> {
+    override suspend fun removeItem(itemId: String): AppResult<Unit> = mutex.withLock {
         return try {
             val response = cartApi.deleteCartItem(itemId, DeleteItemFromCartRequestDto(itemId))
             if (response.isSuccessful) {
@@ -75,7 +79,7 @@ class CartRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun applyCoupon(couponCode: String): AppResult<Cart> {
+    override suspend fun applyCoupon(couponCode: String): AppResult<Cart> = mutex.withLock {
         return try {
             val response = cartApi.applyCoupon(ApplyCouponRequestDto(couponCode))
             if (response.isSuccessful) {

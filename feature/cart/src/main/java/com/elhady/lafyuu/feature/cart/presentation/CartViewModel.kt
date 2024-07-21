@@ -3,9 +3,11 @@ package com.elhady.lafyuu.feature.cart.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.feature.cart.domain.usecase.ApplyCouponUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.DecreaseCartItemUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.GetCartUseCase
+import com.elhady.lafyuu.feature.cart.domain.usecase.IncreaseCartItemQuantityUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.RemoveCartItemUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.UpdateCartItemQuantityUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CartViewModel @Inject constructor(
     private val getCartUseCase: GetCartUseCase,
-    private val updateCartItemQuantityUseCase: UpdateCartItemQuantityUseCase,
+    private val increaseCartItemQuantityUseCase: IncreaseCartItemQuantityUseCase,
     private val decreaseCartItemUseCase: DecreaseCartItemUseCase,
     private val removeCartItemUseCase: RemoveCartItemUseCase,
     private val applyCouponUseCase: ApplyCouponUseCase
@@ -40,18 +42,13 @@ class CartViewModel @Inject constructor(
     fun onEvent(event: CartUiEvent) {
         when (event) {
             CartUiEvent.LoadCart -> loadCart()
-            is CartUiEvent.IncreaseQuantity -> updateQuantity(event.itemId, event.currentQuantity + 1)
-            is CartUiEvent.DecreaseQuantity -> {
-                if (event.currentQuantity > 1) {
-                    decreaseQuantity(event.itemId, 1)
-                } else {
-                    removeItem(event.itemId)
-                }
-            }
+            is CartUiEvent.IncreaseQuantity -> increaseQuantity(event.itemId)
+            is CartUiEvent.DecreaseQuantity -> decreaseQuantity(event.itemId)
             is CartUiEvent.RemoveItem -> removeItem(event.itemId)
             is CartUiEvent.CouponCodeChanged -> {
                 _uiState.update { it.copy(couponCodeInput = event.code, couponError = null) }
             }
+
             CartUiEvent.ApplyCouponClicked -> applyCoupon()
             CartUiEvent.CheckoutClicked -> sendEffect(CartUiEffect.NavigateToCheckout)
             CartUiEvent.RetryClicked -> loadCart()
@@ -70,13 +67,13 @@ class CartViewModel @Inject constructor(
                         it.copy(
                             isLoading = false,
                             cart = cart,
-                            items = cart.items,
                             originalTotal = cart.originalTotal ?: cart.itemsTotal,
                             finalTotal = cart.finalTotal ?: cart.itemsTotal,
                             error = null
                         )
                     }
                 }
+
                 is AppResult.Error -> {
                     _uiState.update {
                         it.copy(
@@ -85,6 +82,7 @@ class CartViewModel @Inject constructor(
                         )
                     }
                 }
+
                 is AppResult.Loading -> {
                     _uiState.update { it.copy(isLoading = true) }
                 }
@@ -92,35 +90,48 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    private fun updateQuantity(itemId: String, newQuantity: Int) {
+    private fun increaseQuantity(itemId: String) {
         viewModelScope.launch {
             setUpdatingItem(itemId, true)
-            when (val result = updateCartItemQuantityUseCase(itemId, newQuantity)) {
+            when (val result = increaseCartItemQuantityUseCase(itemId)) {
                 is AppResult.Success -> {
                     setUpdatingItem(itemId, false)
                     loadCart()
                 }
+
                 is AppResult.Error -> {
                     setUpdatingItem(itemId, false)
-                    sendEffect(CartUiEffect.ShowSnackbar(result.message ?: "Failed to update quantity"))
+                    sendEffect(
+                        CartUiEffect.ShowSnackbar(
+                            message = result.message ?: "Failed to increase quantity",
+                            type = AlertType.Error
+                        )
+                    )
                 }
+
                 is AppResult.Loading -> {}
             }
         }
     }
 
-    private fun decreaseQuantity(itemId: String, quantity: Int) {
+    private fun decreaseQuantity(itemId: String) {
         viewModelScope.launch {
             setUpdatingItem(itemId, true)
-            when (val result = decreaseCartItemUseCase(itemId, quantity)) {
+            when (val result = decreaseCartItemUseCase(itemId)) {
                 is AppResult.Success -> {
                     setUpdatingItem(itemId, false)
                     loadCart()
                 }
+
                 is AppResult.Error -> {
                     setUpdatingItem(itemId, false)
-                    sendEffect(CartUiEffect.ShowSnackbar(result.message ?: "Failed to decrease quantity"))
+                    sendEffect(
+                        CartUiEffect.ShowSnackbar(
+                            result.message ?: "Failed to decrease quantity", AlertType.Error
+                        )
+                    )
                 }
+
                 is AppResult.Loading -> {}
             }
         }
@@ -132,13 +143,25 @@ class CartViewModel @Inject constructor(
             when (val result = removeCartItemUseCase(itemId)) {
                 is AppResult.Success -> {
                     setUpdatingItem(itemId, false)
-                    sendEffect(CartUiEffect.ShowSnackbar("Item removed from cart"))
+                    sendEffect(
+                        CartUiEffect.ShowSnackbar(
+                            "Item removed from cart",
+                            AlertType.Success
+                        )
+                    )
                     loadCart()
                 }
+
                 is AppResult.Error -> {
                     setUpdatingItem(itemId, false)
-                    sendEffect(CartUiEffect.ShowSnackbar(result.message ?: "Failed to remove item"))
+                    sendEffect(
+                        CartUiEffect.ShowSnackbar(
+                            result.message ?: "Failed to remove item",
+                            AlertType.Error
+                        )
+                    )
                 }
+
                 is AppResult.Loading -> {}
             }
         }
@@ -163,16 +186,25 @@ class CartViewModel @Inject constructor(
                             couponError = null
                         )
                     }
-                    sendEffect(CartUiEffect.ShowSnackbar("Coupon applied successfully!"))
+                    sendEffect(
+                        CartUiEffect.ShowSnackbar(
+                            "Coupon applied successfully!",
+                            AlertType.Success
+                        )
+                    )
                 }
+
                 is AppResult.Error -> {
+                    val errMsg = result.message ?: "Your Cupon Is Not Correct"
                     _uiState.update {
                         it.copy(
                             isApplyingCoupon = false,
-                            couponError = result.message ?: "Your Cupon Is Not Correct"
+                            couponError = errMsg
                         )
                     }
+                    sendEffect(CartUiEffect.ShowSnackbar(errMsg, AlertType.Error))
                 }
+
                 is AppResult.Loading -> {
                     _uiState.update { it.copy(isApplyingCoupon = true) }
                 }

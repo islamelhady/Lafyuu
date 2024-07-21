@@ -1,5 +1,6 @@
 package com.elhady.lafyuu.feature.cart.presentation
 
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.TabBarItem
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
 import com.elhady.lafyuu.feature.cart.domain.model.CartItem
@@ -7,7 +8,6 @@ import com.elhady.lafyuu.feature.cart.domain.model.CartItem
 data class CartUiState(
     val isLoading: Boolean = false,
     val cart: Cart? = null,
-    val items: List<CartItem> = emptyList(),
     val couponCodeInput: String = "",
     val isApplyingCoupon: Boolean = false,
     val couponError: String? = null,
@@ -17,12 +17,15 @@ data class CartUiState(
     val discountAmount: Double? = null,
     val finalTotal: Double? = null,
     val appliedCouponCode: String? = null
-)
+) {
+    val items: List<CartItem>
+        get() = cart?.items ?: emptyList()
+}
 
 sealed interface CartUiEvent {
     data object LoadCart : CartUiEvent
-    data class IncreaseQuantity(val itemId: String, val currentQuantity: Int) : CartUiEvent
-    data class DecreaseQuantity(val itemId: String, val currentQuantity: Int) : CartUiEvent
+    data class IncreaseQuantity(val itemId: String) : CartUiEvent
+    data class DecreaseQuantity(val itemId: String) : CartUiEvent
     data class RemoveItem(val itemId: String) : CartUiEvent
     data class CouponCodeChanged(val code: String) : CartUiEvent
     data object ApplyCouponClicked : CartUiEvent
@@ -36,5 +39,5 @@ sealed interface CartUiEffect {
     data object NavigateToCheckout : CartUiEffect
     data class NavigateToProductDetails(val productId: String) : CartUiEffect
     data class NavigateToTab(val tabRoute: String) : CartUiEffect
-    data class ShowSnackbar(val message: String) : CartUiEffect
+    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Success) : CartUiEffect
 }

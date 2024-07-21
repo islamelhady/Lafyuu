@@ -1,13 +1,14 @@
 package com.elhady.lafyuu.feature.cart.presentation
 
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
 import com.elhady.lafyuu.feature.cart.domain.model.CartItem
 import com.elhady.lafyuu.feature.cart.domain.usecase.ApplyCouponUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.DecreaseCartItemUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.GetCartUseCase
+import com.elhady.lafyuu.feature.cart.domain.usecase.IncreaseCartItemQuantityUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.RemoveCartItemUseCase
-import com.elhady.lafyuu.feature.cart.domain.usecase.UpdateCartItemQuantityUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +30,7 @@ class CartViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private val getCartUseCase: GetCartUseCase = mockk()
-    private val updateCartItemQuantityUseCase: UpdateCartItemQuantityUseCase = mockk()
+    private val increaseCartItemQuantityUseCase: IncreaseCartItemQuantityUseCase = mockk()
     private val decreaseCartItemUseCase: DecreaseCartItemUseCase = mockk()
     private val removeCartItemUseCase: RemoveCartItemUseCase = mockk()
     private val applyCouponUseCase: ApplyCouponUseCase = mockk()
@@ -54,7 +55,7 @@ class CartViewModelTest {
 
         val viewModel = CartViewModel(
             getCartUseCase,
-            updateCartItemQuantityUseCase,
+            increaseCartItemQuantityUseCase,
             decreaseCartItemUseCase,
             removeCartItemUseCase,
             applyCouponUseCase
@@ -74,7 +75,7 @@ class CartViewModelTest {
         coEvery { getCartUseCase() } returns AppResult.Success(Cart(cartId = "c-1", items = emptyList()))
         val viewModel = CartViewModel(
             getCartUseCase,
-            updateCartItemQuantityUseCase,
+            increaseCartItemQuantityUseCase,
             decreaseCartItemUseCase,
             removeCartItemUseCase,
             applyCouponUseCase
@@ -85,5 +86,29 @@ class CartViewModelTest {
 
         val effect = viewModel.uiEffect.first()
         assertTrue(effect is CartUiEffect.NavigateToCheckout)
+    }
+
+    @Test
+    fun `IncreaseQuantity failure emits Error snackbar effect`() = runTest {
+        val cart = Cart(cartId = "c-1", items = emptyList())
+        coEvery { getCartUseCase() } returns AppResult.Success(cart)
+        coEvery { increaseCartItemQuantityUseCase("i-1") } returns AppResult.Error("Exceeds stock")
+
+        val viewModel = CartViewModel(
+            getCartUseCase,
+            increaseCartItemQuantityUseCase,
+            decreaseCartItemUseCase,
+            removeCartItemUseCase,
+            applyCouponUseCase
+        )
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.onEvent(CartUiEvent.IncreaseQuantity("i-1"))
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val effect = viewModel.uiEffect.first()
+        assertTrue(effect is CartUiEffect.ShowSnackbar)
+        assertEquals(AlertType.Error, (effect as CartUiEffect.ShowSnackbar).type)
+        assertEquals("Exceeds stock", effect.message)
     }
 }

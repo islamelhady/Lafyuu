@@ -3,8 +3,10 @@ package com.elhady.lafyuu.feature.cart.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -52,7 +54,7 @@ fun CartRoute(
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
                             message = effect.message,
-                            type = AlertType.Success
+                            type = effect.type
                         )
                     )
                 }
@@ -133,7 +135,7 @@ fun CartScreen(
                     items(uiState.items, key = { it.itemId }) { item ->
                         val isUpdating = uiState.updatingItemIds.contains(item.itemId)
                         WideProductCard(
-                            imageUrl = com.elhady.lafyuu.core.designsystem.R.drawable.img_product_shoes_blue,
+                            imageUrl = item.productCoverUrl,
                             name = item.productName,
                             price = String.format("%.2f", item.finalPricePerUnit),
                             isFavorite = false,
@@ -152,16 +154,14 @@ fun CartScreen(
                                         onDecrement = {
                                             onEvent(
                                                 CartUiEvent.DecreaseQuantity(
-                                                    item.itemId,
-                                                    item.quantity
+                                                    item.itemId
                                                 )
                                             )
                                         },
                                         onIncrement = {
                                             onEvent(
                                                 CartUiEvent.IncreaseQuantity(
-                                                    item.itemId,
-                                                    item.quantity
+                                                    item.itemId
                                                 )
                                             )
                                         }
@@ -170,6 +170,7 @@ fun CartScreen(
                             }
                         )
                     }
+
                     if (uiState.items.isNotEmpty()) {
                         item {
                             Column(

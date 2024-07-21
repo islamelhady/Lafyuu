@@ -7,10 +7,22 @@ import javax.inject.Inject
 class UpdateCartItemQuantityUseCase @Inject constructor(
     private val repository: CartRepository
 ) {
-    suspend operator fun invoke(itemId: String, quantity: Int): AppResult<Unit> {
-        if (quantity <= 0) {
-            return AppResult.Error("Quantity must be greater than zero")
+    suspend operator fun invoke(itemId: String, targetQuantity: Int): AppResult<Unit> {
+        if (itemId.isBlank()) {
+            return AppResult.Error("Invalid item ID")
         }
-        return repository.updateItemQuantity(itemId, quantity)
+        if (targetQuantity <= 0) {
+            return repository.removeItem(itemId)
+        }
+        val cartResult = repository.getCart()
+        if (cartResult is AppResult.Success) {
+            val item = cartResult.data.items.find { it.itemId == itemId }
+            if (item != null) {
+                if (targetQuantity > item.productStock) {
+                    return AppResult.Error("Cannot exceed available stock (${item.productStock})")
+                }
+            }
+        }
+        return repository.updateItemQuantity(itemId, targetQuantity)
     }
 }

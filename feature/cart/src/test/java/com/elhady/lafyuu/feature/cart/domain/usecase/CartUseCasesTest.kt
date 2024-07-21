@@ -2,6 +2,7 @@ package com.elhady.lafyuu.feature.cart.domain.usecase
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
+import com.elhady.lafyuu.feature.cart.domain.model.CartItem
 import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -27,13 +28,21 @@ class CartUseCasesTest {
     }
 
     @Test
-    fun `UpdateCartItemQuantityUseCase validates quantity greater than zero`() = runTest {
-        val useCase = UpdateCartItemQuantityUseCase(repository)
+    fun `IncreaseCartItemQuantityUseCase prevents exceeding stock`() = runTest {
+        val useCase = IncreaseCartItemQuantityUseCase(repository)
+        val item = CartItem(
+            itemId = "item-1", productId = "p-1", productName = "Shoe",
+            productCoverUrl = "", productStock = 2, weightInGrams = 100.0,
+            quantity = 2, discountPercentage = 0.0, basePricePerUnit = 50.0,
+            finalPricePerUnit = 50.0, totalPrice = 100.0
+        )
+        val cart = Cart(cartId = "c-1", items = listOf(item))
+        coEvery { repository.getCart() } returns AppResult.Success(cart)
 
-        val result = useCase("item-1", 0)
+        val result = useCase("item-1")
 
         assertTrue(result is AppResult.Error)
-        assertEquals("Quantity must be greater than zero", (result as AppResult.Error).message)
+        assertEquals("Cannot exceed available stock (2)", (result as AppResult.Error).message)
     }
 
     @Test
