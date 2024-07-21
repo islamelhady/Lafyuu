@@ -20,9 +20,9 @@ import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.feature.auth.presentation.navigation.AUTH_GRAPH_ROUTE
 import com.elhady.lafyuu.feature.auth.presentation.navigation.authGraph
+import com.elhady.lafyuu.feature.cart.navigation.cartScreen
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
-import com.elhady.lafyuu.feature.cart.navigation.cartScreen
 import com.elhady.lafyuu.feature.product.navigation.navigateToProductDetails
 import com.elhady.lafyuu.feature.product.navigation.productDetailsScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val cartItemCount by viewModel.cartItemCount.collectAsStateWithLifecycle()
 
             LafyuuTheme {
                 when (uiState) {
@@ -51,12 +52,12 @@ class MainActivity : ComponentActivity() {
                     }
                     is MainUiState.Authenticated -> {
                         key(true) {
-                            MainApp(isAuthenticated = true)
+                            MainApp(isAuthenticated = true, cartItemCount = cartItemCount)
                         }
                     }
                     is MainUiState.Unauthenticated -> {
                         key(false) {
-                            MainApp(isAuthenticated = false)
+                            MainApp(isAuthenticated = false, cartItemCount = 0)
                         }
                     }
                 }
@@ -67,7 +68,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainApp(
-    isAuthenticated: Boolean
+    isAuthenticated: Boolean,
+    cartItemCount: Int
 ) {
     val navController = rememberNavController()
 
@@ -116,7 +118,8 @@ fun MainApp(
                         restoreState = true
                     }
                 }
-            }
+            },
+            cartItemCount = cartItemCount
         )
 
         productDetailsScreen(

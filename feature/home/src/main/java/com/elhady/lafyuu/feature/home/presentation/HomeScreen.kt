@@ -42,6 +42,7 @@ fun HomeRoute(
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToWishlist: () -> Unit = {},
     onNavigateToTab: (String) -> Unit = {},
+    cartItemCount: Int = 0,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -64,14 +65,16 @@ fun HomeRoute(
 
     HomeScreen(
         uiState = uiState,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        cartItemCount = cartItemCount
     )
 }
 
 @Composable
 internal fun HomeScreen(
     uiState: HomeUiState,
-    onEvent: (HomeUiEvent) -> Unit
+    onEvent: (HomeUiEvent) -> Unit,
+    cartItemCount: Int = 0
 ) {
     LafyuuScaffold(
         topBar = {
@@ -88,7 +91,13 @@ internal fun HomeScreen(
         },
         bottomBar = {
             NavigationBottomBar(
-                tabs = defaultTabBarItems,
+                tabs = defaultTabBarItems.map { tab ->
+                    if (tab.route == "cart") {
+                        tab.copy(badgeCount = if (cartItemCount > 0) cartItemCount else null)
+                    } else {
+                        tab
+                    }
+                },
                 selectedTab = uiState.selectedTab,
                 onTabSelected = { onEvent(HomeUiEvent.BottomTabSelected(it)) }
             )

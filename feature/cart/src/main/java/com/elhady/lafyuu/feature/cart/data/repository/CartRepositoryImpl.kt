@@ -11,16 +11,24 @@ import com.elhady.lafyuu.feature.cart.data.remote.model.DeleteItemFromCartReques
 import com.elhady.lafyuu.feature.cart.data.remote.model.UpdateItemRequestDto
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
 import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class CartRepositoryImpl @Inject constructor(
     private val cartApi: CartApi,
     private val apiErrorParser: ApiErrorParser
 ) : CartRepository {
 
     private val mutex = Mutex()
+    private val _cartFlow = MutableStateFlow<Cart?>(null)
+
+    override fun observeCart(): Flow<Cart?> = _cartFlow.asStateFlow()
 
     override suspend fun getCart(): AppResult<Cart> = mutex.withLock {
         return try {
@@ -28,7 +36,9 @@ class CartRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) {
-                    AppResult.Success(body.toDomain())
+                    val cart = body.toDomain()
+                    _cartFlow.value = cart
+                    AppResult.Success(cart)
                 } else {
                     AppResult.Error(message = "Empty response body")
                 }
@@ -44,6 +54,7 @@ class CartRepositoryImpl @Inject constructor(
         return try {
             val response = cartApi.updateCartItem(itemId, UpdateItemRequestDto(quantity))
             if (response.isSuccessful) {
+                refreshCartUnlocked()
                 AppResult.Success(Unit)
             } else {
                 mapError(apiErrorParser.parseError(response))
@@ -57,6 +68,7 @@ class CartRepositoryImpl @Inject constructor(
         return try {
             val response = cartApi.decrementCartItem(DecrementItemRequestDto(itemId, quantity))
             if (response.isSuccessful) {
+                refreshCartUnlocked()
                 AppResult.Success(Unit)
             } else {
                 mapError(apiErrorParser.parseError(response))
@@ -70,6 +82,7 @@ class CartRepositoryImpl @Inject constructor(
         return try {
             val response = cartApi.deleteCartItem(itemId, DeleteItemFromCartRequestDto(itemId))
             if (response.isSuccessful) {
+                refreshCartUnlocked()
                 AppResult.Success(Unit)
             } else {
                 mapError(apiErrorParser.parseError(response))
@@ -85,7 +98,11 @@ class CartRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 val body = response.body()
                 if (body != null) {
-                    AppResult.Success(body.toDomain())
+                    val summaryCart = body.toDomain()
+                    val currentItems = _cartFlow.value?.items ?: emptyList()
+                    val updatedCart = summaryCart.copy(items = if (summaryCart.items.isEmpty()) currentItems else summaryCart.items)
+                    _cartFlow.value = updatedCart
+                    AppResult.Success(updatedCart)
                 } else {
                     AppResult.Error(message = "Empty response body")
                 }
@@ -100,6 +117,17 @@ class CartRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
+    }
+
+    private suspend fun refreshCartUnlocked() {
+        try {
+            val response = cartApi.getCart()
+            if (response.isSuccessful) {
+                response.body()?.let { body ->
+                    _cartFlow.value = body.toDomain()
+                }
+            }
+        } catch (_: Exception) {}
     }
 
     private fun mapError(networkError: NetworkError): AppResult.Error {
