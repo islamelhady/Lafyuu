@@ -13,6 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +38,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 fun SingleListItem(
     title: String,
     subtitle: String? = null,
+    isSelected: Boolean = false,
     onClick: () -> Unit,
     titleStyle: TextStyle = Theme.typography.heading6,
     modifier: Modifier = Modifier,
@@ -47,7 +52,9 @@ fun SingleListItem(
             .fillMaxWidth()
             .height(Theme.size.buttonHeight)
             .clip(Theme.corner.small)
-            .background(Theme.color.backgroundWhite)
+            .background(
+                color = if (isSelected) Theme.color.blue.copy(alpha = 0.05f) else Theme.color.backgroundWhite
+            )
             .clickable(onClick = onClick)
             .padding(all = Theme.space.large),
         verticalAlignment = Alignment.CenterVertically,
