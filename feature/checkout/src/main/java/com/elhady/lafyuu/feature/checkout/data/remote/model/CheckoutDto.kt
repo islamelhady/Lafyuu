@@ -25,6 +25,17 @@ data class CreateAddressRequestDto(
 )
 
 @Serializable
+data class UpdateAddressRequestDto(
+    val id: String,
+    val state: String,
+    val city: String,
+    val street: String,
+    val apartment: String,
+    val phoneNumber: String,
+    val notes: String
+)
+
+@Serializable
 data class OrderCheckoutRequestDto(
     val shippingAddressId: String,
     val paymentMethod: String,
