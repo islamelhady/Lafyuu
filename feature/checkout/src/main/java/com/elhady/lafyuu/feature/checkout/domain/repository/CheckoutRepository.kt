@@ -6,7 +6,17 @@ import com.elhady.lafyuu.feature.checkout.domain.model.CheckoutResult
 
 interface CheckoutRepository {
     suspend fun getAddresses(): AppResult<List<Address>>
+    suspend fun getAddress(addressId: String): AppResult<Address>
     suspend fun createAddress(
+        state: String,
+        city: String,
+        street: String,
+        apartment: String,
+        phoneNumber: String,
+        notes: String
+    ): AppResult<Address>
+    suspend fun updateAddress(
+        addressId: String,
         state: String,
         city: String,
         street: String,
