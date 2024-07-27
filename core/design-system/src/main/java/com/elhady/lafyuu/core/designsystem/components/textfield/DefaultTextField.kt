@@ -12,6 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
@@ -25,7 +27,9 @@ fun DefaultTextField(
     modifier: Modifier = Modifier,
     placeholder: String = "Placeholder",
     state: LafyuuFieldState = LafyuuFieldState.Default,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    leadingIcon: ImageVector? = null
 ) {
     LafyuuTextField(
         value = value,
@@ -34,7 +38,8 @@ fun DefaultTextField(
         state = state,
         errorMessage = errorMessage,
         modifier = modifier,
-        leadingIcon = User,
+        leadingIcon = leadingIcon,
+        keyboardType = keyboardType
     )
 }
 
@@ -55,6 +60,7 @@ private fun AllFormFieldsPreview() {
                 DefaultTextField(
                     value = defaultValue,
                     onValueChange = { defaultValue = it },
+                    leadingIcon = User,
                     placeholder = "Placeholder",
                     state = LafyuuFieldState.Default
                 )
@@ -68,12 +74,14 @@ private fun AllFormFieldsPreview() {
                 DefaultTextField(
                     value = activeValue,
                     onValueChange = { activeValue = it },
+                    leadingIcon = User,
                     state = LafyuuFieldState.Active
                 )
                 var errorValue by remember { mutableStateOf("Active") }
                 DefaultTextField(
                     value = errorValue,
                     onValueChange = { errorValue = it },
+                    leadingIcon = User,
                     state = LafyuuFieldState.Error,
                     errorMessage = "Oops! This field is not valid"
                 )

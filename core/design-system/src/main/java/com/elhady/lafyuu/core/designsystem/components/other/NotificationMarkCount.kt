@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.theme.Theme
@@ -32,8 +33,14 @@ fun NotificationMarkCount(
     ) {
         LafyuuText(
             text = badgeCount.toString(),
-            style = Theme.typography.normalTextBold,
+            style = Theme.typography.normalCaptionBold,
             color = Theme.color.backgroundWhite
         )
     }
+}
+
+@Preview
+@Composable
+fun NotificationMarkCountPreview() {
+    NotificationMarkCount(badgeCount = 40)
 }
