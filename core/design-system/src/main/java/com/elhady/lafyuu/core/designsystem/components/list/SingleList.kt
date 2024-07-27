@@ -13,13 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
@@ -51,9 +46,8 @@ fun SingleListItem(
         modifier = modifier
             .fillMaxWidth()
             .height(Theme.size.buttonHeight)
-            .clip(Theme.corner.small)
             .background(
-                color = if (isSelected) Theme.color.blue.copy(alpha = 0.05f) else Theme.color.backgroundWhite
+                color = if (isSelected) Theme.color.blue.copy(alpha = 0.1f) else Theme.color.backgroundWhite
             )
             .clickable(onClick = onClick)
             .padding(all = Theme.space.large),
@@ -115,6 +109,7 @@ private fun AllSingleListShapesPreview() {
                     subtitle = "List",
                     showChevron = true,
                     onClick = {},
+                    isSelected = true,
                     leadingIcon = Offer,
                     leadingIconTint = Theme.color.blue
                 )
@@ -133,6 +128,7 @@ private fun AllSingleListShapesPreview() {
                     badgeCount = {
                         NotificationMarkCount(badgeCount = 2)
                     },
+                    isSelected = true,
                     onClick = {}
                 )
 
