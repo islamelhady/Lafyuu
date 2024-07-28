@@ -1,5 +1,7 @@
 package com.elhady.lafyuu
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -21,6 +24,14 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.feature.auth.presentation.navigation.AUTH_GRAPH_ROUTE
 import com.elhady.lafyuu.feature.auth.presentation.navigation.authGraph
 import com.elhady.lafyuu.feature.cart.navigation.cartScreen
+import com.elhady.lafyuu.feature.checkout.presentation.addAddressScreen
+import com.elhady.lafyuu.feature.checkout.presentation.checkoutScreen
+import com.elhady.lafyuu.feature.checkout.presentation.editAddressScreen
+import com.elhady.lafyuu.feature.checkout.presentation.navigateToCheckout
+import com.elhady.lafyuu.feature.checkout.presentation.navigateToAddAddress
+import com.elhady.lafyuu.feature.checkout.presentation.navigateToEditAddress
+import com.elhady.lafyuu.feature.checkout.presentation.navigateToPayment
+import com.elhady.lafyuu.feature.checkout.presentation.paymentScreen
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
 import com.elhady.lafyuu.feature.product.navigation.navigateToProductDetails
@@ -72,6 +83,7 @@ fun MainApp(
     cartItemCount: Int
 ) {
     val navController = rememberNavController()
+    val context = LocalContext.current
 
     NavHost(
         navController = navController,
@@ -135,7 +147,9 @@ fun MainApp(
         )
 
         cartScreen(
-            onNavigateToCheckout = {},
+            onNavigateToCheckout = {
+                navController.navigateToCheckout()
+            },
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
             },
@@ -149,6 +163,50 @@ fun MainApp(
                         restoreState = true
                     }
                 }
+            }
+        )
+
+        checkoutScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToPayment = { addressId, paymentMethod ->
+                navController.navigateToPayment(addressId, paymentMethod)
+            },
+            onNavigateToAddAddress = {
+                navController.navigateToAddAddress()
+            },
+            onNavigateToEditAddress = { addressId ->
+                navController.navigateToEditAddress(addressId)
+            }
+        )
+
+        addAddressScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            }
+        )
+
+        editAddressScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            }
+        )
+
+        paymentScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToSuccess = {
+                navController.navigate(HOME_ROUTE) {
+                    popUpTo(HOME_ROUTE) { inclusive = true }
+                }
+            },
+            onOpenUrl = { url ->
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                try {
+                    context.startActivity(intent)
+                } catch (_: Exception) {}
             }
         )
     }
