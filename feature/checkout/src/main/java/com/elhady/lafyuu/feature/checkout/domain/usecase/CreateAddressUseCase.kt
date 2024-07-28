@@ -17,7 +17,7 @@ class CreateAddressUseCase @Inject constructor(
         notes: String
     ): AppResult<Address> {
         if (state.isBlank() || city.isBlank() || street.isBlank() || phoneNumber.isBlank()) {
-            return AppResult.Error("Please fill in all required address fields")
+            return AppResult.Error("Please Fill The Form")
         }
         return repository.createAddress(state, city, street, apartment, phoneNumber, notes)
     }
