@@ -19,6 +19,12 @@ class CreateAddressUseCase @Inject constructor(
         if (state.isBlank() || city.isBlank() || street.isBlank() || phoneNumber.isBlank()) {
             return AppResult.Error("Please Fill The Form")
         }
+        val addressesResult = repository.getAddresses()
+        if (addressesResult is AppResult.Success) {
+            if (addressesResult.data.size >= 5) {
+                return AppResult.Error("Maximum limit of 5 addresses reached")
+            }
+        }
         return repository.createAddress(state, city, street, apartment, phoneNumber, notes)
     }
 }
