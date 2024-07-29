@@ -40,9 +40,9 @@ class PaymentViewModelTest {
     @Test
     fun `PayClicked triggers checkout and sets success state`() = runTest {
         coEvery { getCartUseCase() } returns AppResult.Success(Cart(cartId = "c-1", items = emptyList(), finalTotal = 100.0))
-        coEvery { checkoutUseCase("a-1", "Credit Card", null) } returns AppResult.Success(CheckoutResult("Paid successfully", null, null))
+        coEvery { checkoutUseCase("a-1", "Credit Card Or Debit", null) } returns AppResult.Success(CheckoutResult("Paid successfully", null, null))
 
-        val savedStateHandle = SavedStateHandle(mapOf("shippingAddressId" to "a-1", "paymentMethod" to "Credit Card"))
+        val savedStateHandle = SavedStateHandle(mapOf("shippingAddressId" to "a-1"))
         val viewModel = PaymentViewModel(checkoutUseCase, getCartUseCase, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
 

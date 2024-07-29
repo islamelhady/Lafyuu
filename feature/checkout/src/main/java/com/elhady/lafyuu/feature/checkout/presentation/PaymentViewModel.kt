@@ -29,8 +29,7 @@ class PaymentViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(
         PaymentUiState(
-            shippingAddressId = shippingAddressIdArg,
-            selectedPaymentMethod = paymentMethodArg
+            shippingAddressId = shippingAddressIdArg
         )
     )
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
@@ -39,7 +38,7 @@ class PaymentViewModel @Inject constructor(
     val uiEffect = _uiEffect.receiveAsFlow()
 
     init {
-        loadCheckoutTotal()
+        loadCartAndCoupon()
     }
 
     fun onEvent(event: PaymentUiEvent) {
@@ -56,24 +55,26 @@ class PaymentViewModel @Inject constructor(
         }
     }
 
-    private fun loadCheckoutTotal() {
+    private fun loadCartAndCoupon() {
         viewModelScope.launch {
             when (val result = getCartUseCase()) {
                 is AppResult.Success -> {
                     val cart = result.data
                     val total = cart.finalTotal ?: cart.itemsTotal
-                    _uiState.update { it.copy(checkoutTotal = total) }
+                    val coupon = cart.appliedCoupon?.code
+                    _uiState.update { it.copy(checkoutTotal = total, couponCode = coupon) }
                 }
                 else -> {}
             }
         }
     }
 
-    private fun executeCheckout(couponCode: String?) {
-        if (_uiState.value.isCheckingOut) return // Prevent duplicate submissions
+    private fun executeCheckout(customCouponCode: String?) {
+        if (_uiState.value.isCheckingOut) return
 
         val addressId = _uiState.value.shippingAddressId
         val paymentMethod = _uiState.value.selectedPaymentMethod
+        val couponCode = customCouponCode ?: _uiState.value.couponCode
 
         if (addressId.isBlank()) {
             sendEffect(PaymentUiEffect.ShowSnackBar("Shipping address is missing", AlertType.Error))
@@ -85,17 +86,20 @@ class PaymentViewModel @Inject constructor(
             when (val result = checkoutUseCase(addressId, paymentMethod, couponCode)) {
                 is AppResult.Success -> {
                     val res = result.data
+                    val hasExternalFlow = !res.unifiedCheckoutUrl.isNullOrBlank() || !res.paymentClientSecret.isNullOrBlank()
+
                     _uiState.update {
                         it.copy(
                             isCheckingOut = false,
                             checkoutResult = res,
-                            isSuccess = true
+                            isSuccess = !hasExternalFlow
                         )
                     }
                     res.unifiedCheckoutUrl?.let { url ->
                         sendEffect(PaymentUiEffect.OpenExternalUrl(url))
                     }
-                    sendEffect(PaymentUiEffect.ShowSnackBar(res.message.ifBlank { "Checkout successful!" }, AlertType.Success))
+                    val msg = res.message.ifBlank { if (hasExternalFlow) "Please complete payment" else "Checkout successful!" }
+                    sendEffect(PaymentUiEffect.ShowSnackBar(msg, if (hasExternalFlow) AlertType.Warning else AlertType.Success))
                 }
                 is AppResult.Error -> {
                     _uiState.update { it.copy(isCheckingOut = false) }

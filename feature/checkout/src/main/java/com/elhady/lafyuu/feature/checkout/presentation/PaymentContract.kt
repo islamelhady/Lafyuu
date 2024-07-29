@@ -9,6 +9,7 @@ data class PaymentUiState(
     val selectedPaymentMethod: String = "Credit Card",
     val shippingAddressId: String = "",
     val checkoutTotal: Double = 0.0,
+    val couponCode: String? = null,
     val isCheckingOut: Boolean = false,
     val checkoutResult: CheckoutResult? = null,
     val isSuccess: Boolean = false,
