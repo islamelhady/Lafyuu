@@ -27,15 +27,25 @@ import com.elhady.lafyuu.feature.cart.navigation.cartScreen
 import com.elhady.lafyuu.feature.checkout.presentation.addAddressScreen
 import com.elhady.lafyuu.feature.checkout.presentation.checkoutScreen
 import com.elhady.lafyuu.feature.checkout.presentation.editAddressScreen
-import com.elhady.lafyuu.feature.checkout.presentation.navigateToCheckout
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToAddAddress
+import com.elhady.lafyuu.feature.checkout.presentation.navigateToCheckout
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToEditAddress
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToPayment
 import com.elhady.lafyuu.feature.checkout.presentation.paymentScreen
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
+import com.elhady.lafyuu.feature.orders.presentation.navigateToOrderDetails
+import com.elhady.lafyuu.feature.orders.presentation.navigateToOrders
+import com.elhady.lafyuu.feature.orders.presentation.orderDetailsScreen
+import com.elhady.lafyuu.feature.orders.presentation.ordersScreen
 import com.elhady.lafyuu.feature.product.navigation.navigateToProductDetails
 import com.elhady.lafyuu.feature.product.navigation.productDetailsScreen
+import com.elhady.lafyuu.feature.profile.presentation.accountScreen
+import com.elhady.lafyuu.feature.profile.presentation.changePasswordScreen
+import com.elhady.lafyuu.feature.profile.presentation.navigateToAccount
+import com.elhady.lafyuu.feature.profile.presentation.navigateToChangePassword
+import com.elhady.lafyuu.feature.profile.presentation.navigateToProfile
+import com.elhady.lafyuu.feature.profile.presentation.profileScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -61,11 +71,13 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
+
                     is MainUiState.Authenticated -> {
                         key(true) {
                             MainApp(isAuthenticated = true, cartItemCount = cartItemCount)
                         }
                     }
+
                     is MainUiState.Unauthenticated -> {
                         key(false) {
                             MainApp(isAuthenticated = false, cartItemCount = 0)
@@ -121,7 +133,9 @@ fun MainApp(
                 // Handle navigation to wishlist
             },
             onNavigateToTab = { tabId ->
-                if (navController.graph.findNode(tabId) != null) {
+                if (tabId == "account" || tabId == "Account") {
+                    navController.navigateToAccount()
+                } else if (navController.graph.findNode(tabId) != null) {
                     navController.navigate(tabId) {
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true
@@ -154,7 +168,9 @@ fun MainApp(
                 navController.navigateToProductDetails(productId)
             },
             onNavigateToTab = { tabId ->
-                if (navController.graph.findNode(tabId) != null) {
+                if (tabId == "account" || tabId == "Account") {
+                    navController.navigateToAccount()
+                } else if (navController.graph.findNode(tabId) != null) {
                     navController.navigate(tabId) {
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true
@@ -198,15 +214,62 @@ fun MainApp(
                 navController.popBackStack()
             },
             onNavigateToSuccess = {
-                navController.navigate(HOME_ROUTE) {
-                    popUpTo(HOME_ROUTE) { inclusive = true }
-                }
+                navController.navigateToOrders()
             },
             onOpenUrl = { url ->
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 try {
                     context.startActivity(intent)
-                } catch (_: Exception) {}
+                } catch (_: Exception) {
+                }
+            }
+        )
+
+        ordersScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToOrderDetails = { orderId ->
+                navController.navigateToOrderDetails(orderId)
+            }
+        )
+
+        orderDetailsScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            }
+        )
+
+        accountScreen(
+            onNavigateToProfile = {
+                navController.navigateToProfile()
+            },
+            onNavigateToOrders = {
+                navController.navigateToOrders()
+            },
+            onNavigateToAddress = {
+                navController.navigateToAddAddress()
+            },
+            onNavigateToPayment = {
+                TODO()
+            }
+        )
+
+        profileScreen(
+            onNavigateToChangePassword = {
+                navController.navigateToChangePassword()
+            },
+            onNavigateToLogin = {
+                navController.popBackStack(AUTH_GRAPH_ROUTE, false)
+            },
+            onNavigateBack = {
+                navController.popBackStack()
+            }
+        )
+
+        changePasswordScreen(
+            onNavigateBack = {
+                navController.popBackStack()
             }
         )
     }
