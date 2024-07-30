@@ -14,10 +14,12 @@ sealed interface ProfileUiEvent {
     data object ChangePasswordClicked : ProfileUiEvent
     data object LogoutClicked : ProfileUiEvent
     data object RetryClicked : ProfileUiEvent
+    data object BackClicked: ProfileUiEvent
 }
 
 sealed interface ProfileUiEffect {
     data object NavigateToChangePassword : ProfileUiEffect
     data object NavigateToLogin : ProfileUiEffect
+    data object NavigateBack: ProfileUiEffect
     data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : ProfileUiEffect
 }

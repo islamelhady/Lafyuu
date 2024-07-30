@@ -38,6 +38,7 @@ class ProfileViewModel @Inject constructor(
             ProfileUiEvent.ChangePasswordClicked -> sendEffect(ProfileUiEffect.NavigateToChangePassword)
             ProfileUiEvent.LogoutClicked -> logout()
             ProfileUiEvent.RetryClicked -> loadProfile()
+            ProfileUiEvent.BackClicked -> sendEffect(ProfileUiEffect.NavigateBack)
         }
     }
 

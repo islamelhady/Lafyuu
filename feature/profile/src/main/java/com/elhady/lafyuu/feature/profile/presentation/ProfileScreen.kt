@@ -38,7 +38,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 fun ProfileRoute(
     onNavigateToChangePassword: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    modifier: Modifier = Modifier,
+    onNavigateBack: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -49,6 +49,7 @@ fun ProfileRoute(
             when (effect) {
                 ProfileUiEffect.NavigateToChangePassword -> onNavigateToChangePassword()
                 ProfileUiEffect.NavigateToLogin -> onNavigateToLogin()
+                ProfileUiEffect.NavigateBack -> onNavigateBack()
                 is ProfileUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
@@ -65,7 +66,6 @@ fun ProfileRoute(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
-        modifier = modifier
     )
 }
 
@@ -74,7 +74,6 @@ fun ProfileScreen(
     uiState: ProfileUiState,
     snackbarHostState: SnackbarHostState,
     onEvent: (ProfileUiEvent) -> Unit,
-    modifier: Modifier = Modifier
 ) {
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
@@ -82,7 +81,7 @@ fun ProfileScreen(
             SingleTopAppBar(
                 title = "Profile",
                 leadingIcon = Left,
-                onLeadingClick = {}
+                onLeadingClick = { onEvent(ProfileUiEvent.BackClicked)}
             )
         }
     ) {
@@ -99,7 +98,6 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(Theme.space.large)
                 ) {
-                    // User Profile Header Card
                     uiState.userProfile?.let { profile ->
                         Row(
                             modifier = Modifier
@@ -149,7 +147,7 @@ fun ProfileScreen(
                             title = "Change Password",
                             subtitle = "***********",
                             showChevron = true,
-                            onClick = {},
+                            onClick = { onEvent(ProfileUiEvent.ChangePasswordClicked) },
                             isSelected = true,
                             leadingIcon = Password,
                             leadingIconTint = Theme.color.blue
@@ -158,10 +156,10 @@ fun ProfileScreen(
                             title = "Logout",
                             subtitle = "Logout",
                             showChevron = true,
-                            onClick = {},
+                            onClick = { onEvent(ProfileUiEvent.LogoutClicked) },
                             isSelected = true,
                             leadingIcon = Trash,
-                            leadingIconTint = Theme.color.blue
+                            leadingIconTint = Theme.color.error
                         )
                     }
                 }
