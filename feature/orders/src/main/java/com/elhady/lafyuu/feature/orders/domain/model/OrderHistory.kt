@@ -3,7 +3,11 @@ package com.elhady.lafyuu.feature.orders.domain.model
 data class OrderHistory(
     val orderId: String,
     val orderCode: String,
-    val history: List<OrderHistoryEntry>
+    val totalPrice: Double = 0.0,
+    val paymentMethod: String = "",
+    val createdAt: String? = null,
+    val updatedAt: String? = null,
+    val history: List<OrderHistoryEntry> = emptyList()
 )
 
 data class OrderHistoryEntry(

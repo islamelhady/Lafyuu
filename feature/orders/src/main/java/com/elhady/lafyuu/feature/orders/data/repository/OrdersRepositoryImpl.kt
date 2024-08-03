@@ -35,14 +35,24 @@ class OrdersRepositoryImpl @Inject constructor(
 
     override suspend fun getOrderHistory(orderId: String): AppResult<OrderHistory> {
         return try {
-            val response = ordersApi.getOrderHistory(orderId)
-            if (response.isSuccessful) {
-                val body = response.body()
+            val historyResponse = ordersApi.getOrderHistory(orderId)
+            val ordersResponse = ordersApi.getOrders()
+
+            if (historyResponse.isSuccessful) {
+                val body = historyResponse.body()
                 if (body != null) {
+                    val matchingOrder = if (ordersResponse.isSuccessful) {
+                        ordersResponse.body()?.orders?.find { it.orderId == orderId }
+                    } else null
+
                     AppResult.Success(
                         OrderHistory(
                             orderId = body.orderId ?: orderId,
-                            orderCode = body.orderCode ?: "",
+                            orderCode = body.orderCode ?: matchingOrder?.orderCode ?: "",
+                            totalPrice = matchingOrder?.totalPrice ?: 0.0,
+                            paymentMethod = matchingOrder?.paymentMethod ?: "",
+                            createdAt = matchingOrder?.createdAt,
+                            updatedAt = matchingOrder?.updatedAt,
                             history = body.history.orEmpty().map { it.toDomain() }
                         )
                     )
@@ -50,7 +60,7 @@ class OrdersRepositoryImpl @Inject constructor(
                     AppResult.Error("Order history not found")
                 }
             } else {
-                mapError(apiErrorParser.parseError(response))
+                mapError(apiErrorParser.parseError(historyResponse))
             }
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
