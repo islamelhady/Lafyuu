@@ -18,6 +18,7 @@ import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.list.SingleListItem
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.icons.Bag
+import com.elhady.lafyuu.core.designsystem.icons.CreditCard
 import com.elhady.lafyuu.core.designsystem.icons.Location
 import com.elhady.lafyuu.core.designsystem.icons.Trash
 import com.elhady.lafyuu.core.designsystem.icons.User
@@ -104,8 +105,8 @@ fun AccountScreen(
             )
             SingleListItem(
                 title = "Payment",
-                leadingIcon = Trash,
-                leadingIconTint = Theme.color.error,
+                leadingIcon = CreditCard,
+                leadingIconTint = Theme.color.blue,
                 onClick = { onEvent(AccountUiEvent.PaymentClicked) }
             )
         }
