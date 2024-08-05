@@ -20,7 +20,6 @@ import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisual
 import com.elhady.lafyuu.core.designsystem.icons.Bag
 import com.elhady.lafyuu.core.designsystem.icons.CreditCard
 import com.elhady.lafyuu.core.designsystem.icons.Location
-import com.elhady.lafyuu.core.designsystem.icons.Trash
 import com.elhady.lafyuu.core.designsystem.icons.User
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
@@ -81,9 +80,11 @@ fun AccountScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Theme.color.backgroundWhite, shape = Theme.corner.small)
+                .background(
+                    color = Theme.color.backgroundWhite,
+                    shape = Theme.corner.small
+                )
                 .padding(Theme.space.large),
-            verticalArrangement = Arrangement.spacedBy(Theme.space.large)
         ) {
             SingleListItem(
                 title = "Profile",
