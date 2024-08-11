@@ -83,46 +83,42 @@ fun OffersScreen(
             )
         }
     ) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = Theme.space.large)
-        ) {
-            when {
-                uiState.isLoading && uiState.offers.isEmpty() -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Theme.color.blue
-                    )
-                }
+        when {
+            uiState.isLoading && uiState.offers.isEmpty() -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Theme.color.blue
+                )
+            }
 
-                uiState.offers.isEmpty() -> {
-                    InfoStateContent(
-                        errorMessage = "No offers available",
-                        onRetryClick = { onEvent(OffersUiEvent.RetryClicked) },
-                        errorType = AlertType.Warning,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+            uiState.offers.isEmpty() -> {
+                InfoStateContent(
+                    errorMessage = "No offers available",
+                    onRetryClick = { onEvent(OffersUiEvent.RetryClicked) },
+                    errorType = AlertType.Warning,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
 
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                    ) {
-                        item {
-                            InformationCard(
-                                information = "Use \"MEGSL\" Coupon For Get 90% off"
-                            )
-                        }
-                        items(uiState.offers, key = { it.id }) { offer ->
-                            Banner(
-                                title = offer.name,
-                                subtitle = offer.description ?: "50% Off",
-                                imageUrl = offer.coverUrl,
-                                onClick = { onEvent(OffersUiEvent.OfferClicked(offer)) }
-                            )
-                        }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = Theme.space.large),
+                    verticalArrangement = Arrangement.spacedBy(Theme.space.large)
+                ) {
+                    item {
+                        InformationCard(
+                            information = "Use \"MEGSL\" Coupon For \nGet 90% off"
+                        )
+                    }
+                    items(uiState.offers, key = { it.id }) { offer ->
+                        Banner(
+                            title = offer.name,
+                            subtitle = offer.description ?: "50% Off",
+                            imageUrl = offer.coverUrl,
+                            onClick = { onEvent(OffersUiEvent.OfferClicked(offer)) }
+                        )
                     }
                 }
             }
