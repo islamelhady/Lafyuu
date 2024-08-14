@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -17,7 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -27,7 +26,6 @@ import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.icons.Transaction
-import com.elhady.lafyuu.core.designsystem.icons.X
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
@@ -39,12 +37,13 @@ fun NotificationListItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     image: Painter? = null,
-    leadingIcon: ImageVector? = null
+    leadingIcon: ImageVector? = null,
+    backgroundColor: Color = Theme.color.backgroundWhite
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(Theme.color.backgroundWhite)
+            .background(backgroundColor)
             .clickable(onClick = onClick)
             .padding(all = Theme.space.large),
         verticalAlignment = Alignment.Top
