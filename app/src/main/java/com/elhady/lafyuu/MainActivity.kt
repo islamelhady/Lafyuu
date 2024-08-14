@@ -34,6 +34,8 @@ import com.elhady.lafyuu.feature.checkout.presentation.navigateToPayment
 import com.elhady.lafyuu.feature.checkout.presentation.paymentScreen
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
+import com.elhady.lafyuu.feature.notifications.presentation.navigateToNotifications
+import com.elhady.lafyuu.feature.notifications.presentation.notificationsScreen
 import com.elhady.lafyuu.feature.offers.presentation.navigateToOffers
 import com.elhady.lafyuu.feature.offers.presentation.offersScreen
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrderDetails
@@ -129,7 +131,7 @@ fun MainApp(
                 // Handle navigation to categories
             },
             onNavigateToNotifications = {
-                // Handle navigation to notifications
+                navController.navigateToNotifications()
             },
             onNavigateToWishlist = {
                 // Handle navigation to wishlist
@@ -255,6 +257,12 @@ fun MainApp(
             },
             onNavigateToOrderDetails = { orderId ->
                 navController.navigateToOrderDetails(orderId)
+            }
+        )
+
+        notificationsScreen(
+            onNavigateBack = {
+                navController.popBackStack()
             }
         )
 
