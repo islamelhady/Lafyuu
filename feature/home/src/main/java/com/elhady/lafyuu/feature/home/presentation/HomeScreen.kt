@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeRoute(
+    onNavigateToSearch: () -> Unit = {},
     onNavigateToProductDetails: (String) -> Unit = {},
     onNavigateToCategory: (categoryId: String, categoryName: String) -> Unit = { _, _ -> },
     onNavigateToFlashSale: () -> Unit = {},
@@ -51,13 +52,18 @@ fun HomeRoute(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is HomeUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
-                is HomeUiEffect.NavigateToCategoryProducts -> onNavigateToCategory(effect.categoryId, effect.categoryName)
+                is HomeUiEffect.NavigateToCategoryProducts -> onNavigateToCategory(
+                    effect.categoryId,
+                    effect.categoryName
+                )
+
                 is HomeUiEffect.NavigateToFlashSale -> onNavigateToFlashSale()
                 is HomeUiEffect.NavigateToMegaSale -> onNavigateToMegaSale()
                 is HomeUiEffect.NavigateToCategoriesList -> onNavigateToCategories()
                 is HomeUiEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is HomeUiEffect.NavigateToWishlist -> onNavigateToWishlist()
                 is HomeUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
+                HomeUiEffect.NavigateToSearch -> onNavigateToSearch()
                 is HomeUiEffect.ShowSnackbar -> {}
             }
         }
@@ -79,9 +85,9 @@ internal fun HomeScreen(
     LafyuuScaffold(
         topBar = {
             SearchTopBarWithNotification(
-                searchValue = uiState.searchQuery,
-                onSearchValueChange = { onEvent(HomeUiEvent.SearchQueryChanged(it)) },
-                onClearSearchClick = { onEvent(HomeUiEvent.ClearSearchClicked) },
+//                searchValue = uiState.searchQuery,
+//                onSearchValueChange = { onEvent(HomeUiEvent.SearchQueryChanged(it)) },
+                onSearchClick = { onEvent(HomeUiEvent.SearchClicked) },
                 trailingIcon = Love,
                 onLeadingClick = {},
                 onTrailingClick = { onEvent(HomeUiEvent.WishlistClicked) },
@@ -178,7 +184,13 @@ internal fun HomeScreen(
                     ) {
                         SuperFlashSaleSection(
                             offers = uiState.offers,
-                            onOfferClick = { offerId -> onEvent(HomeUiEvent.OfferBannerClicked(offerId)) },
+                            onOfferClick = { offerId ->
+                                onEvent(
+                                    HomeUiEvent.OfferBannerClicked(
+                                        offerId
+                                    )
+                                )
+                            },
                             onSeeMoreClick = { onEvent(HomeUiEvent.SeeMoreFlashSaleClicked) }
                         )
                         CategoryListSection(

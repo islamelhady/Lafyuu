@@ -47,6 +47,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 @Composable
 fun ExploreRoute(
     onNavigateToCategoryProducts: (String, String) -> Unit,
+    onNavigateToSearch: () -> Unit,
     onNavigateToNotifications: () -> Unit,
     onNavigateToWishlist: () -> Unit,
     onNavigateToTab: (String) -> Unit,
@@ -63,10 +64,10 @@ fun ExploreRoute(
                     effect.categoryName
                 )
 
+                ExploreUiEffect.NavigateToSearch -> onNavigateToSearch()
                 is ExploreUiEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is ExploreUiEffect.NavigateToWishlist -> onNavigateToWishlist()
                 is ExploreUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
-                is ExploreUiEffect.NavigateToSearch -> {}
                 is ExploreUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
@@ -97,9 +98,9 @@ fun ExploreScreen(
         snackbarHostState = snackbarHostState,
         topBar = {
             SearchTopBarWithNotification(
-                searchValue = "",
-                onSearchValueChange = {},
-                onClearSearchClick = {},
+//                searchValue = "",
+//                onSearchValueChange = { onEvent(ExploreUiEvent.SearchClicked) },
+                onSearchClick = { onEvent(ExploreUiEvent.SearchClicked) },
                 trailingIcon = Love,
                 onLeadingClick = {},
                 onTrailingClick = { onEvent(ExploreUiEvent.WishlistClicked) },
@@ -127,7 +128,7 @@ fun ExploreScreen(
                 InfoStateContent(
                     errorMessage = "No categories available",
                     onRetryClick = { onEvent(ExploreUiEvent.RetryClicked) },
-                    errorType = AlertType.Error,
+                    errorType = AlertType.Success,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }

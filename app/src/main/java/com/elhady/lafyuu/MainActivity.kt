@@ -52,6 +52,8 @@ import com.elhady.lafyuu.feature.profile.presentation.navigateToAccount
 import com.elhady.lafyuu.feature.profile.presentation.navigateToChangePassword
 import com.elhady.lafyuu.feature.profile.presentation.navigateToProfile
 import com.elhady.lafyuu.feature.profile.presentation.profileScreen
+import com.elhady.lafyuu.feature.search.presentation.navigateToSearch
+import com.elhady.lafyuu.feature.search.presentation.searchScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -117,6 +119,9 @@ fun MainApp(
         )
 
         homeScreen(
+            onNavigateToSearch = {
+                navController.navigateToSearch()
+            },
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
             },
@@ -270,7 +275,10 @@ fun MainApp(
 
         exploreScreen(
             onNavigateToCategoryProducts = { categoryId, categoryName ->
-                // Handle navigation to category products
+                navController.navigateToSearch()
+            },
+            onNavigateToSearch = {
+                navController.navigateToSearch()
             },
             onNavigateToNotifications = {
                 navController.navigateToNotifications()
@@ -293,6 +301,15 @@ fun MainApp(
                         }
                     }
                 }
+            }
+        )
+
+        searchScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToProductDetails = { productId ->
+                navController.navigateToProductDetails(productId)
             }
         )
 

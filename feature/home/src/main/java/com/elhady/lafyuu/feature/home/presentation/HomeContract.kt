@@ -4,7 +4,7 @@ import com.elhady.lafyuu.core.designsystem.components.element.TabBarItem
 
 sealed interface HomeUiEvent {
     data class SearchQueryChanged(val query: String) : HomeUiEvent
-    data object ClearSearchClicked : HomeUiEvent
+    data object SearchClicked : HomeUiEvent
     data class CategoryClicked(val categoryId: String, val categoryName: String) : HomeUiEvent
     data class ProductClicked(val productId: String) : HomeUiEvent
     data class FavoriteClicked(val productId: String) : HomeUiEvent
@@ -19,6 +19,7 @@ sealed interface HomeUiEvent {
 }
 
 sealed interface HomeUiEffect {
+    data object NavigateToSearch : HomeUiEffect
     data class NavigateToProductDetails(val productId: String) : HomeUiEffect
     data class NavigateToCategoryProducts(val categoryId: String, val categoryName: String) : HomeUiEffect
     data object NavigateToFlashSale : HomeUiEffect
