@@ -2,6 +2,7 @@ package com.elhady.lafyuu.feature.search.presentation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -23,6 +24,7 @@ import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
+import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.icons.Filter
 import com.elhady.lafyuu.core.designsystem.icons.Short
 import com.elhady.lafyuu.core.designsystem.theme.Theme
@@ -75,13 +77,26 @@ fun SearchScreen(
                 onSearchValueChange = { onEvent(SearchUiEvent.QueryChanged(it)) },
                 onClearSearchClick = { onEvent(SearchUiEvent.QueryChanged("")) },
                 trailingIcon = Short,
-                onTrailingClick = {},
+                onTrailingClick = { onEvent(SearchUiEvent.SortClicked) },
                 filterIcon = Filter,
                 onFilterClick = {},
             )
         }
     ) {
         when {
+            uiState.query.isBlank() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LafyuuText(
+                        text = "Type a product name to search",
+                        style = Theme.typography.normalTextRegular,
+                        color = Theme.color.neutralGrey
+                    )
+                }
+            }
+
             uiState.isLoading && uiState.products.isEmpty() -> {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
@@ -93,7 +108,7 @@ fun SearchScreen(
                 InfoStateContent(
                     errorMessage = "Product Not Found",
                     onRetryClick = { onEvent(SearchUiEvent.RetryClicked) },
-                    errorType = AlertType.Error,
+                    errorType = AlertType.Success,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }

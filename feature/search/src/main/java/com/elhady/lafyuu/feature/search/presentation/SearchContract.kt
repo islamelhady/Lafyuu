@@ -11,6 +11,8 @@ data class SearchUiState(
     val minPrice: Double? = null,
     val maxPrice: Double? = null,
     val isInStock: Boolean? = null,
+    val sortBy: String? = null,
+    val sortOrder: String? = null,
     val error: String? = null
 )
 
@@ -20,6 +22,7 @@ sealed interface SearchUiEvent {
     data class CategoryFilterChanged(val category: String?) : SearchUiEvent
     data class PriceFilterChanged(val min: Double?, val max: Double?) : SearchUiEvent
     data class InStockFilterChanged(val isInStock: Boolean?) : SearchUiEvent
+    data object SortClicked : SearchUiEvent
     data class ProductClicked(val productId: String) : SearchUiEvent
     data object BackClicked : SearchUiEvent
     data object RetryClicked : SearchUiEvent

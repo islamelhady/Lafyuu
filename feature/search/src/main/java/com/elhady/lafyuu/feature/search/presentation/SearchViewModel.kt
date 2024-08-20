@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.feature.search.domain.usecase.SearchProductsUseCase
+import com.elhady.lafyuu.feature.search.presentation.SearchUiEffect.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -40,7 +41,9 @@ class SearchViewModel @Inject constructor(
 
     init {
         observeSearchQuery()
-        searchProducts()
+        if (initialQuery.isNotBlank()) {
+            searchProducts()
+        }
     }
 
     fun onEvent(event: SearchUiEvent) {
@@ -65,8 +68,11 @@ class SearchViewModel @Inject constructor(
                 _uiState.update { it.copy(isInStock = event.isInStock) }
                 searchProducts()
             }
+            SearchUiEvent.SortClicked -> {
+                toggleSort()
+            }
             is SearchUiEvent.ProductClicked -> {
-                sendEffect(SearchUiEffect.NavigateToProductDetails(event.productId))
+                sendEffect(NavigateToProductDetails(event.productId))
             }
             SearchUiEvent.BackClicked -> {
                 sendEffect(SearchUiEffect.NavigateBack)
@@ -75,6 +81,21 @@ class SearchViewModel @Inject constructor(
                 searchProducts()
             }
         }
+    }
+
+    private fun toggleSort() {
+        val currentSortBy = _uiState.value.sortBy
+        val currentSortOrder = _uiState.value.sortOrder
+
+        val (nextSortBy, nextSortOrder) = when {
+            currentSortBy == null -> Pair("price", "asc")
+            currentSortBy == "price" && currentSortOrder == "asc" -> Pair("price", "desc")
+            currentSortBy == "price" && currentSortOrder == "desc" -> Pair("rating", "desc")
+            else -> Pair(null, null)
+        }
+
+        _uiState.update { it.copy(sortBy = nextSortBy, sortOrder = nextSortOrder) }
+        searchProducts()
     }
 
     private fun observeSearchQuery() {
@@ -91,13 +112,20 @@ class SearchViewModel @Inject constructor(
     private fun searchProducts() {
         viewModelScope.launch {
             val state = _uiState.value
+            if (state.query.isBlank()) {
+                _uiState.update { it.copy(isLoading = false, products = emptyList(), error = null) }
+                return@launch
+            }
+
             _uiState.update { it.copy(isLoading = true, error = null) }
             when (val result = searchProductsUseCase(
-                searchTerm = state.query.ifBlank { null },
+                searchTerm = state.query,
                 category = state.category,
                 minPrice = state.minPrice,
                 maxPrice = state.maxPrice,
-                isInStock = state.isInStock
+                isInStock = state.isInStock,
+                sortBy = state.sortBy,
+                sortOrder = state.sortOrder
             )) {
                 is AppResult.Success -> {
                     _uiState.update {
