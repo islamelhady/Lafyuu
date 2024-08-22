@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.feature.search.domain.usecase.GetCategoriesUseCase
 import com.elhady.lafyuu.feature.search.domain.usecase.SearchProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchProductsUseCase: SearchProductsUseCase,
+    private val getCategoriesUseCase: GetCategoriesUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -40,6 +42,7 @@ class SearchViewModel @Inject constructor(
 
     init {
         observeSearchQuery()
+        loadCategories()
         if (initialQuery.isNotBlank()) {
             searchProducts()
         }
@@ -56,8 +59,7 @@ class SearchViewModel @Inject constructor(
                 searchProducts()
             }
             is SearchUiEvent.CategoryFilterChanged -> {
-                _uiState.update { it.copy(category = event.category) }
-                searchProducts()
+                _uiState.update { it.copy(tempCategory = event.category) }
             }
             is SearchUiEvent.PriceRangeChanged -> {
                 _uiState.update { it.copy(tempMinPrice = event.min, tempMaxPrice = event.max) }
@@ -69,6 +71,7 @@ class SearchViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isFilterSheetOpen = true,
+                        tempCategory = it.category,
                         tempMinPrice = it.minPrice ?: 0.0,
                         tempMaxPrice = it.maxPrice ?: 2000.0,
                         tempIsInStock = it.isInStock
@@ -81,23 +84,10 @@ class SearchViewModel @Inject constructor(
             SearchUiEvent.ApplyFilters -> {
                 _uiState.update {
                     it.copy(
+                        category = it.tempCategory,
                         minPrice = it.tempMinPrice,
                         maxPrice = it.tempMaxPrice,
                         isInStock = it.tempIsInStock,
-                        isFilterSheetOpen = false
-                    )
-                }
-                searchProducts()
-            }
-            SearchUiEvent.ResetFilters -> {
-                _uiState.update {
-                    it.copy(
-                        minPrice = null,
-                        maxPrice = null,
-                        isInStock = null,
-                        tempMinPrice = 0.0,
-                        tempMaxPrice = 2000.0,
-                        tempIsInStock = null,
                         isFilterSheetOpen = false
                     )
                 }
@@ -109,10 +99,20 @@ class SearchViewModel @Inject constructor(
             is SearchUiEvent.ProductClicked -> {
                 sendEffect(SearchUiEffect.NavigateToProductDetails(event.productId))
             }
-            SearchUiEvent.BackClicked -> {
+            SearchUiEvent.BackToHomeClick -> {
                 sendEffect(SearchUiEffect.NavigateToHome)
             }
-            SearchUiEvent.BackToHomeClick -> sendEffect(SearchUiEffect.NavigateToHome)
+        }
+    }
+
+    private fun loadCategories() {
+        viewModelScope.launch {
+            when (val result = getCategoriesUseCase()) {
+                is AppResult.Success -> {
+                    _uiState.update { it.copy(categories = result.data) }
+                }
+                else -> {}
+            }
         }
     }
 

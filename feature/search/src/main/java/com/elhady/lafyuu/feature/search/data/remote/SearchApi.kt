@@ -1,5 +1,6 @@
 package com.elhady.lafyuu.feature.search.data.remote
 
+import com.elhady.lafyuu.feature.search.data.remote.model.GetAllCategoriesResponseDto
 import com.elhady.lafyuu.feature.search.data.remote.model.PagedListOfProductDto
 import retrofit2.Response
 import retrofit2.http.GET
@@ -18,4 +19,7 @@ interface SearchApi {
         @Query("page") page: Int? = 1,
         @Query("pageSize") pageSize: Int? = 20
     ): Response<PagedListOfProductDto>
+
+    @GET("api/categories")
+    suspend fun getCategories(): Response<GetAllCategoriesResponseDto>
 }

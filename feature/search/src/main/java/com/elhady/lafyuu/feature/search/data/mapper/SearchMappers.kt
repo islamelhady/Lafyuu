@@ -1,6 +1,8 @@
 package com.elhady.lafyuu.feature.search.data.mapper
 
+import com.elhady.lafyuu.feature.search.data.remote.model.CategoryItemDto
 import com.elhady.lafyuu.feature.search.data.remote.model.ProductDto
+import com.elhady.lafyuu.feature.search.domain.model.Category
 import com.elhady.lafyuu.feature.search.domain.model.Product
 
 fun ProductDto.toDomain(): Product {
@@ -28,3 +30,10 @@ fun ProductDto.toDomain(): Product {
         rating = rating
     )
 }
+
+fun CategoryItemDto.toDomain() = Category(
+    id = id.orEmpty(),
+    name = name.orEmpty(),
+    description = description.orEmpty(),
+    coverPictureUrl = coverPictureUrl ?: coverUrl ?: iconUrl ?: image ?: imageUrl
+)

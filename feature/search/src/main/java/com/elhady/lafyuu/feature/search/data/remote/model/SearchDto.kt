@@ -37,3 +37,27 @@ data class PagedListOfProductDto(
     val hasNextPage: Boolean? = false,
     val hasPreviousPage: Boolean? = false
 )
+
+@Serializable
+data class CategoryItemDto(
+    val id: String? = null,
+    val name: String? = null,
+    val description: String? = null,
+    val coverPictureUrl: String? = null,
+    val coverUrl: String? = null,
+    val iconUrl: String? = null,
+    val image: String? = null,
+    val imageUrl: String? = null
+)
+
+@Serializable
+data class GetAllCategoriesResponseDto(
+    val categories: List<CategoryItemDto>? = emptyList(),
+    val items: List<CategoryItemDto>? = emptyList(),
+    val data: List<CategoryItemDto>? = emptyList()
+) {
+    val allCategories: List<CategoryItemDto>
+        get() = categories?.ifEmpty { items?.ifEmpty { data.orEmpty() } ?: data.orEmpty() }
+            ?: items?.ifEmpty { data.orEmpty() }
+            ?: data.orEmpty()
+}

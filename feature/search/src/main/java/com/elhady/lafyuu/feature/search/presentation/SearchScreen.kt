@@ -1,6 +1,5 @@
 package com.elhady.lafyuu.feature.search.presentation
 
-import Left
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -25,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SearchBarWithTrailing
@@ -39,9 +36,7 @@ import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerMedium
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSlider
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
-import com.elhady.lafyuu.core.designsystem.components.other.SelectingChip
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
-import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.components.textfield.DefaultTextField
 import com.elhady.lafyuu.core.designsystem.icons.Filter
 import com.elhady.lafyuu.core.designsystem.icons.Short
