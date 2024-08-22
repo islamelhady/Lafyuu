@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.feature.search.domain.usecase.SearchProductsUseCase
-import com.elhady.lafyuu.feature.search.presentation.SearchUiEffect.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -60,26 +59,60 @@ class SearchViewModel @Inject constructor(
                 _uiState.update { it.copy(category = event.category) }
                 searchProducts()
             }
-            is SearchUiEvent.PriceFilterChanged -> {
-                _uiState.update { it.copy(minPrice = event.min, maxPrice = event.max) }
+            is SearchUiEvent.PriceRangeChanged -> {
+                _uiState.update { it.copy(tempMinPrice = event.min, tempMaxPrice = event.max) }
+            }
+            is SearchUiEvent.InStockChanged -> {
+                _uiState.update { it.copy(tempIsInStock = event.isInStock) }
+            }
+            SearchUiEvent.FilterClicked -> {
+                _uiState.update {
+                    it.copy(
+                        isFilterSheetOpen = true,
+                        tempMinPrice = it.minPrice ?: 0.0,
+                        tempMaxPrice = it.maxPrice ?: 2000.0,
+                        tempIsInStock = it.isInStock
+                    )
+                }
+            }
+            SearchUiEvent.FilterDismissed -> {
+                _uiState.update { it.copy(isFilterSheetOpen = false) }
+            }
+            SearchUiEvent.ApplyFilters -> {
+                _uiState.update {
+                    it.copy(
+                        minPrice = it.tempMinPrice,
+                        maxPrice = it.tempMaxPrice,
+                        isInStock = it.tempIsInStock,
+                        isFilterSheetOpen = false
+                    )
+                }
                 searchProducts()
             }
-            is SearchUiEvent.InStockFilterChanged -> {
-                _uiState.update { it.copy(isInStock = event.isInStock) }
+            SearchUiEvent.ResetFilters -> {
+                _uiState.update {
+                    it.copy(
+                        minPrice = null,
+                        maxPrice = null,
+                        isInStock = null,
+                        tempMinPrice = 0.0,
+                        tempMaxPrice = 2000.0,
+                        tempIsInStock = null,
+                        isFilterSheetOpen = false
+                    )
+                }
                 searchProducts()
             }
             SearchUiEvent.SortClicked -> {
                 toggleSort()
             }
             is SearchUiEvent.ProductClicked -> {
-                sendEffect(NavigateToProductDetails(event.productId))
+                sendEffect(SearchUiEffect.NavigateToProductDetails(event.productId))
             }
             SearchUiEvent.BackClicked -> {
-                sendEffect(SearchUiEffect.NavigateBack)
+                sendEffect(SearchUiEffect.NavigateToHome)
             }
-            SearchUiEvent.RetryClicked -> {
-                searchProducts()
-            }
+            SearchUiEvent.BackToHomeClick -> sendEffect(SearchUiEffect.NavigateToHome)
         }
     }
 

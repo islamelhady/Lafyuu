@@ -16,7 +16,7 @@ fun NavController.navigateToSearch(query: String? = null, navOptions: NavOptions
 }
 
 fun NavGraphBuilder.searchScreen(
-    onNavigateBack: () -> Unit,
+    onNavigateToHome: () -> Unit,
     onNavigateToProductDetails: (String) -> Unit
 ) {
     composable(
@@ -30,7 +30,7 @@ fun NavGraphBuilder.searchScreen(
         )
     ) {
         SearchRoute(
-            onNavigateBack = onNavigateBack,
+            onNavigateToHome = onNavigateToHome,
             onNavigateToProductDetails = onNavigateToProductDetails
         )
     }

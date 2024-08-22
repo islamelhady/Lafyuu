@@ -36,6 +36,7 @@ import com.elhady.lafyuu.feature.explore.presentation.exploreScreen
 import com.elhady.lafyuu.feature.explore.presentation.navigateToExplore
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
+import com.elhady.lafyuu.feature.home.navigation.navigateToHome
 import com.elhady.lafyuu.feature.notifications.presentation.navigateToNotifications
 import com.elhady.lafyuu.feature.notifications.presentation.notificationsScreen
 import com.elhady.lafyuu.feature.offers.presentation.navigateToOffers
@@ -305,8 +306,8 @@ fun MainApp(
         )
 
         searchScreen(
-            onNavigateBack = {
-                navController.popBackStack()
+            onNavigateToHome = {
+                navController.navigateToHome()
             },
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)

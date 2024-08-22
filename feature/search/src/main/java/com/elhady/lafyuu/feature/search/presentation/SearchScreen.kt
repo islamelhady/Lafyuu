@@ -1,37 +1,54 @@
 package com.elhady.lafyuu.feature.search.presentation
 
+import Left
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SearchBarWithTrailing
+import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
+import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.button.LabelButton
 import com.elhady.lafyuu.core.designsystem.components.card.ProductCard
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
+import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSlider
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
+import com.elhady.lafyuu.core.designsystem.components.other.SelectingChip
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
+import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.icons.Filter
 import com.elhady.lafyuu.core.designsystem.icons.Short
+import com.elhady.lafyuu.core.designsystem.icons.X
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
 fun SearchRoute(
-    onNavigateBack: () -> Unit,
+    onNavigateToHome: () -> Unit,
     onNavigateToProductDetails: (String) -> Unit,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
@@ -42,7 +59,7 @@ fun SearchRoute(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 is SearchUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
-                SearchUiEffect.NavigateBack -> onNavigateBack()
+                SearchUiEffect.NavigateToHome -> onNavigateToHome()
                 is SearchUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
@@ -63,12 +80,15 @@ fun SearchRoute(
 }
 
 @SuppressLint("DefaultLocale")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     uiState: SearchUiState,
     snackbarHostState: SnackbarHostState,
     onEvent: (SearchUiEvent) -> Unit,
 ) {
+    val sheetState = rememberModalBottomSheetState()
+
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
         topBar = {
@@ -79,7 +99,7 @@ fun SearchScreen(
                 trailingIcon = Short,
                 onTrailingClick = { onEvent(SearchUiEvent.SortClicked) },
                 filterIcon = Filter,
-                onFilterClick = {},
+                onFilterClick = { onEvent(SearchUiEvent.FilterClicked) },
             )
         }
     ) {
@@ -89,10 +109,10 @@ fun SearchScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    LafyuuText(
-                        text = "Type a product name to search",
-                        style = Theme.typography.normalTextRegular,
-                        color = Theme.color.neutralGrey
+                    InfoStateContent(
+                        errorMessage = "Type a product name to search",
+                        errorType = AlertType.Warning,
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
             }
@@ -107,8 +127,9 @@ fun SearchScreen(
             uiState.products.isEmpty() -> {
                 InfoStateContent(
                     errorMessage = "Product Not Found",
-                    onRetryClick = { onEvent(SearchUiEvent.RetryClicked) },
-                    errorType = AlertType.Success,
+                    caption = "Back to Home",
+                    onRetryClick = { onEvent(SearchUiEvent.BackToHomeClick) },
+                    errorType = AlertType.Error,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -134,6 +155,74 @@ fun SearchScreen(
                             onClick = { onEvent(SearchUiEvent.ProductClicked(product.id)) }
                         )
                     }
+                }
+            }
+        }
+
+        if (uiState.isFilterSheetOpen) {
+            ModalBottomSheet(
+                onDismissRequest = { onEvent(SearchUiEvent.FilterDismissed) },
+                sheetState = sheetState
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Theme.space.large)
+                ) {
+                    SingleTopAppBar(
+                        title = "Filter Search",
+                        leadingIcon = X,
+                        onLeadingClick = { onEvent(SearchUiEvent.FilterDismissed) }
+                    )
+
+                    Column(verticalArrangement = Arrangement.spacedBy(Theme.space.small)) {
+                        LafyuuText(
+                            text = "Price Range: $${uiState.tempMinPrice?.toInt() ?: 0} - $${uiState.tempMaxPrice?.toInt() ?: 2000}",
+                            style = Theme.typography.mediumTextBold,
+                            color = Theme.color.neutralDark
+                        )
+                        LafyuuSlider(
+                            value = (uiState.tempMinPrice?.toFloat()
+                                ?: 0f)..(uiState.tempMaxPrice?.toFloat() ?: 2000f),
+                            onValueChange = { range ->
+                                onEvent(
+                                    SearchUiEvent.PriceRangeChanged(
+                                        range.start.toDouble(),
+                                        range.endInclusive.toDouble()
+                                    )
+                                )
+                            },
+                            valueRange = 0f..2000f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    Column(verticalArrangement = Arrangement.spacedBy(Theme.space.small)) {
+                        LafyuuText(
+                            text = "Availability",
+                            style = Theme.typography.mediumTextBold,
+                            color = Theme.color.neutralDark
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                        ) {
+                            LabelButton(
+                                caption = "All",
+                                isEnabled = uiState.tempIsInStock == null,
+                                onClick = { onEvent(SearchUiEvent.InStockChanged(null)) }
+                            )
+                            LabelButton(
+                                caption = "In Stock",
+                                isEnabled = uiState.tempIsInStock == true,
+                                onClick = { onEvent(SearchUiEvent.InStockChanged(true)) }
+                            )
+                        }
+                    }
+                    DefaultButton(
+                        caption = "Apply",
+                        onClick = { onEvent(SearchUiEvent.ApplyFilters) },
+                        modifier = Modifier.fillMaxWidth().padding(bottom = Theme.space.large)
+                    )
                 }
             }
         }
