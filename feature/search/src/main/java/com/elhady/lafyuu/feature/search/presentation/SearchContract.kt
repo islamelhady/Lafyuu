@@ -6,17 +6,23 @@ import com.elhady.lafyuu.feature.search.domain.model.Product
 
 data class SearchUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val products: List<Product> = emptyList(),
     val categories: List<Category> = emptyList(),
     val query: String = "",
     val category: String? = null,
+    val isPriceFilterEnabled: Boolean = false,
     val minPrice: Double? = null,
     val maxPrice: Double? = null,
     val isInStock: Boolean? = null,
     val sortBy: String? = null,
     val sortOrder: String? = null,
+    val page: Int = 1,
+    val pageSize: Int = 20,
+    val hasMorePages: Boolean = false,
     val isFilterSheetOpen: Boolean = false,
     val tempCategory: String? = null,
+    val tempIsPriceFilterEnabled: Boolean = false,
     val tempMinPrice: Double? = null,
     val tempMaxPrice: Double? = null,
     val tempIsInStock: Boolean? = null,
@@ -28,6 +34,7 @@ sealed interface SearchUiEvent {
     data class SearchSubmitted(val query: String) : SearchUiEvent
     data class CategoryFilterChanged(val category: String?) : SearchUiEvent
     data class PriceRangeChanged(val min: Double?, val max: Double?) : SearchUiEvent
+    data class PriceFilterToggled(val enabled: Boolean) : SearchUiEvent
     data class InStockChanged(val isInStock: Boolean?) : SearchUiEvent
     data object FilterClicked : SearchUiEvent
     data object FilterDismissed : SearchUiEvent

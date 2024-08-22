@@ -10,6 +10,7 @@ import com.elhady.lafyuu.feature.search.domain.usecase.SearchProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +37,7 @@ class SearchViewModel @Inject constructor(
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     private val _searchQuery = MutableStateFlow(initialQuery)
+    private var searchJob: Job? = null
 
     private val _uiEffect = Channel<SearchUiEffect>()
     val uiEffect = _uiEffect.receiveAsFlow()
@@ -55,14 +57,23 @@ class SearchViewModel @Inject constructor(
                 _searchQuery.value = event.query
             }
             is SearchUiEvent.SearchSubmitted -> {
-                _uiState.update { it.copy(query = event.query) }
+                _uiState.update { it.copy(query = event.query, page = 1) }
                 searchProducts()
             }
             is SearchUiEvent.CategoryFilterChanged -> {
                 _uiState.update { it.copy(tempCategory = event.category) }
             }
             is SearchUiEvent.PriceRangeChanged -> {
-                _uiState.update { it.copy(tempMinPrice = event.min, tempMaxPrice = event.max) }
+                _uiState.update {
+                    it.copy(
+                        tempIsPriceFilterEnabled = true,
+                        tempMinPrice = event.min,
+                        tempMaxPrice = event.max
+                    )
+                }
+            }
+            is SearchUiEvent.PriceFilterToggled -> {
+                _uiState.update { it.copy(tempIsPriceFilterEnabled = event.enabled) }
             }
             is SearchUiEvent.InStockChanged -> {
                 _uiState.update { it.copy(tempIsInStock = event.isInStock) }
@@ -72,6 +83,7 @@ class SearchViewModel @Inject constructor(
                     it.copy(
                         isFilterSheetOpen = true,
                         tempCategory = it.category,
+                        tempIsPriceFilterEnabled = it.isPriceFilterEnabled,
                         tempMinPrice = it.minPrice ?: 0.0,
                         tempMaxPrice = it.maxPrice ?: 2000.0,
                         tempIsInStock = it.isInStock
@@ -82,13 +94,17 @@ class SearchViewModel @Inject constructor(
                 _uiState.update { it.copy(isFilterSheetOpen = false) }
             }
             SearchUiEvent.ApplyFilters -> {
+                val minPrice = if (uiState.value.tempIsPriceFilterEnabled) uiState.value.tempMinPrice else null
+                val maxPrice = if (uiState.value.tempIsPriceFilterEnabled) uiState.value.tempMaxPrice else null
                 _uiState.update {
                     it.copy(
                         category = it.tempCategory,
-                        minPrice = it.tempMinPrice,
-                        maxPrice = it.tempMaxPrice,
+                        isPriceFilterEnabled = it.tempIsPriceFilterEnabled,
+                        minPrice = minPrice,
+                        maxPrice = maxPrice,
                         isInStock = it.tempIsInStock,
-                        isFilterSheetOpen = false
+                        isFilterSheetOpen = false,
+                        page = 1
                     )
                 }
                 searchProducts()
@@ -123,11 +139,10 @@ class SearchViewModel @Inject constructor(
         val (nextSortBy, nextSortOrder) = when {
             currentSortBy == null -> Pair("price", "asc")
             currentSortBy == "price" && currentSortOrder == "asc" -> Pair("price", "desc")
-            currentSortBy == "price" && currentSortOrder == "desc" -> Pair("rating", "desc")
             else -> Pair(null, null)
         }
 
-        _uiState.update { it.copy(sortBy = nextSortBy, sortOrder = nextSortOrder) }
+        _uiState.update { it.copy(sortBy = nextSortBy, sortOrder = nextSortOrder, page = 1) }
         searchProducts()
     }
 
@@ -137,13 +152,15 @@ class SearchViewModel @Inject constructor(
                 .debounce(400L)
                 .distinctUntilChanged()
                 .collectLatest {
+                    _uiState.update { state -> state.copy(page = 1) }
                     searchProducts()
                 }
         }
     }
 
-    private fun searchProducts() {
-        viewModelScope.launch {
+    fun searchProducts() {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
             val state = _uiState.value
             if (state.query.isBlank()) {
                 _uiState.update { it.copy(isLoading = false, products = emptyList(), error = null) }
@@ -158,7 +175,9 @@ class SearchViewModel @Inject constructor(
                 maxPrice = state.maxPrice,
                 isInStock = state.isInStock,
                 sortBy = state.sortBy,
-                sortOrder = state.sortOrder
+                sortOrder = state.sortOrder,
+                page = state.page,
+                pageSize = state.pageSize
             )) {
                 is AppResult.Success -> {
                     _uiState.update {

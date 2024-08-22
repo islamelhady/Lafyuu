@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.search.presentation
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -169,9 +172,35 @@ fun SearchScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = Theme.space.large),
+                        .padding(horizontal = Theme.space.large)
+                        .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
                 ) {
+                    LafyuuText(
+                        text = "Category",
+                        style = Theme.typography.heading5,
+                        color = Theme.color.neutralDark
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(Theme.space.small),
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
+                    ) {
+                        LabelButton(
+                            caption = "All",
+                            isEnabled = uiState.tempCategory == null,
+                            onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(null)) },
+                            hasBorder = true
+                        )
+                        uiState.categories.forEach { cat ->
+                            LabelButton(
+                                caption = cat.name,
+                                isEnabled = uiState.tempCategory == cat.name || uiState.tempCategory == cat.id,
+                                onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(cat.name)) },
+                                hasBorder = true
+                            )
+                        }
+                    }
+
                     LafyuuText(
                         text = "Price Range",
                         style = Theme.typography.heading5,
