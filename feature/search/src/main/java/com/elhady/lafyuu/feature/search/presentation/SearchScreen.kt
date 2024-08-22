@@ -36,11 +36,13 @@ import com.elhady.lafyuu.core.designsystem.components.card.ProductCard
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerMedium
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSlider
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.other.SelectingChip
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
+import com.elhady.lafyuu.core.designsystem.components.textfield.DefaultTextField
 import com.elhady.lafyuu.core.designsystem.icons.Filter
 import com.elhady.lafyuu.core.designsystem.icons.Short
 import com.elhady.lafyuu.core.designsystem.icons.X
@@ -164,65 +166,95 @@ fun SearchScreen(
                 onDismissRequest = { onEvent(SearchUiEvent.FilterDismissed) },
                 sheetState = sheetState
             ) {
+                SingleTopAppBar(
+                    title = "Filter Search",
+                    leadingIcon = X,
+                    onLeadingClick = { onEvent(SearchUiEvent.FilterDismissed) }
+                )
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(Theme.space.large)
+                        .fillMaxWidth()
+                        .padding(horizontal = Theme.space.large),
+                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
                 ) {
-                    SingleTopAppBar(
-                        title = "Filter Search",
-                        leadingIcon = X,
-                        onLeadingClick = { onEvent(SearchUiEvent.FilterDismissed) }
+                    LafyuuText(
+                        text = "Price Range",
+                        style = Theme.typography.heading5,
+                        color = Theme.color.neutralDark
                     )
-
-                    Column(verticalArrangement = Arrangement.spacedBy(Theme.space.small)) {
-                        LafyuuText(
-                            text = "Price Range: $${uiState.tempMinPrice?.toInt() ?: 0} - $${uiState.tempMaxPrice?.toInt() ?: 2000}",
-                            style = Theme.typography.mediumTextBold,
-                            color = Theme.color.neutralDark
-                        )
-                        LafyuuSlider(
-                            value = (uiState.tempMinPrice?.toFloat()
-                                ?: 0f)..(uiState.tempMaxPrice?.toFloat() ?: 2000f),
-                            onValueChange = { range ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        DefaultTextField(
+                            value = "${uiState.tempMinPrice?.toInt() ?: 0}",
+                            onValueChange = { newValue ->
                                 onEvent(
                                     SearchUiEvent.PriceRangeChanged(
-                                        range.start.toDouble(),
-                                        range.endInclusive.toDouble()
+                                        newValue.toDoubleOrNull() ?: 0.0,
+                                        uiState.tempMaxPrice ?: 2000.0
                                     )
                                 )
                             },
-                            valueRange = 0f..2000f,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.weight(1f)
+                        )
+                        DefaultTextField(
+                            value = "${uiState.tempMaxPrice?.toInt() ?: 2000}",
+                            onValueChange = { newValue ->
+                                onEvent(
+                                    SearchUiEvent.PriceRangeChanged(
+                                        uiState.tempMinPrice ?: 0.0,
+                                        newValue.toDoubleOrNull() ?: 2000.0
+                                    )
+                                )
+                            },
+                            modifier = Modifier.weight(1f)
                         )
                     }
+                    LafyuuSlider(
+                        value = (uiState.tempMinPrice?.toFloat()
+                            ?: 0f)..(uiState.tempMaxPrice?.toFloat() ?: 2000f),
+                        onValueChange = { range ->
+                            onEvent(
+                                SearchUiEvent.PriceRangeChanged(
+                                    range.start.toDouble(),
+                                    range.endInclusive.toDouble()
+                                )
+                            )
+                        },
+                        valueRange = 0f..2000f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                    Column(verticalArrangement = Arrangement.spacedBy(Theme.space.small)) {
-                        LafyuuText(
-                            text = "Availability",
-                            style = Theme.typography.mediumTextBold,
-                            color = Theme.color.neutralDark
+                    LafyuuText(
+                        text = "Availability",
+                        style = Theme.typography.heading5,
+                        color = Theme.color.neutralDark
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                    ) {
+                        LabelButton(
+                            caption = "All",
+                            isEnabled = uiState.tempIsInStock == null,
+                            onClick = { onEvent(SearchUiEvent.InStockChanged(null)) },
+                            hasBorder = true
                         )
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                        ) {
-                            LabelButton(
-                                caption = "All",
-                                isEnabled = uiState.tempIsInStock == null,
-                                onClick = { onEvent(SearchUiEvent.InStockChanged(null)) }
-                            )
-                            LabelButton(
-                                caption = "In Stock",
-                                isEnabled = uiState.tempIsInStock == true,
-                                onClick = { onEvent(SearchUiEvent.InStockChanged(true)) }
-                            )
-                        }
+                        LabelButton(
+                            caption = "In Stock",
+                            isEnabled = uiState.tempIsInStock == true,
+                            onClick = { onEvent(SearchUiEvent.InStockChanged(true)) },
+                            hasBorder = true
+                        )
                     }
                     DefaultButton(
                         caption = "Apply",
                         onClick = { onEvent(SearchUiEvent.ApplyFilters) },
-                        modifier = Modifier.fillMaxWidth().padding(bottom = Theme.space.large)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = Theme.space.large)
                     )
+                    VerticalSpacerMedium()
                 }
             }
         }
