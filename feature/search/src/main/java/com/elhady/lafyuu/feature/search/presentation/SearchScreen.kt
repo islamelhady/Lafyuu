@@ -1,10 +1,11 @@
 package com.elhady.lafyuu.feature.search.presentation
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SearchBarWithTrailing
@@ -80,7 +82,7 @@ fun SearchRoute(
 }
 
 @SuppressLint("DefaultLocale")
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SearchScreen(
     uiState: SearchUiState,
@@ -181,21 +183,27 @@ fun SearchScreen(
                         style = Theme.typography.heading5,
                         color = Theme.color.neutralDark
                     )
-                    Row(
+                    FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(Theme.space.small),
-                        modifier = Modifier.horizontalScroll(rememberScrollState())
+                        verticalArrangement = Arrangement.spacedBy(Theme.space.small)
                     ) {
+                        val isAllSelected = uiState.tempCategory == null
                         LabelButton(
                             caption = "All",
-                            isEnabled = uiState.tempCategory == null,
                             onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(null)) },
+                            containerColor = if (isAllSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                            contentColor = if (isAllSelected) Theme.color.blue else Theme.color.neutralGrey,
+                            style = if (isAllSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
                             hasBorder = true
                         )
                         uiState.categories.forEach { cat ->
+                            val isSelected = uiState.tempCategory == cat.name || uiState.tempCategory == cat.id
                             LabelButton(
                                 caption = cat.name,
-                                isEnabled = uiState.tempCategory == cat.name || uiState.tempCategory == cat.id,
                                 onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(cat.name)) },
+                                containerColor = if (isSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                                contentColor = if (isSelected) Theme.color.blue else Theme.color.neutralGrey,
+                                style = if (isSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
                                 hasBorder = true
                             )
                         }
@@ -250,27 +258,26 @@ fun SearchScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    LafyuuText(
-                        text = "Availability",
-                        style = Theme.typography.heading5,
-                        color = Theme.color.neutralDark
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                    ) {
-                        LabelButton(
-                            caption = "All",
-                            isEnabled = uiState.tempIsInStock == null,
-                            onClick = { onEvent(SearchUiEvent.InStockChanged(null)) },
-                            hasBorder = true
-                        )
-                        LabelButton(
-                            caption = "In Stock",
-                            isEnabled = uiState.tempIsInStock == true,
-                            onClick = { onEvent(SearchUiEvent.InStockChanged(true)) },
-                            hasBorder = true
-                        )
-                    }
+//                    LafyuuText(
+//                        text = "Availability",
+//                        style = Theme.typography.heading5,
+//                        color = Theme.color.neutralDark)
+//                    Row(
+//                        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
+//                    ) {
+//                        LabelButton(
+//                            caption = "All",
+//                            isEnabled = uiState.tempIsInStock == null,
+//                            onClick = { onEvent(SearchUiEvent.InStockChanged(null)) },
+//                            hasBorder = true
+//                        )
+//                        LabelButton(
+//                            caption = "In Stock",
+//                            isEnabled = uiState.tempIsInStock == true,
+//                            onClick = { onEvent(SearchUiEvent.InStockChanged(true)) },
+//                            hasBorder = true
+//                        )
+//                    }
                     DefaultButton(
                         caption = "Apply",
                         onClick = { onEvent(SearchUiEvent.ApplyFilters) },

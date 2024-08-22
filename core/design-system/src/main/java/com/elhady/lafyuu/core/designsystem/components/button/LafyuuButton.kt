@@ -103,7 +103,8 @@ internal fun LafyuuButton(
                 LafyuuText(
                     text = it,
                     style = style,
-                    color = textAndIconColor
+                    color = textAndIconColor,
+                    modifier = Modifier.padding(horizontal = Theme.space.small)
                 )
             }
         }
