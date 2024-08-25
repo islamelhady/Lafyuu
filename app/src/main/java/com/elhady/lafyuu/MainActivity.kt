@@ -33,11 +33,12 @@ import com.elhady.lafyuu.feature.checkout.presentation.navigateToEditAddress
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToPayment
 import com.elhady.lafyuu.feature.checkout.presentation.paymentScreen
 import com.elhady.lafyuu.feature.explore.presentation.exploreScreen
-import com.elhady.lafyuu.feature.explore.presentation.navigateToExplore
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.categoriesScreen
+import com.elhady.lafyuu.feature.home.navigation.categoryProductsScreen
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
 import com.elhady.lafyuu.feature.home.navigation.navigateToCategories
+import com.elhady.lafyuu.feature.home.navigation.navigateToCategoryProducts
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrders
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrderDetails
 import com.elhady.lafyuu.feature.orders.presentation.ordersScreen
@@ -154,13 +155,22 @@ fun MainApp(
                 navController.popBackStack()
             },
             onNavigateToCategoryProducts = { categoryId, categoryName ->
-                // Handle category products navigation
+                navController.navigateToCategoryProducts(categoryName)
+            }
+        )
+
+        categoryProductsScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToProductDetails = { productId ->
+                navController.navigateToProductDetails(productId)
             }
         )
 
         exploreScreen(
             onNavigateToCategoryProducts = { categoryId, categoryName ->
-                // Handle navigation to category products
+                navController.navigateToCategoryProducts(categoryName)
             },
             onNavigateToSearch = {
                 // Handle navigation to search

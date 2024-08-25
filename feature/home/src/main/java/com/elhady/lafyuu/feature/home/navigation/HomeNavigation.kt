@@ -3,12 +3,17 @@ package com.elhady.lafyuu.feature.home.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.elhady.lafyuu.feature.home.presentation.CategoriesRoute
+import com.elhady.lafyuu.feature.home.presentation.CategoryProductsRoute
 import com.elhady.lafyuu.feature.home.presentation.HomeRoute
 
 const val HOME_ROUTE = "home"
 const val CATEGORIES_ROUTE = "categories"
+const val CATEGORY_PRODUCTS_ROUTE_BASE = "category_products"
+const val CATEGORY_PRODUCTS_ROUTE = "$CATEGORY_PRODUCTS_ROUTE_BASE/{categoryName}"
 
 fun NavController.navigateToHome(navOptions: NavOptions? = null) {
     this.navigate(HOME_ROUTE, navOptions)
@@ -16,6 +21,10 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
 
 fun NavController.navigateToCategories(navOptions: NavOptions? = null) {
     this.navigate(CATEGORIES_ROUTE, navOptions)
+}
+
+fun NavController.navigateToCategoryProducts(categoryName: String, navOptions: NavOptions? = null) {
+    this.navigate("$CATEGORY_PRODUCTS_ROUTE_BASE/$categoryName", navOptions)
 }
 
 fun NavGraphBuilder.homeScreen(
@@ -52,6 +61,23 @@ fun NavGraphBuilder.categoriesScreen(
         CategoriesRoute(
             onNavigateBack = onNavigateBack,
             onNavigateToCategoryProducts = onNavigateToCategoryProducts
+        )
+    }
+}
+
+fun NavGraphBuilder.categoryProductsScreen(
+    onNavigateBack: () -> Unit,
+    onNavigateToProductDetails: (String) -> Unit
+) {
+    composable(
+        route = CATEGORY_PRODUCTS_ROUTE,
+        arguments = listOf(
+            navArgument("categoryName") { type = NavType.StringType }
+        )
+    ) {
+        CategoryProductsRoute(
+            onNavigateBack = onNavigateBack,
+            onNavigateToProductDetails = onNavigateToProductDetails
         )
     }
 }
