@@ -21,9 +21,10 @@ sealed interface HomeUiEvent {
 sealed interface HomeUiEffect {
     data object NavigateToSearch : HomeUiEffect
     data class NavigateToProductDetails(val productId: String) : HomeUiEffect
+    data class NavigateToCategoryProducts(val categoryId: String, val categoryName: String) : HomeUiEffect
     data object NavigateToFlashSale : HomeUiEffect
     data object NavigateToMegaSale : HomeUiEffect
-    data object NavigateToCategoriesList : HomeUiEffect
+    data object NavigateToMoreCategories : HomeUiEffect
     data object NavigateToNotifications : HomeUiEffect
     data object NavigateToWishlist : HomeUiEffect
     data class NavigateToTab(val tabRoute: String) : HomeUiEffect

@@ -39,6 +39,7 @@ import com.elhady.lafyuu.feature.home.navigation.categoryProductsScreen
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
 import com.elhady.lafyuu.feature.home.navigation.navigateToCategories
 import com.elhady.lafyuu.feature.home.navigation.navigateToCategoryProducts
+import com.elhady.lafyuu.feature.notifications.presentation.navigateToNotifications
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrders
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrderDetails
 import com.elhady.lafyuu.feature.orders.presentation.ordersScreen
@@ -53,6 +54,7 @@ import com.elhady.lafyuu.feature.product.navigation.navigateToProductDetails
 import com.elhady.lafyuu.feature.product.navigation.navigateToReviews
 import com.elhady.lafyuu.feature.product.navigation.productDetailsScreen
 import com.elhady.lafyuu.feature.product.navigation.reviewsScreen
+import com.elhady.lafyuu.feature.search.presentation.navigateToSearch
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -125,11 +127,17 @@ fun MainApp(
             onNavigateToMegaSale = {
                 // Handle navigation to mega sale
             },
-            onNavigateToCategories = {
+            onNavigateToMoreCategories = {
                 navController.navigateToCategories()
             },
+            onNavigateToCategoryProducts = { categoryId, categoryName ->
+                navController.navigateToCategoryProducts(categoryName)
+            },
+            onNavigateToSearch = {
+                navController.navigateToSearch()
+            },
             onNavigateToNotifications = {
-                // Handle navigation to notifications
+                navController.navigateToNotifications()
             },
             onNavigateToWishlist = {
                 // Handle navigation to wishlist

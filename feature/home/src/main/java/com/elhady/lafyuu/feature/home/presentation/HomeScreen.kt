@@ -36,9 +36,10 @@ import kotlinx.coroutines.flow.collectLatest
 fun HomeRoute(
     onNavigateToSearch: () -> Unit = {},
     onNavigateToProductDetails: (String) -> Unit = {},
+    onNavigateToCategoryProducts: (String, String) -> Unit = { _, _ -> },
     onNavigateToFlashSale: () -> Unit = {},
     onNavigateToMegaSale: () -> Unit = {},
-    onNavigateToCategories: () -> Unit = {},
+    onNavigateToMoreCategories: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToWishlist: () -> Unit = {},
     onNavigateToTab: (String) -> Unit = {},
@@ -51,9 +52,10 @@ fun HomeRoute(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is HomeUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
+                is HomeUiEffect.NavigateToCategoryProducts -> onNavigateToCategoryProducts(effect.categoryId, effect.categoryName)
                 is HomeUiEffect.NavigateToFlashSale -> onNavigateToFlashSale()
                 is HomeUiEffect.NavigateToMegaSale -> onNavigateToMegaSale()
-                is HomeUiEffect.NavigateToCategoriesList -> onNavigateToCategories()
+                is HomeUiEffect.NavigateToMoreCategories -> onNavigateToMoreCategories()
                 is HomeUiEffect.NavigateToNotifications -> onNavigateToNotifications()
                 is HomeUiEffect.NavigateToWishlist -> onNavigateToWishlist()
                 is HomeUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
