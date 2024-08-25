@@ -34,6 +34,7 @@ sealed interface ProductDetailsUiEvent {
 sealed interface ProductDetailsUiEffect {
     data object NavigateBack : ProductDetailsUiEffect
     data class NavigateToProductDetails(val productId: String) : ProductDetailsUiEffect
+    data class NavigateToReviews(val productId: String) : ProductDetailsUiEffect
     data class ShowSnackbar(val message: String) : ProductDetailsUiEffect
     data object NavigateToSearch : ProductDetailsUiEffect
 }

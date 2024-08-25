@@ -33,6 +33,7 @@ fun ProductDetailsRoute(
     onNavigateBack: () -> Unit,
     onNavigateToSearch: () -> Unit,
     onNavigateToProductDetails: (String) -> Unit,
+    onNavigateToReviews: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProductDetailsViewModel = hiltViewModel()
 ) {
@@ -47,6 +48,7 @@ fun ProductDetailsRoute(
                 is ProductDetailsUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(
                     effect.productId
                 )
+                is ProductDetailsUiEffect.NavigateToReviews -> onNavigateToReviews(effect.productId)
 
                 is ProductDetailsUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(

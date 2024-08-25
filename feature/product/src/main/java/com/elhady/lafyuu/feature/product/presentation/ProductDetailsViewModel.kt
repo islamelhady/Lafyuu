@@ -57,8 +57,8 @@ class ProductDetailsViewModel @Inject constructor(
                 ProductDetailsUiEffect.NavigateToProductDetails(event.productId)
             )
             ProductDetailsUiEvent.SeeMoreReviewsClicked -> {
-                // Future expansion or toast
-                sendEffect(ProductDetailsUiEffect.ShowSnackbar("Reviews feature"))
+                val productId = _uiState.value.product?.id ?: return
+                sendEffect(ProductDetailsUiEffect.NavigateToReviews(productId))
             }
         }
     }
