@@ -193,7 +193,7 @@ class HomeViewModelTest {
         viewModel.onEvent(HomeUiEvent.SearchQueryChanged("Pending"))
         advanceTimeBy(100L)
 
-        viewModel.onEvent(HomeUiEvent.SearchClicked)
+        viewModel.onClearSearch()
         advanceTimeBy(350L)
         advanceUntilIdle()
 
@@ -218,7 +218,7 @@ class HomeViewModelTest {
         advanceTimeBy(350L) // debounce passes, search invocation starts
         advanceTimeBy(200L) // request in flight
 
-        viewModel.onEvent(HomeUiEvent.SearchClicked)
+        viewModel.onClearSearch()
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -239,7 +239,7 @@ class HomeViewModelTest {
         advanceTimeBy(350L)
         advanceUntilIdle()
 
-        viewModel.onEvent(HomeUiEvent.SearchClicked)
+        viewModel.onClearSearch()
         advanceUntilIdle()
 
         val state = viewModel.uiState.value

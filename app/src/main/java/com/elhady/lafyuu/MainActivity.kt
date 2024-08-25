@@ -35,7 +35,9 @@ import com.elhady.lafyuu.feature.checkout.presentation.paymentScreen
 import com.elhady.lafyuu.feature.explore.presentation.exploreScreen
 import com.elhady.lafyuu.feature.explore.presentation.navigateToExplore
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
+import com.elhady.lafyuu.feature.home.navigation.categoriesScreen
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
+import com.elhady.lafyuu.feature.home.navigation.navigateToCategories
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrders
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrderDetails
 import com.elhady.lafyuu.feature.orders.presentation.ordersScreen
@@ -116,9 +118,6 @@ fun MainApp(
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
             },
-            onNavigateToCategory = { categoryId, categoryName ->
-                // Handle navigation to category products
-            },
             onNavigateToFlashSale = {
                 // Handle navigation to flash sale
             },
@@ -126,7 +125,7 @@ fun MainApp(
                 // Handle navigation to mega sale
             },
             onNavigateToCategories = {
-                navController.navigateToExplore()
+                navController.navigateToCategories()
             },
             onNavigateToNotifications = {
                 // Handle navigation to notifications
@@ -148,6 +147,15 @@ fun MainApp(
                 }
             },
             cartItemCount = cartItemCount
+        )
+
+        categoriesScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToCategoryProducts = { categoryId, categoryName ->
+                // Handle category products navigation
+            }
         )
 
         exploreScreen(

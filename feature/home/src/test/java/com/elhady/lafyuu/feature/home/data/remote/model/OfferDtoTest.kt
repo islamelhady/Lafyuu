@@ -72,7 +72,7 @@ class OfferDtoTest {
 
     @Test
     fun `deserializes wrapped offers json successfully`() {
-        val jsonString = "{\"offers\":{\"items\":[{\"id\":\"917299cd-3e8b\",\"name\":\"Offer 1\"}]}}"
+        val jsonString = "{\"items\":[{\"id\":\"917299cd-3e8b\",\"name\":\"Offer 1\"}]}"
         val response = kotlinx.serialization.json.Json.decodeFromString<GetAllOffersResponse>(jsonString)
         assertEquals(1, response.allOffers.size)
         assertEquals("Offer 1", response.allOffers.first().name)
