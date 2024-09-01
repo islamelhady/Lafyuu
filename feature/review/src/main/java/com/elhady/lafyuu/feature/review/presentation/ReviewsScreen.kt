@@ -1,9 +1,6 @@
 package com.elhady.lafyuu.feature.review.presentation
 
 import Left
-import Star
-import StarFilled
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,12 +9,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,12 +32,12 @@ import com.elhady.lafyuu.core.designsystem.components.element.ReviewData
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.other.RatingBar
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
-import com.elhady.lafyuu.core.designsystem.components.textfield.DefaultTextField
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
 fun ReviewsRoute(
     onNavigateBack: () -> Unit,
+    onNavigateToWriteReview: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReviewsViewModel = hiltViewModel()
 ) {
@@ -54,6 +48,7 @@ fun ReviewsRoute(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 ReviewsUiEffect.NavigateBack -> onNavigateBack()
+                is ReviewsUiEffect.NavigateToWriteReview -> onNavigateToWriteReview(effect.productId)
                 is ReviewsUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
@@ -104,7 +99,7 @@ fun ReviewsScreen(
             ) {
                 DefaultButton(
                     caption = "Write Review",
-                    onClick = { onEvent(ReviewsUiEvent.OpenWriteReviewDialog) },
+                    onClick = { onEvent(ReviewsUiEvent.WriteReviewClicked) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -183,58 +178,6 @@ fun ReviewsScreen(
                     }
                 }
             }
-        }
-
-        // Write Review Dialog
-        if (uiState.isWriteReviewDialogVisible) {
-            AlertDialog(
-                onDismissRequest = { onEvent(ReviewsUiEvent.CloseWriteReviewDialog) },
-                title = { LafyuuText(text = "Write Review", style = Theme.typography.heading4) },
-                text = {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(Theme.space.medium),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        LafyuuText(text = "Rating (1 - 5)", style = Theme.typography.normalTextRegular)
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(Theme.space.small),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            for (i in 1..5) {
-                                Icon(
-                                    imageVector = if (i <= uiState.newReviewRating) StarFilled else Star,
-                                    contentDescription = "$i stars",
-                                    tint = if (i <= uiState.newReviewRating) Theme.color.yellow else Theme.color.neutralLight,
-                                    modifier = Modifier
-                                        .size(Theme.size.iconLarge)
-                                        .clickable {
-                                            onEvent(ReviewsUiEvent.UpdateNewReviewRating(i))
-                                        }
-                                )
-                            }
-                        }
-                        DefaultTextField(
-                            value = uiState.newReviewComment,
-                            onValueChange = { onEvent(ReviewsUiEvent.UpdateNewReviewComment(it)) },
-                            placeholder = "Write your review here...",
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                },
-                confirmButton = {
-                    DefaultButton(
-                        caption = "Submit",
-                        isLoading = uiState.isSubmittingReview,
-                        onClick = { onEvent(ReviewsUiEvent.SubmitReview) }
-                    )
-                },
-                dismissButton = {
-                    DefaultButton(
-                        caption = "Cancel",
-                        onClick = { onEvent(ReviewsUiEvent.CloseWriteReviewDialog) }
-                    )
-                }
-            )
         }
     }
 }

@@ -58,11 +58,11 @@ class ProductDetailsViewModel @Inject constructor(
             )
             ProductDetailsUiEvent.SeeMoreReviewsClicked -> {
                 val productId = _uiState.value.product?.id ?: return
-                sendEffect(ProductDetailsUiEffect.NavigateToReviews(productId, openWriteReview = false))
+                sendEffect(ProductDetailsUiEffect.NavigateToReviews(productId))
             }
             ProductDetailsUiEvent.WriteReviewClicked -> {
                 val productId = _uiState.value.product?.id ?: return
-                sendEffect(ProductDetailsUiEffect.NavigateToReviews(productId, openWriteReview = true))
+                sendEffect(ProductDetailsUiEffect.NavigateToWriteReview(productId))
             }
         }
     }

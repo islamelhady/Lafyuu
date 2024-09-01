@@ -288,8 +288,9 @@ fun ProductDetailsContent(
                     LabelButton(
                         caption = "Write Review",
                         onClick = { onEvent(ProductDetailsUiEvent.WriteReviewClicked) },
-                        containerColor = Theme.color.green.copy(alpha = 0.1f),
-                        contentColor = Theme.color.green,
+                        contentColor = Theme.color.blue,
+                        hasBorder = true,
+                        borderColor = Theme.color.blue,
                         style = Theme.typography.largeCaptionBold,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -308,8 +309,9 @@ fun ProductDetailsContent(
                         LabelButton(
                             caption = "Write the First Review",
                             onClick = { onEvent(ProductDetailsUiEvent.WriteReviewClicked) },
-                            containerColor = Theme.color.green.copy(alpha = 0.1f),
-                            contentColor = Theme.color.green,
+                            contentColor = Theme.color.blue,
+                            hasBorder = true,
+                            borderColor = Theme.color.blue,
                             style = Theme.typography.largeCaptionBold,
                             modifier = Modifier
                                 .fillMaxWidth()

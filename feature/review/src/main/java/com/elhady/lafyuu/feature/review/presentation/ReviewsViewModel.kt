@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
-import com.elhady.lafyuu.feature.review.domain.usecase.CreateReviewUseCase
 import com.elhady.lafyuu.feature.review.domain.usecase.GetProductReviewsInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -20,21 +19,12 @@ import javax.inject.Inject
 @HiltViewModel
 class ReviewsViewModel @Inject constructor(
     private val getProductReviewsInfoUseCase: GetProductReviewsInfoUseCase,
-    private val createReviewUseCase: CreateReviewUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val productIdArg: String = savedStateHandle["productId"] ?: ""
-    private val openWriteReviewArg: Boolean = savedStateHandle["openWriteReview"] ?: false
 
-    private val _uiState = MutableStateFlow(
-        ReviewsUiState(
-            productId = productIdArg,
-            isWriteReviewDialogVisible = openWriteReviewArg,
-            newReviewRating = 0,
-            newReviewComment = ""
-        )
-    )
+    private val _uiState = MutableStateFlow(ReviewsUiState(productId = productIdArg))
     val uiState: StateFlow<ReviewsUiState> = _uiState.asStateFlow()
 
     private val _uiEffect = Channel<ReviewsUiEffect>()
@@ -52,19 +42,11 @@ class ReviewsViewModel @Inject constructor(
             is ReviewsUiEvent.FilterRating -> {
                 _uiState.update { it.copy(selectedRatingFilter = event.rating) }
             }
-            ReviewsUiEvent.OpenWriteReviewDialog -> {
-                _uiState.update { it.copy(isWriteReviewDialogVisible = true, newReviewRating = 5, newReviewComment = "") }
+            ReviewsUiEvent.WriteReviewClicked -> {
+                if (productIdArg.isNotBlank()) {
+                    sendEffect(ReviewsUiEffect.NavigateToWriteReview(productIdArg))
+                }
             }
-            ReviewsUiEvent.CloseWriteReviewDialog -> {
-                _uiState.update { it.copy(isWriteReviewDialogVisible = false) }
-            }
-            is ReviewsUiEvent.UpdateNewReviewRating -> {
-                _uiState.update { it.copy(newReviewRating = event.rating) }
-            }
-            is ReviewsUiEvent.UpdateNewReviewComment -> {
-                _uiState.update { it.copy(newReviewComment = event.comment) }
-            }
-            ReviewsUiEvent.SubmitReview -> submitReview()
             ReviewsUiEvent.BackClicked -> sendEffect(ReviewsUiEffect.NavigateBack)
             ReviewsUiEvent.RetryClicked -> loadReviews(productIdArg)
         }
@@ -93,35 +75,6 @@ class ReviewsViewModel @Inject constructor(
                 }
                 is AppResult.Loading -> {
                     _uiState.update { it.copy(isLoading = true) }
-                }
-            }
-        }
-    }
-
-    private fun submitReview() {
-        val state = _uiState.value
-        val productId = state.productId
-        if (productId.isBlank()) return
-
-        if (state.newReviewComment.isBlank()) {
-            sendEffect(ReviewsUiEffect.ShowSnackbar("Comment cannot be empty", AlertType.Error))
-            return
-        }
-
-        viewModelScope.launch {
-            _uiState.update { it.copy(isSubmittingReview = true) }
-            when (val result = createReviewUseCase(productId, state.newReviewRating, state.newReviewComment)) {
-                is AppResult.Success -> {
-                    _uiState.update { it.copy(isSubmittingReview = false, isWriteReviewDialogVisible = false) }
-                    sendEffect(ReviewsUiEffect.ShowSnackbar("Review submitted successfully", AlertType.Success))
-                    loadReviews(productId)
-                }
-                is AppResult.Error -> {
-                    _uiState.update { it.copy(isSubmittingReview = false) }
-                    sendEffect(ReviewsUiEffect.ShowSnackbar(result.message ?: "Failed to submit review", AlertType.Error))
-                }
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isSubmittingReview = true) }
                 }
             }
         }

@@ -19,7 +19,8 @@ fun NavGraphBuilder.productDetailsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToSearch: () -> Unit,
     onNavigateToProductDetails: (String) -> Unit,
-    onNavigateToReviews: (String, Boolean) -> Unit
+    onNavigateToReviews: (String) -> Unit,
+    onNavigateToWriteReview: (String) -> Unit
 ) {
     composable(
         route = PRODUCT_DETAILS_ROUTE,
@@ -35,7 +36,8 @@ fun NavGraphBuilder.productDetailsScreen(
             onNavigateBack = onNavigateBack,
             onNavigateToSearch = onNavigateToSearch,
             onNavigateToProductDetails = onNavigateToProductDetails,
-            onNavigateToReviews = onNavigateToReviews
+            onNavigateToReviews = onNavigateToReviews,
+            onNavigateToWriteReview = onNavigateToWriteReview
         )
     }
 }
