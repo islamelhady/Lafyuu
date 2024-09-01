@@ -271,11 +271,12 @@ fun ProductDetailsContent(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        SectionTitle("Review Product")
-                        LabelButton(
-                            caption = "See More",
-                            onClick = { onEvent(ProductDetailsUiEvent.SeeMoreReviewsClicked) },
-                            contentColor = Theme.color.blue
+                        SectionTitle(
+                            title = "Review Product",
+                            actionText = "See More",
+                            onActionClick = { onEvent(ProductDetailsUiEvent.SeeMoreReviewsClicked) },
+
+
                         )
                     }
                     uiState.reviews.take(2).forEach { review ->
