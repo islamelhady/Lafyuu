@@ -210,8 +210,8 @@ fun MainApp(
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
             },
-            onNavigateToReviews = { productId ->
-                navController.navigateToReviews(productId)
+            onNavigateToReviews = { productId, openWriteReview ->
+                navController.navigateToReviews(productId, openWriteReview)
             }
         )
 

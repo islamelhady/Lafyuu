@@ -24,12 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import com.elhady.lafyuu.core.designsystem.R
+import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.button.LabelButton
+import com.elhady.lafyuu.core.designsystem.components.card.InformationCard
 import com.elhady.lafyuu.core.designsystem.components.card.ProductCard
 import com.elhady.lafyuu.core.designsystem.components.element.ColorSelectRow
 import com.elhady.lafyuu.core.designsystem.components.element.ReviewCard
@@ -264,21 +267,13 @@ fun ProductDetailsContent(
             }
 
             // Reviews
-            if (uiState.reviews.isNotEmpty()) {
-                Column(verticalArrangement = Arrangement.spacedBy(Theme.space.medium)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        SectionTitle(
-                            title = "Review Product",
-                            actionText = "See More",
-                            onActionClick = { onEvent(ProductDetailsUiEvent.SeeMoreReviewsClicked) },
-
-
-                        )
-                    }
+            Column(verticalArrangement = Arrangement.spacedBy(Theme.space.medium)) {
+                if (uiState.reviews.isNotEmpty()) {
+                    SectionTitle(
+                        title = "Review Product",
+                        actionText = "See More",
+                        onActionClick = { onEvent(ProductDetailsUiEvent.SeeMoreReviewsClicked) }
+                    )
                     uiState.reviews.take(2).forEach { review ->
                         ReviewCard(
                             review = ReviewData(
@@ -288,6 +283,37 @@ fun ProductDetailsContent(
                                 comment = review.comment,
                                 date = review.createdAt
                             )
+                        )
+                    }
+                    LabelButton(
+                        caption = "Write Review",
+                        onClick = { onEvent(ProductDetailsUiEvent.WriteReviewClicked) },
+                        containerColor = Theme.color.green.copy(alpha = 0.1f),
+                        contentColor = Theme.color.green,
+                        style = Theme.typography.largeCaptionBold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = Theme.space.small)
+                            .padding(horizontal = Theme.space.large)
+                    )
+                } else if (!uiState.isLoading) {
+                    SectionTitle(title = "Review Product")
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = Theme.space.large),
+                        verticalArrangement = Arrangement.spacedBy(Theme.space.small)
+                    ) {
+                        InformationCard(information = "No reviews yet\nBe the first to review this product.")
+                        LabelButton(
+                            caption = "Write the First Review",
+                            onClick = { onEvent(ProductDetailsUiEvent.WriteReviewClicked) },
+                            containerColor = Theme.color.green.copy(alpha = 0.1f),
+                            contentColor = Theme.color.green,
+                            style = Theme.typography.largeCaptionBold,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = Theme.space.small)
                         )
                     }
                 }

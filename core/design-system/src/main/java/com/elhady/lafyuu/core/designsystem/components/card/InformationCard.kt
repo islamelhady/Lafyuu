@@ -26,7 +26,7 @@ fun InformationCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(Theme.corner.small)
-            .background(Theme.color.yellow)
+            .background(Theme.color.yellow.copy(alpha = 0.1f))
             .padding(Theme.space.large)
     ) {
         Row(
@@ -36,12 +36,12 @@ fun InformationCard(
             Icon(
                 imageVector = Alert,
                 contentDescription = null,
-                tint = Theme.color.backgroundWhite
+                tint = Theme.color.yellow
             )
             LafyuuText(
                 text = information,
                 style = Theme.typography.normalTextRegular,
-                color = Theme.color.backgroundWhite,
+                color = Theme.color.yellow,
                 textAlign = TextAlign.Start,
             )
         }

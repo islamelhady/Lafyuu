@@ -11,7 +11,7 @@ class CreateReviewUseCase @Inject constructor(
         if (productId.isBlank()) {
             return AppResult.Error("Invalid product ID")
         }
-        if (rating < 1 || rating > 5) {
+        if (rating !in 1..5) {
             return AppResult.Error("Rating must be between 1 and 5")
         }
         if (comment.isBlank()) {

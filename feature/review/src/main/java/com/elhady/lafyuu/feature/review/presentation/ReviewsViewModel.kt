@@ -25,8 +25,16 @@ class ReviewsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val productIdArg: String = savedStateHandle["productId"] ?: ""
+    private val openWriteReviewArg: Boolean = savedStateHandle["openWriteReview"] ?: false
 
-    private val _uiState = MutableStateFlow(ReviewsUiState(productId = productIdArg))
+    private val _uiState = MutableStateFlow(
+        ReviewsUiState(
+            productId = productIdArg,
+            isWriteReviewDialogVisible = openWriteReviewArg,
+            newReviewRating = 0,
+            newReviewComment = ""
+        )
+    )
     val uiState: StateFlow<ReviewsUiState> = _uiState.asStateFlow()
 
     private val _uiEffect = Channel<ReviewsUiEffect>()

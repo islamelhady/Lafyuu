@@ -19,7 +19,7 @@ fun NavGraphBuilder.productDetailsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToSearch: () -> Unit,
     onNavigateToProductDetails: (String) -> Unit,
-    onNavigateToReviews: (String) -> Unit
+    onNavigateToReviews: (String, Boolean) -> Unit
 ) {
     composable(
         route = PRODUCT_DETAILS_ROUTE,
