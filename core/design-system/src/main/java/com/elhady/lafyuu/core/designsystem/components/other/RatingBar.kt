@@ -36,7 +36,7 @@ fun RatingBar(
         repeat(maxStar) { index ->
             Icon(
                 imageVector = Star,
-                contentDescription = null,
+                contentDescription = "$rating stars",
                 modifier = Modifier.size(iconSize),
                 tint = if (index < rating.roundToInt()) Theme.color.yellow else Theme.color.neutralLight
             )

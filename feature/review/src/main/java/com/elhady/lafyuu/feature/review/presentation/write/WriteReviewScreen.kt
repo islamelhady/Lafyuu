@@ -90,7 +90,7 @@ fun WriteReviewScreen(
                     .padding(Theme.space.large)
             ) {
                 DefaultButton(
-                    caption = "Post Review",
+                    caption = "Submit",
                     isLoading = uiState.isLoading,
                     onClick = { onEvent(WriteReviewUiEvent.SubmitClicked) },
                     modifier = Modifier.fillMaxWidth()
