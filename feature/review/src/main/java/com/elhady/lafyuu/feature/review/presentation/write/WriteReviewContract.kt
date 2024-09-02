@@ -4,7 +4,7 @@ import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 
 data class WriteReviewUiState(
     val productId: String = "",
-    val rating: Int = 5,
+    val rating: Int = 0,
     val comment: String = "",
     val isLoading: Boolean = false,
     val error: String? = null

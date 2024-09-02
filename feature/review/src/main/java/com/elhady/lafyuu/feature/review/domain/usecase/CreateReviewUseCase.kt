@@ -14,9 +14,6 @@ class CreateReviewUseCase @Inject constructor(
         if (rating !in 1..5) {
             return AppResult.Error("Rating must be between 1 and 5")
         }
-        if (comment.isBlank()) {
-            return AppResult.Error("Comment cannot be empty")
-        }
         return repository.createReview(productId, rating, comment.trim())
     }
 }

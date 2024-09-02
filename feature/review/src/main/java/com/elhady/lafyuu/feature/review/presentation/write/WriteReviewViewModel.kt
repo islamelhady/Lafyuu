@@ -46,8 +46,8 @@ class WriteReviewViewModel @Inject constructor(
     private fun submitReview() {
         val state = _uiState.value
         if (state.productId.isBlank()) return
-        if (state.comment.isBlank()) {
-            sendEffect(WriteReviewUiEffect.ShowSnackbar("Comment cannot be empty", AlertType.Error))
+        if (state.rating < 1) {
+            sendEffect(WriteReviewUiEffect.ShowSnackbar("Please select a rating", AlertType.Error))
             return
         }
 
