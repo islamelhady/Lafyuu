@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.core.designsystem.components.other
 
 import Star
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,18 +28,32 @@ fun RatingBar(
     modifier: Modifier = Modifier,
     iconSize: Dp = Theme.size.iconSmall,
     maxStar: Int = 5,
-    showRatingText: Boolean = false
+    showRatingText: Boolean = false,
+    onRatingChanged: ((Float) -> Unit)? = null
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
         repeat(maxStar) { index ->
+            val starNumber = index + 1
+            val isSelected = index < rating.roundToInt()
             Icon(
                 imageVector = Star,
-                contentDescription = "$rating stars",
-                modifier = Modifier.size(iconSize),
-                tint = if (index < rating.roundToInt()) Theme.color.yellow else Theme.color.neutralLight
+                contentDescription = "$starNumber stars",
+                modifier = Modifier
+                    .size(iconSize)
+                    .then(
+                        if (onRatingChanged != null) {
+                            Modifier
+                                .padding(4.dp)
+                                .clickable { onRatingChanged(starNumber.toFloat()) }
+                        } else {
+                            Modifier
+                        }
+                    ),
+                tint = if (isSelected) Theme.color.yellow else Theme.color.neutralLight
             )
         }
         if (showRatingText) {

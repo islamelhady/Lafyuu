@@ -1,27 +1,20 @@
 package com.elhady.lafyuu.feature.review.presentation.write
 
 import Left
-import Star
-import StarFilled
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -30,6 +23,7 @@ import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
+import com.elhady.lafyuu.core.designsystem.components.other.RatingBar
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.TextAreaField
 import com.elhady.lafyuu.core.designsystem.theme.Theme
@@ -110,44 +104,27 @@ fun WriteReviewScreen(
                 style = Theme.typography.heading5,
                 color = Theme.color.neutralDark
             )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                for (i in 1..5) {
-                    Icon(
-                        imageVector = if (i <= uiState.rating) StarFilled else Star,
-                        contentDescription = "$i stars",
-                        tint = if (i <= uiState.rating) Theme.color.yellow else Theme.color.neutralLight,
-                        modifier = Modifier
-                            .size(Theme.size.iconLarge)
-                            .padding(4.dp)
-                            .clickable {
-                                onEvent(WriteReviewUiEvent.RatingChanged(i))
-                            }
-                    )
+            RatingBar(
+                rating = uiState.rating.toFloat(),
+                iconSize = Theme.size.iconLarge,
+                showRatingText = true,
+                onRatingChanged = { newRating ->
+                    onEvent(WriteReviewUiEvent.RatingChanged(newRating.toInt()))
                 }
-            }
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(Theme.space.small)
-            ) {
-                LafyuuText(
-                    text = "Write Your Review",
-                    style = Theme.typography.heading5,
-                    color = Theme.color.neutralDark
-                )
-                TextAreaField(
-                    value = uiState.comment,
-                    onValueChange = { onEvent(WriteReviewUiEvent.CommentChanged(it)) },
-                    placeholder = "Write your review here",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(160.dp)
-                )
-            }
+            )
+            LafyuuText(
+                text = "Write Your Review",
+                style = Theme.typography.heading5,
+                color = Theme.color.neutralDark
+            )
+            TextAreaField(
+                value = uiState.comment,
+                onValueChange = { onEvent(WriteReviewUiEvent.CommentChanged(it)) },
+                placeholder = "Write your review here",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+            )
         }
     }
 }
