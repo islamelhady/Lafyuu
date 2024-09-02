@@ -36,7 +36,7 @@ fun ProductDto.toDomain(): Product {
         originalPrice = origPrice,
         discountPercentage = if (discount > 0) discount else null,
         discountLabel = label,
-        rating = rating?.toFloat()
+        rating = rating?.toInt()
     )
 }
 

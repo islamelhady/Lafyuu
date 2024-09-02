@@ -21,7 +21,7 @@ data class ProductDto(
     val stock: Int? = 0,
     val weight: Double? = 0.0,
     val color: String? = null,
-    val rating: Float? = null,
+    val rating: Int? = null,
     val reviewsCount: Int? = 0,
     val discountPercentage: Int? = 0,
     val sellerId: String? = null,

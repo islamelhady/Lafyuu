@@ -6,6 +6,6 @@ data class Product(
     val price: Double = 0.0,
     val originalPrice: Double? = null,
     val discountPercentage: Int = 0,
-    val rating: Float = 0f,
+    val rating: Int = 0,
     val imageUrl: String? = null
 )

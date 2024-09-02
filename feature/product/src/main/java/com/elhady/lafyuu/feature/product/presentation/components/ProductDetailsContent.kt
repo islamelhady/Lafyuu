@@ -24,13 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import com.elhady.lafyuu.core.designsystem.R
-import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.button.LabelButton
 import com.elhady.lafyuu.core.designsystem.components.card.InformationCard
 import com.elhady.lafyuu.core.designsystem.components.card.ProductCard
@@ -47,8 +45,6 @@ import com.elhady.lafyuu.core.designsystem.icons.LoveFilled
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.feature.product.presentation.ProductDetailsUiEvent
 import com.elhady.lafyuu.feature.product.presentation.ProductDetailsUiState
-import kotlin.collections.ifEmpty
-import kotlin.collections.isNotEmpty
 
 @Composable
 fun ProductDetailsContent(

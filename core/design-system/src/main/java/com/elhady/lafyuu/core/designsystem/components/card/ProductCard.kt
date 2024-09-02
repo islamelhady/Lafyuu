@@ -41,7 +41,7 @@ fun ProductCard(
     originalPrice: String? = null,
     discountLabel: String? = null,
     isDelete: Boolean? = null,
-    rating: Float? = null,
+    rating: Int? = null,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -139,7 +139,7 @@ private fun ProductCardsPreview() {
                     imageUrl = painterResource(R.drawable.imp_product_shoes_yellow),
                     name = "Nike Air Zoom Pegasus 36 Miami",
                     price = "$299,43",
-                    rating = 4.0f,
+                    rating = 4,
                     discountLabel = "50% OFF",
                     originalPrice = "$399,43",
                     isDelete = true,
@@ -159,7 +159,7 @@ private fun ProductCardsPreview() {
                     imageUrl = painterResource(R.drawable.imp_product_shoes_yellow),
                     name = "Nike Air Zoom Pegasus 36 Miami",
                     price = "$299,43",
-                    rating = 4.0f,
+                    rating = 4,
                     discountLabel = "50% OFF",
                     originalPrice = "$399,43",
                     onClick = {}

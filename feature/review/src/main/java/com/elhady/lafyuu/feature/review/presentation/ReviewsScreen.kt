@@ -129,7 +129,7 @@ fun ReviewsScreen(
                             horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
                         ) {
                             RatingBar(
-                                rating = uiState.averageRating.toFloat(),
+                                rating = uiState.averageRating.toInt(),
                                 iconSize = Theme.size.iconMedium
                             )
                             LafyuuText(

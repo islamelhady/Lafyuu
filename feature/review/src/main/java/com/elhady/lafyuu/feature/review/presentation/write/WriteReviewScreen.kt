@@ -105,7 +105,7 @@ fun WriteReviewScreen(
                 color = Theme.color.neutralDark
             )
             RatingBar(
-                rating = uiState.rating.toFloat(),
+                rating = uiState.rating,
                 iconSize = Theme.size.iconLarge,
                 showRatingText = true,
                 onRatingChanged = { newRating ->

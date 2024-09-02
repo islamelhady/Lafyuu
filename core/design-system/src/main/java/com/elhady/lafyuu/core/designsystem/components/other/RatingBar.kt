@@ -24,7 +24,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun RatingBar(
-    rating: Float,
+    rating: Int,
     modifier: Modifier = Modifier,
     iconSize: Dp = Theme.size.iconSmall,
     maxStar: Int = 5,
@@ -38,7 +38,7 @@ fun RatingBar(
     ) {
         repeat(maxStar) { index ->
             val starNumber = index + 1
-            val isSelected = index < rating.roundToInt()
+            val isSelected = index < rating
             Icon(
                 imageVector = Star,
                 contentDescription = "$starNumber stars",
@@ -58,7 +58,7 @@ fun RatingBar(
         }
         if (showRatingText) {
             LafyuuText(
-                text = "${rating.roundToInt()}/$maxStar",
+                text = "${rating}/$maxStar",
                 style = Theme.typography.heading5,
                 color = Theme.color.neutralGrey,
                 modifier = Modifier.padding(start = Theme.space.large)
@@ -78,9 +78,9 @@ private fun RatingBarPreview() {
             ) {
                 SectionTitle("Rating")
 
-                RatingBar(rating = 4.0f, iconSize = Theme.size.iconSmall)
-                RatingBar(rating = 4.0f, iconSize = Theme.size.iconMedium)
-                RatingBar(rating = 4.0f, iconSize = Theme.size.iconLarge, showRatingText = true)
+                RatingBar(rating = 4, iconSize = Theme.size.iconSmall)
+                RatingBar(rating = 4, iconSize = Theme.size.iconMedium)
+                RatingBar(rating = 4, iconSize = Theme.size.iconLarge, showRatingText = true)
             }
         }
     }
