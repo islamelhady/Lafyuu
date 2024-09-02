@@ -28,7 +28,8 @@ fun RatingBar(
     iconSize: Dp = Theme.size.iconSmall,
     maxStar: Int = 5,
     showRatingText: Boolean = false,
-    onRatingChanged: ((Float) -> Unit)? = null
+    onRatingChanged: ((Float) -> Unit)? = null,
+    showReviewNumber: String? = null
 ) {
     Row(
         modifier = modifier,
@@ -63,6 +64,14 @@ fun RatingBar(
                 modifier = Modifier.padding(start = Theme.space.large)
             )
         }
+        showReviewNumber?.let {
+            LafyuuText(
+                text = "($showReviewNumber Review)",
+                style = Theme.typography.normalTextRegular,
+                color = Theme.color.neutralGrey,
+                modifier = Modifier.padding(start = Theme.space.small)
+            )
+        }
     }
 }
 
@@ -79,7 +88,7 @@ private fun RatingBarPreview() {
 
                 RatingBar(rating = 4, iconSize = Theme.size.iconSmall)
                 RatingBar(rating = 4, iconSize = Theme.size.iconMedium)
-                RatingBar(rating = 4, iconSize = Theme.size.iconLarge, showRatingText = true)
+                RatingBar(rating = 4, iconSize = Theme.size.iconLarge, showRatingText = true, showReviewNumber = "4")
             }
         }
     }
