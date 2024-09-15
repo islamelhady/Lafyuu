@@ -53,8 +53,10 @@ dependencies {
     implementation(project(":feature:explore"))
     implementation(project(":feature:search"))
     implementation(project(":feature:review"))
+    implementation(project(":feature:favorites"))
     implementation(project(":core:design-system"))
     implementation(project(":core:common"))
+    implementation(project(":core:database"))
 
     // Navigation & Lifecycle
     implementation(libs.androidx.navigation.compose)
