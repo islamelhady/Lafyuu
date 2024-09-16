@@ -3,7 +3,7 @@ package com.elhady.lafyuu.feature.favorites.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
+import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
     private val favoritesRepository: FavoritesRepository,
-    private val getProductDetailsUseCase: GetProductDetailsUseCase
+    private val productRepository: ProductRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavoritesUiState())
@@ -51,9 +50,8 @@ class FavoritesViewModel @Inject constructor(
     private fun observeFavorites() {
         viewModelScope.launch {
             favoritesRepository.observeFavoriteIds()
-                .combine(reloadTrigger) { favoriteIds, _ -> favoriteIds }
-                .distinctUntilChanged()
-                .collectLatest { favoriteIds ->
+                .combine(reloadTrigger) { favoriteIds, trigger -> Pair(favoriteIds, trigger) }
+                .collectLatest { (favoriteIds, _) ->
                     if (favoriteIds.isEmpty()) {
                         _uiState.update {
                             it.copy(
@@ -67,8 +65,8 @@ class FavoritesViewModel @Inject constructor(
                         try {
                             val deferredProducts = favoriteIds.map { id ->
                                 async {
-                                    when (val result = getProductDetailsUseCase(id)) {
-                                        is AppResult.Success -> result.data.details
+                                    when (val result = productRepository.getProductDetails(id)) {
+                                        is AppResult.Success -> result.data
                                         else -> null
                                     }
                                 }
@@ -94,7 +92,7 @@ class FavoritesViewModel @Inject constructor(
                         } catch (e: Exception) {
                             if (e is kotlinx.coroutines.CancellationException) throw e
                             _uiState.update {
-                                t -> t.copy(
+                                it.copy(
                                     isLoading = false,
                                     error = e.localizedMessage ?: "Failed to load favorite products"
                                 )

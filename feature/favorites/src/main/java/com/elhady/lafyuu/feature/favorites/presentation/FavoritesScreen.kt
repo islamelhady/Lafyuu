@@ -20,10 +20,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
 import com.elhady.lafyuu.core.designsystem.components.card.ProductCard
 import com.elhady.lafyuu.core.designsystem.components.card.WideProductCard
@@ -89,6 +87,14 @@ fun FavoritesScreen(
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
                     color = Theme.color.blue
+                )
+            }
+
+            uiState.error != null && uiState.favoriteProducts.isEmpty() -> {
+                InfoStateContent(
+                    errorMessage = uiState.error,
+                    onRetryClick = { onEvent(FavoritesUiEvent.LoadFavorites) },
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
 
