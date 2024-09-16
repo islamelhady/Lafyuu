@@ -1,0 +1,14 @@
+package com.elhady.lafyuu.core.common.domain.repository
+
+import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.domain.model.Product
+import com.elhady.lafyuu.core.common.domain.model.ProductContent
+import com.elhady.lafyuu.core.common.domain.model.ProductDetails
+import com.elhady.lafyuu.core.common.domain.model.ProductReview
+
+interface ProductRepository {
+    suspend fun getProductDetails(id: String): AppResult<ProductDetails>
+    suspend fun getProductReviews(productId: String, page: Int = 1, pageSize: Int = 10): AppResult<List<ProductReview>>
+    suspend fun getRecommendedProducts(pageSize: Int = 10): AppResult<List<Product>>
+    suspend fun addToCart(productId: String, quantity: Int): AppResult<Unit>
+}

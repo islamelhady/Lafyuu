@@ -1,6 +1,10 @@
 package com.elhady.lafyuu.feature.product.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.domain.model.Product
+import com.elhady.lafyuu.core.common.domain.model.ProductDetails
+import com.elhady.lafyuu.core.common.domain.model.ProductReview
+import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
 import com.elhady.lafyuu.core.network.error.NetworkError
 import com.elhady.lafyuu.feature.product.data.mapper.toDomain
@@ -8,10 +12,6 @@ import com.elhady.lafyuu.feature.product.data.mapper.toProductDetailsDomain
 import com.elhady.lafyuu.feature.product.data.mapper.toProductSummaryDomain
 import com.elhady.lafyuu.feature.product.data.remote.ProductApi
 import com.elhady.lafyuu.feature.product.data.remote.model.AddItemToCartRequestDto
-import com.elhady.lafyuu.feature.product.domain.model.Product
-import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
-import com.elhady.lafyuu.feature.product.domain.model.ProductReview
-import com.elhady.lafyuu.feature.product.domain.repository.ProductRepository
 import javax.inject.Inject
 
 class ProductRepositoryImpl @Inject constructor(

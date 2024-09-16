@@ -1,7 +1,7 @@
 package com.elhady.lafyuu.feature.favorites.presentation
 
+import com.elhady.lafyuu.core.common.domain.model.ProductDetails
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
-import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
 
 data class FavoritesUiState(
     val isLoading: Boolean = false,

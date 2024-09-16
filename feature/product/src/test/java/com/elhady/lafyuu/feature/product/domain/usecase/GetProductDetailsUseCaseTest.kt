@@ -1,10 +1,11 @@
 package com.elhady.lafyuu.feature.product.domain.usecase
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.feature.product.domain.model.Product
-import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
-import com.elhady.lafyuu.feature.product.domain.model.ProductReview
-import com.elhady.lafyuu.feature.product.domain.repository.ProductRepository
+import com.elhady.lafyuu.core.common.domain.model.Product
+import com.elhady.lafyuu.core.common.domain.model.ProductDetails
+import com.elhady.lafyuu.core.common.domain.model.ProductReview
+import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
+import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -34,7 +35,7 @@ class GetProductDetailsUseCaseTest {
     @Test
     fun `returns success content when details request succeeds`() = runTest {
         val details = ProductDetails(id = "p-1", name = "Main Product")
-        val review = ProductReview(comment = "Good")
+        val review = ProductReview(comment = "Good", rating = 5, createdAt = "2023-01-01", userName = "User", userPicture = "")
         val recommended = Product(id = "p-2", name = "Rec Product")
 
         coEvery { repository.getProductDetails("p-1") } returns AppResult.Success(details)

@@ -2,11 +2,11 @@ package com.elhady.lafyuu.feature.product.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.domain.model.ProductContent
+import com.elhady.lafyuu.core.common.domain.model.ProductDetails
+import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
-import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
 import com.elhady.lafyuu.feature.product.domain.usecase.AddToCartUseCase
-import com.elhady.lafyuu.feature.product.domain.usecase.GetProductDetailsUseCase
-import com.elhady.lafyuu.feature.product.domain.usecase.ProductContent
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
