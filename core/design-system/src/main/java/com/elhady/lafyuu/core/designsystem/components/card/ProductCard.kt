@@ -41,6 +41,7 @@ fun ProductCard(
     originalPrice: String? = null,
     discountLabel: String? = null,
     isDelete: Boolean? = null,
+    onDeleteClick: () -> Unit = {},
     rating: Int? = null,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
@@ -112,7 +113,7 @@ fun ProductCard(
                 isDelete?.let {
                     IconClick(
                         icon = Trash,
-                        onClick = {},
+                        onClick = { onDeleteClick() },
                         tint = Theme.color.neutralGrey,
                         modifier = Modifier.size(24.dp)
                     )

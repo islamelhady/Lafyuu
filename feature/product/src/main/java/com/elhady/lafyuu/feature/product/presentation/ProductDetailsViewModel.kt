@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.feature.product.domain.usecase.AddToCartUseCase
 import com.elhady.lafyuu.feature.product.domain.usecase.GetProductDetailsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,6 +12,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,6 +22,7 @@ import javax.inject.Inject
 class ProductDetailsViewModel @Inject constructor(
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
+    private val favoritesRepository: FavoritesRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -70,6 +73,13 @@ class ProductDetailsViewModel @Inject constructor(
     private fun loadProductDetails(productId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
+
+            launch {
+                favoritesRepository.isFavorite(productId).collectLatest { isFav ->
+                    _uiState.update { it.copy(isFavorite = isFav) }
+                }
+            }
+
             when (val result = getProductDetailsUseCase(productId)) {
                 is AppResult.Success -> {
                     val content = result.data
@@ -117,10 +127,17 @@ class ProductDetailsViewModel @Inject constructor(
     }
 
     private fun toggleFavorite() {
-        val newFav = !_uiState.value.isFavorite
-        _uiState.update { it.copy(isFavorite = newFav) }
-        val msg = if (newFav) "Added to Wishlist" else "Removed from Wishlist"
-        sendEffect(ProductDetailsUiEffect.ShowSnackbar(msg))
+        val product = _uiState.value.product ?: return
+        viewModelScope.launch {
+            val currentFav = _uiState.value.isFavorite
+            if (currentFav) {
+                favoritesRepository.removeFavorite(product.id)
+                sendEffect(ProductDetailsUiEffect.ShowSnackbar("Removed from Wishlist"))
+            } else {
+                favoritesRepository.addFavorite(product.id)
+                sendEffect(ProductDetailsUiEffect.ShowSnackbar("Added to Wishlist"))
+            }
+        }
     }
 
     private fun addToCart() {

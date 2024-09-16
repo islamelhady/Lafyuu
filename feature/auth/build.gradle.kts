@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":core:design-system"))
     implementation(project(":core:network"))
     implementation(project(":core:datastore"))
+    implementation(project(":core:database"))
     implementation(libs.retrofit.core)
 
     implementation(libs.androidx.appcompat)

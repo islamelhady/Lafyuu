@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.auth.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.datastore.LafyuuDataStore
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
 import com.elhady.lafyuu.core.network.error.NetworkError
@@ -25,7 +26,8 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val authApi: AuthApi,
     private val dataStore: LafyuuDataStore,
-    private val apiErrorParser: ApiErrorParser
+    private val apiErrorParser: ApiErrorParser,
+    private val favoritesRepository: FavoritesRepository
 ) : AuthRepository {
 
     override suspend fun login(email: String, password: String): AppResult<AuthToken> {
@@ -88,6 +90,7 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             val response = authApi.logout()
             dataStore.clearSession()
+            favoritesRepository.clearFavorites()
             if (response.isSuccessful) {
                 AppResult.Success(Unit)
             } else {
@@ -95,6 +98,7 @@ class AuthRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             dataStore.clearSession()
+            favoritesRepository.clearFavorites()
             AppResult.Success(Unit)
         }
     }

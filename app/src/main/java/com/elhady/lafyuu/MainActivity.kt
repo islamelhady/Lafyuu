@@ -56,6 +56,8 @@ import com.elhady.lafyuu.feature.review.navigation.navigateToReviews
 import com.elhady.lafyuu.feature.review.navigation.navigateToWriteReview
 import com.elhady.lafyuu.feature.review.navigation.reviewsScreen
 import com.elhady.lafyuu.feature.review.navigation.writeReviewScreen
+import com.elhady.lafyuu.feature.favorites.navigation.navigateToFavorites
+import com.elhady.lafyuu.feature.favorites.navigation.favoritesScreen
 import com.elhady.lafyuu.feature.search.presentation.navigateToSearch
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -142,7 +144,7 @@ fun MainApp(
                 navController.navigateToNotifications()
             },
             onNavigateToWishlist = {
-                // Handle navigation to wishlist
+                navController.navigateToFavorites()
             },
             onNavigateToTab = { tabId ->
                 if (tabId == "account" || tabId == "Account") {
@@ -178,6 +180,15 @@ fun MainApp(
             }
         )
 
+        favoritesScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToProductDetails = { productId ->
+                navController.navigateToProductDetails(productId)
+            }
+        )
+
         exploreScreen(
             onNavigateToCategoryProducts = { categoryId, categoryName ->
                 navController.navigateToCategoryProducts(categoryName)
@@ -186,7 +197,9 @@ fun MainApp(
                 // Handle navigation to search
             },
             onNavigateToNotifications = {},
-            onNavigateToWishlist = {},
+            onNavigateToWishlist = {
+                navController.navigateToFavorites()
+            },
             onNavigateToTab = { tabId ->
                 if (tabId == "account" || tabId == "Account") {
                     navController.navigateToAccount()
