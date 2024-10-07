@@ -1,9 +1,9 @@
 package com.elhady.lafyuu.feature.checkout.presentation
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.feature.checkout.domain.model.Address
-import com.elhady.lafyuu.feature.checkout.domain.usecase.DeleteAddressUseCase
-import com.elhady.lafyuu.feature.checkout.domain.usecase.GetAddressesUseCase
+import com.elhady.lafyuu.feature.address.domain.model.Address
+import com.elhady.lafyuu.feature.address.domain.usecase.DeleteAddressUseCase
+import com.elhady.lafyuu.feature.address.domain.usecase.GetAddressesUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
