@@ -46,9 +46,9 @@ class HomeViewModelTest {
             HomeContent(
                 categories = listOf(Category("1", "Clothes", null, null)),
                 offers = listOf(Offer("1", "Summer Sale", "50% Off", null)),
-                flashSaleProducts = listOf(Product("1", "Nike Air", null, 100.0, 120.0, 20.0, "20% OFF", 4.5f)),
-                megaSaleProducts = listOf(Product("1", "Nike Air", null, 100.0, 120.0, 20.0, "20% OFF", 4.5f)),
-                recommendedProducts = listOf(Product("1", "Nike Air", null, 100.0, 120.0, 20.0, "20% OFF", 4.5f))
+                flashSaleProducts = listOf(Product("1", "Nike Air", null, 100.0, 120.0, 20.0, "20% OFF", 4)),
+                megaSaleProducts = listOf(Product("1", "Nike Air", null, 100.0, 120.0, 20.0, "20% OFF", 4)),
+                recommendedProducts = listOf(Product("1", "Nike Air", null, 100.0, 120.0, 20.0, "20% OFF", 4))
             )
         )
         coEvery { searchProductsUseCase(any()) } returns AppResult.Success(emptyList())
@@ -117,7 +117,7 @@ class HomeViewModelTest {
         viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
         advanceUntilIdle()
 
-        val searchProducts = listOf(Product("2", "Adidas Ultra", null, 90.0, null, null, null, 4.0f))
+        val searchProducts = listOf(Product("2", "Adidas Ultra", null, 90.0, null, null, null, 4))
         coEvery { searchProductsUseCase("Adidas") } returns AppResult.Success(searchProducts)
 
         viewModel.onEvent(HomeUiEvent.SearchQueryChanged("Adidas"))
@@ -211,7 +211,7 @@ class HomeViewModelTest {
 
         coEvery { searchProductsUseCase("InFlight") } coAnswers {
             delay(1000L)
-            AppResult.Success(listOf(Product("99", "InFlight Item", null, 10.0, null, null, null, 4.0f)))
+            AppResult.Success(listOf(Product("99", "InFlight Item", null, 10.0, null, null, null, 4)))
         }
 
         viewModel.onEvent(HomeUiEvent.SearchQueryChanged("InFlight"))
@@ -232,7 +232,7 @@ class HomeViewModelTest {
         viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
         advanceUntilIdle()
 
-        val searchProducts = listOf(Product("2", "Adidas Ultra", null, 90.0, null, null, null, 4.0f))
+        val searchProducts = listOf(Product("2", "Adidas Ultra", null, 90.0, null, null, null, 4))
         coEvery { searchProductsUseCase("Adidas") } returns AppResult.Success(searchProducts)
 
         viewModel.onEvent(HomeUiEvent.SearchQueryChanged("Adidas"))

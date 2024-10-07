@@ -58,7 +58,7 @@ class GetHomeUseCasesTest {
 
     @Test
     fun `GetProductsUseCase delegates to repository with query parameters`() = runTest {
-        val expected = listOf(Product("1", "Shoes", null, 100.0, null, null, null, 4.0f))
+        val expected = listOf(Product("1", "Shoes", null, 100.0, null, null, null, 4))
         coEvery { homeRepository.getProducts(searchTerm = "Shoes", page = 1, pageSize = 10) } returns AppResult.Success(expected)
 
         val result = getProductsUseCase(searchTerm = "Shoes", page = 1, pageSize = 10)
@@ -72,8 +72,8 @@ class GetHomeUseCasesTest {
     fun `GetHomeContentUseCase orchestrates requests, deduplicates products, and returns HomeContent`() = runTest {
         val categories = listOf(Category("1", "Bags", null, null))
         val offers = listOf(Offer("10", "Flash Sale", "50%", null))
-        val product1 = Product("p1", "Item 1", null, 10.0, null, null, null, 4.0f)
-        val product2 = Product("p2", "Item 2", null, 20.0, null, null, null, 4.5f)
+        val product1 = Product("p1", "Item 1", null, 10.0, null, null, null, 4)
+        val product2 = Product("p2", "Item 2", null, 20.0, null, null, null, 4)
 
         coEvery { homeRepository.getCategories() } returns AppResult.Success(categories)
         coEvery { homeRepository.getOffers() } returns AppResult.Success(offers)
@@ -94,7 +94,7 @@ class GetHomeUseCasesTest {
 
     @Test
     fun `GetHomeContentUseCase applies fallback when section products are empty`() = runTest {
-        val product1 = Product("p1", "Item 1", null, 10.0, null, null, null, 4.0f)
+        val product1 = Product("p1", "Item 1", null, 10.0, null, null, null, 4)
 
         coEvery { homeRepository.getCategories() } returns AppResult.Success(emptyList())
         coEvery { homeRepository.getOffers() } returns AppResult.Success(emptyList())
@@ -133,7 +133,7 @@ class GetHomeUseCasesTest {
     @Test
     fun `GetHomeContentUseCase returns Success with products when offers fail but product requests succeed`() = runTest {
         val categories = listOf(Category("1", "Shoes", null, null))
-        val product1 = Product("p1", "Item 1", null, 10.0, null, null, null, 4.0f)
+        val product1 = Product("p1", "Item 1", null, 10.0, null, null, null, 4)
 
         coEvery { homeRepository.getCategories() } returns AppResult.Success(categories)
         coEvery { homeRepository.getOffers() } returns AppResult.Error(message = "Network Error")
@@ -154,7 +154,7 @@ class GetHomeUseCasesTest {
     @Test
     fun `GetHomeContentUseCase applies fallback when one product section fails but others succeed`() = runTest {
         val categories = listOf(Category("1", "Fashion", null, null))
-        val product1 = Product("p1", "Item 1", null, 10.0, null, null, null, 4.0f)
+        val product1 = Product("p1", "Item 1", null, 10.0, null, null, null, 4)
 
         coEvery { homeRepository.getCategories() } returns AppResult.Success(categories)
         coEvery { homeRepository.getOffers() } returns AppResult.Success(emptyList())
@@ -194,7 +194,7 @@ class GetHomeUseCasesTest {
 
     @Test
     fun `SearchProductsUseCase delegates non-blank query to repository`() = runTest {
-        val expected = listOf(Product("p1", "Nike", null, 100.0, null, null, null, 5.0f))
+        val expected = listOf(Product("p1", "Nike", null, 100.0, null, null, null, 5))
         coEvery { homeRepository.getProducts(searchTerm = "Nike", pageSize = 20) } returns AppResult.Success(expected)
 
         val result = searchProductsUseCase("Nike")

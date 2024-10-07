@@ -61,6 +61,8 @@ import com.elhady.lafyuu.feature.review.navigation.writeReviewScreen
 import com.elhady.lafyuu.feature.favorites.navigation.navigateToFavorites
 import com.elhady.lafyuu.feature.favorites.navigation.favoritesScreen
 import com.elhady.lafyuu.feature.search.presentation.navigateToSearch
+import com.elhady.lafyuu.feature.search.presentation.searchScreen
+import com.elhady.lafyuu.feature.notifications.presentation.notificationsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -196,10 +198,12 @@ fun MainApp(
                 navController.navigateToCategoryProducts(categoryName)
             },
             onNavigateToSearch = {
-                // Handle navigation to search
+                navController.navigateToSearch()
             },
-            onNavigateToNotifications = {},
-            onNavigateToWishlist = {
+            onNavigateToNotifications = {
+                navController.navigateToNotifications()
+            },
+            onNavigateToFavorites = {
                 navController.navigateToFavorites()
             },
             onNavigateToTab = { tabId ->
@@ -222,7 +226,7 @@ fun MainApp(
                 navController.popBackStack()
             },
             onNavigateToSearch = {
-                // Handle navigation to search
+                navController.navigateToSearch()
             },
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
@@ -247,6 +251,21 @@ fun MainApp(
         writeReviewScreen(
             onNavigateBack = {
                 navController.popBackStack()
+            }
+        )
+
+        notificationsScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            }
+        )
+
+        searchScreen(
+            onNavigateToHome = {
+                navController.popBackStack()
+            },
+            onNavigateToProductDetails = { productId ->
+                navController.navigateToProductDetails(productId)
             }
         )
 
