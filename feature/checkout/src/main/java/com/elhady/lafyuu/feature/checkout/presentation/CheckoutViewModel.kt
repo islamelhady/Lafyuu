@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
-import com.elhady.lafyuu.feature.checkout.domain.model.Address
-import com.elhady.lafyuu.feature.checkout.domain.usecase.DeleteAddressUseCase
-import com.elhady.lafyuu.feature.checkout.domain.usecase.GetAddressesUseCase
+import com.elhady.lafyuu.feature.address.domain.model.Address
+import com.elhady.lafyuu.feature.address.domain.usecase.DeleteAddressUseCase
+import com.elhady.lafyuu.feature.address.domain.usecase.GetAddressesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
