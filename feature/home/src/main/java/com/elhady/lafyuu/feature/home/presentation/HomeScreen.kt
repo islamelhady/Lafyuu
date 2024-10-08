@@ -179,15 +179,14 @@ internal fun HomeScreen(
                         verticalArrangement = Arrangement.spacedBy(Theme.space.large)
                     ) {
                         SuperFlashSaleSection(
-                            offers = uiState.offers,
-                            onOfferClick = { offerId ->
+                            products = uiState.flashSaleProducts,
+                            onProductClick = { productId ->
                                 onEvent(
-                                    HomeUiEvent.OfferBannerClicked(
-                                        offerId
+                                    HomeUiEvent.ProductClicked(
+                                        productId
                                     )
                                 )
-                            },
-                            onSeeMoreClick = { onEvent(HomeUiEvent.SeeMoreFlashSaleClicked) }
+                            }
                         )
                         CategoryListSection(
                             categories = uiState.categories,
