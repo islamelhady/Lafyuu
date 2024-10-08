@@ -266,6 +266,9 @@ fun MainApp(
             },
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
+            },
+            onNavigateBack = {
+                navController.popBackStack()
             }
         )
 

@@ -72,6 +72,9 @@ class SearchViewModel @Inject constructor(
                     )
                 }
             }
+            is SearchUiEvent.BackClick -> {
+                sendEffect(SearchUiEffect.NavigateBack)
+            }
             is SearchUiEvent.PriceFilterToggled -> {
                 _uiState.update { it.copy(tempIsPriceFilterEnabled = event.enabled) }
             }

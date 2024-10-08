@@ -1,5 +1,6 @@
 package com.elhady.lafyuu.feature.search.presentation
 
+import Left
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +52,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 @Composable
 fun SearchRoute(
     onNavigateToHome: () -> Unit,
+    onNavigateBack: () -> Unit,
     onNavigateToProductDetails: (String) -> Unit,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
@@ -62,6 +64,7 @@ fun SearchRoute(
             when (effect) {
                 is SearchUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
                 SearchUiEffect.NavigateToHome -> onNavigateToHome()
+                is SearchUiEffect.NavigateBack -> onNavigateBack()
                 is SearchUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
@@ -98,6 +101,8 @@ fun SearchScreen(
                 searchValue = uiState.query,
                 onSearchValueChange = { onEvent(SearchUiEvent.QueryChanged(it)) },
                 onClearSearchClick = { onEvent(SearchUiEvent.QueryChanged("")) },
+                leadingIcon = Left,
+                onLeadingClick = { onEvent(SearchUiEvent.BackClick) },
                 trailingIcon = Short,
                 onTrailingClick = { onEvent(SearchUiEvent.SortClicked) },
                 filterIcon = Filter,

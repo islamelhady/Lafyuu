@@ -42,10 +42,12 @@ sealed interface SearchUiEvent {
     data object SortClicked : SearchUiEvent
     data class ProductClicked(val productId: String) : SearchUiEvent
     data object BackToHomeClick : SearchUiEvent
+    data object BackClick : SearchUiEvent
 }
 
 sealed interface SearchUiEffect {
     data class NavigateToProductDetails(val productId: String) : SearchUiEffect
     data object NavigateToHome : SearchUiEffect
+    data object NavigateBack : SearchUiEffect
     data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : SearchUiEffect
 }
