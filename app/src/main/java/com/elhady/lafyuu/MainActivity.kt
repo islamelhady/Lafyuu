@@ -41,6 +41,8 @@ import com.elhady.lafyuu.feature.home.navigation.categoryProductsScreen
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
 import com.elhady.lafyuu.feature.home.navigation.navigateToCategories
 import com.elhady.lafyuu.feature.home.navigation.navigateToCategoryProducts
+import com.elhady.lafyuu.feature.home.navigation.navigateToProductList
+import com.elhady.lafyuu.feature.home.navigation.productListScreen
 import com.elhady.lafyuu.feature.notifications.presentation.navigateToNotifications
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrders
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrderDetails
@@ -130,10 +132,10 @@ fun MainApp(
                 navController.navigateToProductDetails(productId)
             },
             onNavigateToFlashSale = {
-                // Handle navigation to flash sale
+                navController.navigateToProductList("Flash Sale")
             },
             onNavigateToMegaSale = {
-                // Handle navigation to mega sale
+                navController.navigateToProductList("Mega Sale")
             },
             onNavigateToMoreCategories = {
                 navController.navigateToCategories()
@@ -385,6 +387,15 @@ fun MainApp(
         editAddressScreen(
             onNavigateBack = {
                 navController.popBackStack()
+            }
+        )
+
+        productListScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToProductDetails = { productId ->
+                navController.navigateToProductDetails(productId)
             }
         )
 
