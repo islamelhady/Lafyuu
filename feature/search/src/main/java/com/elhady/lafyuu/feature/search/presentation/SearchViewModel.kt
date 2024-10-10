@@ -113,7 +113,21 @@ class SearchViewModel @Inject constructor(
                 searchProducts()
             }
             SearchUiEvent.SortClicked -> {
-                toggleSort()
+                _uiState.update { it.copy(isSortSheetOpen = true) }
+            }
+            SearchUiEvent.SortDismissed -> {
+                _uiState.update { it.copy(isSortSheetOpen = false) }
+            }
+            is SearchUiEvent.SortSelected -> {
+                _uiState.update {
+                    it.copy(
+                        sortBy = event.sortBy,
+                        sortOrder = event.sortOrder,
+                        isSortSheetOpen = false,
+                        page = 1
+                    )
+                }
+                searchProducts()
             }
             is SearchUiEvent.ProductClicked -> {
                 sendEffect(SearchUiEffect.NavigateToProductDetails(event.productId))
@@ -133,20 +147,6 @@ class SearchViewModel @Inject constructor(
                 else -> {}
             }
         }
-    }
-
-    private fun toggleSort() {
-        val currentSortBy = _uiState.value.sortBy
-        val currentSortOrder = _uiState.value.sortOrder
-
-        val (nextSortBy, nextSortOrder) = when {
-            currentSortBy == null -> Pair("price", "asc")
-            currentSortBy == "price" && currentSortOrder == "asc" -> Pair("price", "desc")
-            else -> Pair(null, null)
-        }
-
-        _uiState.update { it.copy(sortBy = nextSortBy, sortOrder = nextSortOrder, page = 1) }
-        searchProducts()
     }
 
     private fun observeSearchQuery() {

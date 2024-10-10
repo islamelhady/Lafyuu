@@ -93,6 +93,7 @@ fun SearchScreen(
     onEvent: (SearchUiEvent) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
+    val sortSheetState = rememberModalBottomSheetState()
 
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
@@ -263,32 +264,55 @@ fun SearchScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-//                    LafyuuText(
-//                        text = "Availability",
-//                        style = Theme.typography.heading5,
-//                        color = Theme.color.neutralDark)
-//                    Row(
-//                        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
-//                    ) {
-//                        LabelButton(
-//                            caption = "All",
-//                            isEnabled = uiState.tempIsInStock == null,
-//                            onClick = { onEvent(SearchUiEvent.InStockChanged(null)) },
-//                            hasBorder = true
-//                        )
-//                        LabelButton(
-//                            caption = "In Stock",
-//                            isEnabled = uiState.tempIsInStock == true,
-//                            onClick = { onEvent(SearchUiEvent.InStockChanged(true)) },
-//                            hasBorder = true
-//                        )
-//                    }
                     DefaultButton(
                         caption = "Apply",
                         onClick = { onEvent(SearchUiEvent.ApplyFilters) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = Theme.space.large)
+                    )
+                    VerticalSpacerMedium()
+                }
+            }
+        }
+
+        if (uiState.isSortSheetOpen) {
+            ModalBottomSheet(
+                onDismissRequest = { onEvent(SearchUiEvent.SortDismissed) },
+                sheetState = sortSheetState
+            ) {
+                SingleTopAppBar(
+                    title = "Sort By",
+                    leadingIcon = X,
+                    onLeadingClick = { onEvent(SearchUiEvent.SortDismissed) }
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = Theme.space.large, vertical = Theme.space.medium),
+                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                ) {
+                    val isLowToHigh = uiState.sortBy == "price" && uiState.sortOrder == "asc"
+                    val isHighToLow = uiState.sortBy == "price" && uiState.sortOrder == "desc"
+
+                    LabelButton(
+                        caption = "Price: Low to High",
+                        onClick = { onEvent(SearchUiEvent.SortSelected("price", "asc")) },
+                        containerColor = if (isLowToHigh) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                        contentColor = if (isLowToHigh) Theme.color.blue else Theme.color.neutralDark,
+                        style = if (isLowToHigh) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                        hasBorder = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    LabelButton(
+                        caption = "Price: High to Low",
+                        onClick = { onEvent(SearchUiEvent.SortSelected("price", "desc")) },
+                        containerColor = if (isHighToLow) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                        contentColor = if (isHighToLow) Theme.color.blue else Theme.color.neutralDark,
+                        style = if (isHighToLow) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                        hasBorder = true,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     VerticalSpacerMedium()
                 }
