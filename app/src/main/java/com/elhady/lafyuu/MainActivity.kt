@@ -63,6 +63,7 @@ import com.elhady.lafyuu.feature.review.navigation.writeReviewScreen
 import com.elhady.lafyuu.feature.favorites.navigation.navigateToFavorites
 import com.elhady.lafyuu.feature.favorites.navigation.favoritesScreen
 import com.elhady.lafyuu.feature.search.presentation.navigateToSearch
+import com.elhady.lafyuu.feature.offers.presentation.offersScreen
 import com.elhady.lafyuu.feature.search.presentation.searchScreen
 import com.elhady.lafyuu.feature.notifications.presentation.notificationsScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -114,6 +115,16 @@ fun MainApp(
     val navController = rememberNavController()
     val context = LocalContext.current
 
+    val onNavigateToTab: (String) -> Unit = { tabId ->
+        navController.navigate(tabId) {
+            popUpTo(navController.graph.startDestinationId) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = if (isAuthenticated) HOME_ROUTE else AUTH_GRAPH_ROUTE
@@ -152,20 +163,12 @@ fun MainApp(
             onNavigateToWishlist = {
                 navController.navigateToFavorites()
             },
-            onNavigateToTab = { tabId ->
-                if (tabId == "account" || tabId == "Account") {
-                    navController.navigateToAccount()
-                } else if (navController.graph.findNode(tabId) != null) {
-                    navController.navigate(tabId) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            },
+            onNavigateToTab = onNavigateToTab,
             cartItemCount = cartItemCount
+        )
+
+        offersScreen(
+            onNavigateToTab = onNavigateToTab
         )
 
         categoriesScreen(
@@ -208,19 +211,7 @@ fun MainApp(
             onNavigateToFavorites = {
                 navController.navigateToFavorites()
             },
-            onNavigateToTab = { tabId ->
-                if (tabId == "account" || tabId == "Account") {
-                    navController.navigateToAccount()
-                } else if (navController.graph.findNode(tabId) != null) {
-                    navController.navigate(tabId) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            }
+            onNavigateToTab = onNavigateToTab
         )
 
         productDetailsScreen(
@@ -281,19 +272,7 @@ fun MainApp(
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
             },
-            onNavigateToTab = { tabId ->
-                if (tabId == "account" || tabId == "Account") {
-                    navController.navigateToAccount()
-                } else if (navController.graph.findNode(tabId) != null) {
-                    navController.navigate(tabId) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            }
+            onNavigateToTab = onNavigateToTab
         )
 
         checkoutScreen(
@@ -363,7 +342,8 @@ fun MainApp(
             onNavigateToAddress = {
                 navController.navigateToAddress()
             },
-            onNavigateToPayment = {}
+            onNavigateToPayment = {},
+            onNavigateToTab = onNavigateToTab
         )
 
         addressScreen(

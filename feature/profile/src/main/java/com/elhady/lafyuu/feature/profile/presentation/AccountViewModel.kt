@@ -32,6 +32,7 @@ class AccountViewModel @Inject constructor() : ViewModel() {
             AccountUiEvent.OrdersClicked -> sendEffect(AccountUiEffect.NavigateToOrders)
             AccountUiEvent.AddressClicked -> sendEffect(AccountUiEffect.NavigateToAddress)
             AccountUiEvent.PaymentClicked -> sendEffect(AccountUiEffect.NavigateToPayment)
+            is AccountUiEvent.BottomTabSelected -> sendEffect(AccountUiEffect.NavigateToTab(event.tab.route))
         }
     }
 
