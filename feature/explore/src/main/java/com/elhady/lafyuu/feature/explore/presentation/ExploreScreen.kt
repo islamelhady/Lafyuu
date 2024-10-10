@@ -51,6 +51,7 @@ fun ExploreRoute(
     onNavigateToNotifications: () -> Unit,
     onNavigateToWishlist: () -> Unit,
     onNavigateToTab: (String) -> Unit,
+    selectedTab: String = "explore",
     viewModel: ExploreViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -84,6 +85,7 @@ fun ExploreRoute(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
+        selectedTab = selectedTab
     )
 }
 
@@ -93,6 +95,7 @@ fun ExploreScreen(
     uiState: ExploreUiState,
     snackbarHostState: SnackbarHostState,
     onEvent: (ExploreUiEvent) -> Unit,
+    selectedTab: String = "explore"
 ) {
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
@@ -111,7 +114,7 @@ fun ExploreScreen(
         bottomBar = {
             NavigationBottomBar(
                 tabs = defaultTabBarItems,
-                selectedTab = "explore",
+                selectedTab = selectedTab,
                 onTabSelected = { onEvent(ExploreUiEvent.BottomTabSelected(it)) }
             )
         }

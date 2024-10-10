@@ -26,7 +26,8 @@ fun NavGraphBuilder.accountScreen(
     onNavigateToOrders: () -> Unit,
     onNavigateToAddress: () -> Unit,
     onNavigateToPayment: () -> Unit,
-    onNavigateToTab: (String) -> Unit
+    onNavigateToTab: (String) -> Unit,
+    selectedTab: String = "account"
 ) {
     composable(route = ACCOUNT_ROUTE) {
         AccountRoute(
@@ -34,7 +35,8 @@ fun NavGraphBuilder.accountScreen(
             onNavigateToOrders = onNavigateToOrders,
             onNavigateToAddress = onNavigateToAddress,
             onNavigateToPayment = onNavigateToPayment,
-            onNavigateToTab = onNavigateToTab
+            onNavigateToTab = onNavigateToTab,
+            selectedTab = selectedTab
         )
     }
 }

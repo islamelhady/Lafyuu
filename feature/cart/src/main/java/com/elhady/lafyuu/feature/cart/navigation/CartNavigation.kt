@@ -15,13 +15,15 @@ fun NavController.navigateToCart(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.cartScreen(
     onNavigateToCheckout: () -> Unit,
     onNavigateToProductDetails: (String) -> Unit,
-    onNavigateToTab: (String) -> Unit = {}
+    onNavigateToTab: (String) -> Unit = {},
+    selectedTab: String = "cart"
 ) {
     composable(route = CART_ROUTE) {
         CartRoute(
             onNavigateToCheckout = onNavigateToCheckout,
             onNavigateToProductDetails = onNavigateToProductDetails,
-            onNavigateToTab = onNavigateToTab
+            onNavigateToTab = onNavigateToTab,
+            selectedTab = selectedTab
         )
     }
 }

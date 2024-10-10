@@ -44,6 +44,7 @@ fun HomeRoute(
     onNavigateToWishlist: () -> Unit = {},
     onNavigateToTab: (String) -> Unit = {},
     cartItemCount: Int = 0,
+    selectedTab: String = "home",
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -68,7 +69,8 @@ fun HomeRoute(
     HomeScreen(
         uiState = uiState,
         onEvent = viewModel::onEvent,
-        cartItemCount = cartItemCount
+        cartItemCount = cartItemCount,
+        selectedTab = selectedTab
     )
 }
 
@@ -76,7 +78,8 @@ fun HomeRoute(
 internal fun HomeScreen(
     uiState: HomeUiState,
     onEvent: (HomeUiEvent) -> Unit,
-    cartItemCount: Int = 0
+    cartItemCount: Int = 0,
+    selectedTab: String = "home"
 ) {
     LafyuuScaffold(
         topBar = {
@@ -100,7 +103,7 @@ internal fun HomeScreen(
                         tab
                     }
                 },
-                selectedTab = uiState.selectedTab,
+                selectedTab = selectedTab,
                 onTabSelected = { onEvent(HomeUiEvent.BottomTabSelected(it)) }
             )
         }

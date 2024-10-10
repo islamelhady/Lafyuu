@@ -32,6 +32,7 @@ fun AccountRoute(
     onNavigateToAddress: () -> Unit,
     onNavigateToPayment: () -> Unit,
     onNavigateToTab: (String) -> Unit,
+    selectedTab: String = "account",
     viewModel: AccountViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -61,6 +62,7 @@ fun AccountRoute(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
+        selectedTab = selectedTab
     )
 }
 
@@ -69,6 +71,7 @@ fun AccountScreen(
     uiState: AccountUiState,
     snackbarHostState: SnackbarHostState,
     onEvent: (AccountUiEvent) -> Unit,
+    selectedTab: String = "account"
 ) {
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
@@ -82,7 +85,7 @@ fun AccountScreen(
         bottomBar = {
             NavigationBottomBar(
                 tabs = defaultTabBarItems,
-                selectedTab = "account",
+                selectedTab = selectedTab,
                 onTabSelected = { onEvent(AccountUiEvent.BottomTabSelected(it)) }
             )
         }

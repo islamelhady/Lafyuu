@@ -39,6 +39,7 @@ fun CartRoute(
     onNavigateToProductDetails: (String) -> Unit,
     onNavigateToTab: (String) -> Unit,
     modifier: Modifier = Modifier,
+    selectedTab: String = "cart",
     viewModel: CartViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,7 +67,8 @@ fun CartRoute(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
-        modifier = modifier
+        modifier = modifier,
+        selectedTab = selectedTab
     )
 }
 
@@ -75,7 +77,8 @@ fun CartScreen(
     uiState: CartUiState,
     snackbarHostState: SnackbarHostState,
     onEvent: (CartUiEvent) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedTab: String = "cart"
 ) {
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
@@ -95,7 +98,7 @@ fun CartScreen(
                         tab
                     }
                 },
-                selectedTab = "cart",
+                selectedTab = selectedTab,
                 onTabSelected = { onEvent(CartUiEvent.BottomTabSelected(it)) }
             )
         }

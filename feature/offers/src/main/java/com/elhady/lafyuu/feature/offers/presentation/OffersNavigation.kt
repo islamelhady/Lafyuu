@@ -12,11 +12,13 @@ fun NavController.navigateToOffers(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.offersScreen(
-    onNavigateToTab: (String) -> Unit
+    onNavigateToTab: (String) -> Unit,
+    selectedTab: String = "offer"
 ) {
     composable(route = OFFERS_ROUTE) {
         OffersRoute(
-            onNavigateToTab = onNavigateToTab
+            onNavigateToTab = onNavigateToTab,
+            selectedTab = selectedTab
         )
     }
 }
