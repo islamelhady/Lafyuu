@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.elhady.lafyuu.core.designsystem.components.search.SearchBar
 import com.elhady.lafyuu.core.designsystem.icons.Filter
 import com.elhady.lafyuu.core.designsystem.icons.Mic
-import com.elhady.lafyuu.core.designsystem.icons.Short
+import com.elhady.lafyuu.core.designsystem.icons.Sort
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
@@ -78,7 +78,7 @@ private fun SearchBarWithTrailingPreview() {
             searchValue = search,
             onSearchValueChange = { search = it },
             onClearSearchClick = { search = "" },
-            trailingIcon = Short,
+            trailingIcon = Sort,
             onLeadingClick = {},
             onTrailingClick = {},
             filterIcon = Filter,

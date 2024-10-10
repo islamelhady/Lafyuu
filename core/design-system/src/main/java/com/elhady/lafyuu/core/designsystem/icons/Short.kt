@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-val Short: ImageVector
+val Sort: ImageVector
     get() {
         if (_Short != null) {
             return _Short!!
@@ -85,7 +85,7 @@ private var _Short: ImageVector? = null
 fun ShortPreview() {
     Box(Modifier.padding(16.dp)) {
         Image(
-            imageVector = Short,
+            imageVector = Sort,
             contentDescription = null
         )
     }

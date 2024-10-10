@@ -45,7 +45,7 @@ import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisual
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.DefaultTextField
 import com.elhady.lafyuu.core.designsystem.icons.Filter
-import com.elhady.lafyuu.core.designsystem.icons.Short
+import com.elhady.lafyuu.core.designsystem.icons.Sort
 import com.elhady.lafyuu.core.designsystem.icons.X
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
@@ -104,7 +104,7 @@ fun SearchScreen(
                 onClearSearchClick = { onEvent(SearchUiEvent.QueryChanged("")) },
                 leadingIcon = Left,
                 onLeadingClick = { onEvent(SearchUiEvent.BackClick) },
-                trailingIcon = Short,
+                trailingIcon = Sort,
                 onTrailingClick = { onEvent(SearchUiEvent.SortClicked) },
                 filterIcon = Filter,
                 onFilterClick = { onEvent(SearchUiEvent.FilterClicked) },
@@ -185,37 +185,6 @@ fun SearchScreen(
                     verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
                 ) {
                     LafyuuText(
-                        text = "Category",
-                        style = Theme.typography.heading5,
-                        color = Theme.color.neutralDark
-                    )
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(Theme.space.small),
-                        verticalArrangement = Arrangement.spacedBy(Theme.space.small)
-                    ) {
-                        val isAllSelected = uiState.tempCategory == null
-                        LabelButton(
-                            caption = "All",
-                            onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(null)) },
-                            containerColor = if (isAllSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
-                            contentColor = if (isAllSelected) Theme.color.blue else Theme.color.neutralGrey,
-                            style = if (isAllSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
-                            hasBorder = true
-                        )
-                        uiState.categories.forEach { cat ->
-                            val isSelected = uiState.tempCategory == cat.name || uiState.tempCategory == cat.id
-                            LabelButton(
-                                caption = cat.name,
-                                onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(cat.name)) },
-                                containerColor = if (isSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
-                                contentColor = if (isSelected) Theme.color.blue else Theme.color.neutralGrey,
-                                style = if (isSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
-                                hasBorder = true
-                            )
-                        }
-                    }
-
-                    LafyuuText(
                         text = "Price Range",
                         style = Theme.typography.heading5,
                         color = Theme.color.neutralDark
@@ -263,6 +232,63 @@ fun SearchScreen(
                         valueRange = 0f..2000f,
                         modifier = Modifier.fillMaxWidth()
                     )
+                    LafyuuText(
+                        text = "Category",
+                        style = Theme.typography.heading5,
+                        color = Theme.color.neutralDark
+                    )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(Theme.space.small),
+                        verticalArrangement = Arrangement.spacedBy(Theme.space.small)
+                    ) {
+                        val isAllSelected = uiState.tempCategory == null
+                        LabelButton(
+                            caption = "All",
+                            onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(null)) },
+                            containerColor = if (isAllSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                            contentColor = if (isAllSelected) Theme.color.blue else Theme.color.neutralGrey,
+                            style = if (isAllSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                            hasBorder = true
+                        )
+                        uiState.categories.forEach { cat ->
+                            val isSelected = uiState.tempCategory == cat.name || uiState.tempCategory == cat.id
+                            LabelButton(
+                                caption = cat.name,
+                                onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(cat.name)) },
+                                containerColor = if (isSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                                contentColor = if (isSelected) Theme.color.blue else Theme.color.neutralGrey,
+                                style = if (isSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                                hasBorder = true
+                            )
+                        }
+                    }
+                    LafyuuText(
+                        text = "Availability",
+                        style = Theme.typography.heading5,
+                        color = Theme.color.neutralDark
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                    ) {
+                        val isAllAvailability = uiState.tempIsInStock == null
+                        LabelButton(
+                            caption = "All",
+                            onClick = { onEvent(SearchUiEvent.InStockChanged(null)) },
+                            containerColor = if (isAllAvailability) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                            contentColor = if (isAllAvailability) Theme.color.blue else Theme.color.neutralGrey,
+                            style = if (isAllAvailability) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                            hasBorder = true
+                        )
+                        val isInStockSelected = uiState.tempIsInStock == true
+                        LabelButton(
+                            caption = "In Stock Only",
+                            onClick = { onEvent(SearchUiEvent.InStockChanged(true)) },
+                            containerColor = if (isInStockSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                            contentColor = if (isInStockSelected) Theme.color.blue else Theme.color.neutralGrey,
+                            style = if (isInStockSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                            hasBorder = true
+                        )
+                    }
 
                     DefaultButton(
                         caption = "Apply",
