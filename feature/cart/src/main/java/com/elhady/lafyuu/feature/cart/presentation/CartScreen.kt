@@ -133,12 +133,12 @@ fun CartScreen(
             else -> {
                 Column(
                     modifier = Modifier.fillMaxSize()
+                        .padding(horizontal = Theme.space.large)
                 ) {
                     LazyColumn(
                         modifier = Modifier
                             .weight(1f)
-                            .fillMaxWidth()
-                            .padding(horizontal = Theme.space.large),
+                            .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
                     ) {
                         items(uiState.items, key = { it.itemId }) { item ->
