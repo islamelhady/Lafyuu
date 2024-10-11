@@ -132,7 +132,8 @@ fun CartScreen(
 
             else -> {
                 Column(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .padding(horizontal = Theme.space.large)
                 ) {
                     LazyColumn(
@@ -179,8 +180,16 @@ fun CartScreen(
                                 }
                             )
                         }
+                        item {
+                            CartSummarySection(uiState = uiState, onEvent = onEvent)
+                        }
                     }
-                    CartSummarySection(uiState = uiState, onEvent = onEvent)
+                    DefaultButton(
+                        caption = "Check Out",
+                        isLoading = false,
+                        onClick = { onEvent(CartUiEvent.CheckoutClicked) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }
