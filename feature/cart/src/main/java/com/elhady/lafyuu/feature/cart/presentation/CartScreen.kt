@@ -1,5 +1,6 @@
 package com.elhady.lafyuu.feature.cart.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
+import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.button.QuantityButton
 import com.elhady.lafyuu.core.designsystem.components.card.WideProductCard
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
@@ -129,63 +131,56 @@ fun CartScreen(
             }
 
             else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = Theme.space.large),
-                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                Column(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    items(uiState.items, key = { it.itemId }) { item ->
-                        val isUpdating = uiState.updatingItemIds.contains(item.itemId)
-                        WideProductCard(
-                            imageUrl = item.productCoverUrl,
-                            name = item.productName,
-                            price = String.format("%.2f", item.finalPricePerUnit),
-                            isFavorite = false,
-                            onFavoriteClick = {},
-                            onDeleteClick = { onEvent(CartUiEvent.RemoveItem(item.itemId)) },
-                            onClick = { onEvent(CartUiEvent.ProductClicked(item.productId)) },
-                            quantityButton = {
-                                if (isUpdating) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.padding(8.dp),
-                                        color = Theme.color.blue
-                                    )
-                                } else {
-                                    QuantityButton(
-                                        quantity = item.quantity,
-                                        onDecrement = {
-                                            onEvent(
-                                                CartUiEvent.DecreaseQuantity(
-                                                    item.itemId
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .padding(horizontal = Theme.space.large),
+                        verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                    ) {
+                        items(uiState.items, key = { it.itemId }) { item ->
+                            val isUpdating = uiState.updatingItemIds.contains(item.itemId)
+                            WideProductCard(
+                                imageUrl = item.productCoverUrl,
+                                name = item.productName,
+                                price = String.format("%.2f", item.finalPricePerUnit),
+                                isFavorite = false,
+                                onFavoriteClick = {},
+                                onDeleteClick = { onEvent(CartUiEvent.RemoveItem(item.itemId)) },
+                                onClick = { onEvent(CartUiEvent.ProductClicked(item.productId)) },
+                                quantityButton = {
+                                    if (isUpdating) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.padding(8.dp),
+                                            color = Theme.color.blue
+                                        )
+                                    } else {
+                                        QuantityButton(
+                                            quantity = item.quantity,
+                                            onDecrement = {
+                                                onEvent(
+                                                    CartUiEvent.DecreaseQuantity(
+                                                        item.itemId
+                                                    )
                                                 )
-                                            )
-                                        },
-                                        onIncrement = {
-                                            onEvent(
-                                                CartUiEvent.IncreaseQuantity(
-                                                    item.itemId
+                                            },
+                                            onIncrement = {
+                                                onEvent(
+                                                    CartUiEvent.IncreaseQuantity(
+                                                        item.itemId
+                                                    )
                                                 )
-                                            )
-                                        }
-                                    )
+                                            }
+                                        )
+                                    }
                                 }
-                            }
-                        )
-                    }
-
-                    if (uiState.items.isNotEmpty()) {
-                        item {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(Theme.space.large),
-                                verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                            ) {
-                                CartSummarySection(uiState = uiState, onEvent = onEvent)
-                            }
+                            )
                         }
                     }
+                    CartSummarySection(uiState = uiState, onEvent = onEvent)
                 }
             }
         }
