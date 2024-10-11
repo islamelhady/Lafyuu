@@ -101,7 +101,8 @@ fun ProductDetailsScreen(
                         .padding(Theme.space.large)
                 ) {
                     DefaultButton(
-                        caption = "Add To Cart",
+                        caption = if (uiState.isInCart) "Added to Cart" else "Add To Cart",
+                        isEnabled = !uiState.isInCart,
                         isLoading = uiState.isAddingToCart,
                         onClick = { onEvent(ProductDetailsUiEvent.AddToCartClicked) },
                         modifier = Modifier.fillMaxWidth()

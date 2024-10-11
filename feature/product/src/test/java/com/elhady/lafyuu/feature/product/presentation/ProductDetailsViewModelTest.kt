@@ -6,6 +6,7 @@ import com.elhady.lafyuu.core.common.domain.model.ProductContent
 import com.elhady.lafyuu.core.common.domain.model.ProductDetails
 import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
+import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
 import com.elhady.lafyuu.feature.product.domain.usecase.AddToCartUseCase
 import io.mockk.coEvery
 import io.mockk.every
@@ -35,6 +36,9 @@ class ProductDetailsViewModelTest {
     private val favoritesRepository: FavoritesRepository = mockk(relaxed = true) {
         every { isFavorite(any()) } returns flowOf(false)
     }
+    private val cartRepository: CartRepository = mockk(relaxed = true) {
+        every { observeCart() } returns flowOf(null)
+    }
 
     @Before
     fun setUp() {
@@ -54,7 +58,7 @@ class ProductDetailsViewModelTest {
         )
 
         val savedStateHandle = SavedStateHandle(mapOf("productId" to "p-100"))
-        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, savedStateHandle)
+        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, cartRepository, savedStateHandle)
 
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -70,7 +74,7 @@ class ProductDetailsViewModelTest {
         coEvery { getProductDetailsUseCase("p-err") } returns AppResult.Error(message = "Network error")
 
         val savedStateHandle = SavedStateHandle(mapOf("productId" to "p-err"))
-        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, savedStateHandle)
+        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, cartRepository, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -81,7 +85,7 @@ class ProductDetailsViewModelTest {
 
     @Test
     fun `SizeSelected updates selectedSize in state`() = runTest {
-        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, SavedStateHandle())
+        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, cartRepository, SavedStateHandle())
 
         viewModel.onEvent(ProductDetailsUiEvent.SizeSelected("8.5"))
 
@@ -90,7 +94,7 @@ class ProductDetailsViewModelTest {
 
     @Test
     fun `ColorSelected updates selectedColorHex in state`() = runTest {
-        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, SavedStateHandle())
+        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, cartRepository, SavedStateHandle())
 
         viewModel.onEvent(ProductDetailsUiEvent.ColorSelected("#40BFFF"))
 
@@ -107,7 +111,7 @@ class ProductDetailsViewModelTest {
         coEvery { favoritesRepository.removeFavorite("p-1") } answers { favFlow.value = false }
 
         val savedStateHandle = SavedStateHandle(mapOf("productId" to "p-1"))
-        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, savedStateHandle)
+        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, cartRepository, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
 
         assertFalse(viewModel.uiState.value.isFavorite)
@@ -125,7 +129,7 @@ class ProductDetailsViewModelTest {
         coEvery { addToCartUseCase("p-1", 1) } returns AppResult.Success(Unit)
 
         val savedStateHandle = SavedStateHandle(mapOf("productId" to "p-1"))
-        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, savedStateHandle)
+        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, cartRepository, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.onEvent(ProductDetailsUiEvent.AddToCartClicked)
@@ -134,6 +138,7 @@ class ProductDetailsViewModelTest {
         val effect = viewModel.uiEffect.first()
         assertTrue(effect is ProductDetailsUiEffect.ShowSnackbar)
         assertEquals("Added to cart successfully!", (effect as ProductDetailsUiEffect.ShowSnackbar).message)
+        assertTrue(viewModel.uiState.value.isInCart)
     }
 
     @Test
@@ -143,7 +148,7 @@ class ProductDetailsViewModelTest {
         coEvery { addToCartUseCase("p-1", 1) } returns AppResult.Error(message = "Out of stock")
 
         val savedStateHandle = SavedStateHandle(mapOf("productId" to "p-1"))
-        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, savedStateHandle)
+        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, cartRepository, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.onEvent(ProductDetailsUiEvent.AddToCartClicked)
@@ -156,6 +161,7 @@ class ProductDetailsViewModelTest {
         val effect = viewModel.uiEffect.first()
         assertTrue(effect is ProductDetailsUiEffect.ShowSnackbar)
         assertEquals("Out of stock", (effect as ProductDetailsUiEffect.ShowSnackbar).message)
+        assertFalse(viewModel.uiState.value.isInCart)
     }
 
     @Test
@@ -167,7 +173,7 @@ class ProductDetailsViewModelTest {
         )
 
         val savedStateHandle = SavedStateHandle(mapOf("productId" to "p-1"))
-        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, savedStateHandle)
+        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, cartRepository, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
 
         assertEquals("Failed", viewModel.uiState.value.error)
@@ -186,7 +192,7 @@ class ProductDetailsViewModelTest {
         coEvery { getProductDetailsUseCase("p-1") } returns AppResult.Error(message = "Still failing")
 
         val savedStateHandle = SavedStateHandle(mapOf("productId" to "p-1"))
-        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, savedStateHandle)
+        val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, favoritesRepository, cartRepository, savedStateHandle)
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.onEvent(ProductDetailsUiEvent.RetryClicked)

@@ -7,6 +7,7 @@ import com.elhady.lafyuu.core.common.domain.model.ProductReview
 data class ProductDetailsUiState(
     val isLoading: Boolean = false,
     val isAddingToCart: Boolean = false,
+    val isInCart: Boolean = false,
     val product: ProductDetails? = null,
     val reviews: List<ProductReview> = emptyList(),
     val recommendedProducts: List<Product> = emptyList(),

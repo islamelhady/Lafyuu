@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
+import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
 import com.elhady.lafyuu.feature.product.domain.usecase.AddToCartUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -23,6 +24,7 @@ class ProductDetailsViewModel @Inject constructor(
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
     private val favoritesRepository: FavoritesRepository,
+    private val cartRepository: CartRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -77,6 +79,13 @@ class ProductDetailsViewModel @Inject constructor(
             launch {
                 favoritesRepository.isFavorite(productId).collectLatest { isFav ->
                     _uiState.update { it.copy(isFavorite = isFav) }
+                }
+            }
+
+            launch {
+                cartRepository.observeCart().collectLatest { cart ->
+                    val inCart = cart?.items?.any { it.productId == productId } == true
+                    _uiState.update { it.copy(isInCart = inCart) }
                 }
             }
 
@@ -147,7 +156,7 @@ class ProductDetailsViewModel @Inject constructor(
             _uiState.update { it.copy(isAddingToCart = true) }
             when (val result = addToCartUseCase(product.id, qty)) {
                 is AppResult.Success -> {
-                    _uiState.update { it.copy(isAddingToCart = false) }
+                    _uiState.update { it.copy(isAddingToCart = false, isInCart = true) }
                     sendEffect(ProductDetailsUiEffect.ShowSnackbar("Added to cart successfully!"))
                 }
                 is AppResult.Error -> {
