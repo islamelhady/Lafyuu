@@ -80,7 +80,9 @@ class CartRepositoryImpl @Inject constructor(
 
     override suspend fun removeItem(itemId: String): AppResult<Unit> = mutex.withLock {
         return try {
-            val response = cartApi.deleteCartItem(itemId, DeleteItemFromCartRequestDto(itemId))
+            val response = cartApi.deleteCartItem(itemId,
+//                DeleteItemFromCartRequestDto(itemId)
+            )
             if (response.isSuccessful) {
                 refreshCartUnlocked()
                 AppResult.Success(Unit)
