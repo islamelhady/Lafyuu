@@ -111,7 +111,7 @@ class CartRepositoryImpl @Inject constructor(
             } else {
                 val networkError = apiErrorParser.parseError(response)
                 if (response.code() == 400) {
-                    AppResult.Error(message = "Your Cupon Is Not Correct")
+                    AppResult.Error(message = "* Your Coupon Is Not Correct ")
                 } else {
                     mapError(networkError)
                 }

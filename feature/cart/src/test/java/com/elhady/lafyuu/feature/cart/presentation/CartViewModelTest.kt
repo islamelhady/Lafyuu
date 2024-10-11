@@ -111,4 +111,22 @@ class CartViewModelTest {
         assertEquals(AlertType.Error, (effect as CartUiEffect.ShowSnackbar).type)
         assertEquals("Exceeds stock", effect.message)
     }
+
+    @Test
+    fun `ApplyCouponClicked with blank input sets couponError in state`() = runTest {
+        coEvery { getCartUseCase() } returns AppResult.Success(Cart(cartId = "c-1", items = emptyList()))
+        val viewModel = CartViewModel(
+            getCartUseCase,
+            increaseCartItemQuantityUseCase,
+            decreaseCartItemUseCase,
+            removeCartItemUseCase,
+            applyCouponUseCase
+        )
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.onEvent(CartUiEvent.CouponCodeChanged(""))
+        viewModel.onEvent(CartUiEvent.ApplyCouponClicked)
+
+        assertEquals("Please enter a coupon code", viewModel.uiState.value.couponError)
+    }
 }

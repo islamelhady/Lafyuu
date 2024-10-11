@@ -169,7 +169,10 @@ class CartViewModel @Inject constructor(
 
     private fun applyCoupon() {
         val code = _uiState.value.couponCodeInput
-        if (code.isBlank()) return
+        if (code.isBlank()) {
+            _uiState.update { it.copy(couponError = "Please enter a coupon code") }
+            return
+        }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isApplyingCoupon = true, couponError = null) }
