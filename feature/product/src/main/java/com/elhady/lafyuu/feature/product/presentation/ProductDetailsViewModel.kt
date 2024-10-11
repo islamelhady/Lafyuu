@@ -7,6 +7,7 @@ import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
+import com.elhady.lafyuu.feature.cart.domain.usecase.RemoveCartItemUseCase
 import com.elhady.lafyuu.feature.product.domain.usecase.AddToCartUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class ProductDetailsViewModel @Inject constructor(
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
     private val addToCartUseCase: AddToCartUseCase,
+    private val removeCartItemUseCase: RemoveCartItemUseCase,
     private val favoritesRepository: FavoritesRepository,
     private val cartRepository: CartRepository,
     savedStateHandle: SavedStateHandle
@@ -84,8 +86,14 @@ class ProductDetailsViewModel @Inject constructor(
 
             launch {
                 cartRepository.observeCart().collectLatest { cart ->
-                    val inCart = cart?.items?.any { it.productId == productId } == true
-                    _uiState.update { it.copy(isInCart = inCart) }
+                    val cartItem = cart?.items?.find { it.productId == productId }
+                    val inCart = cartItem != null
+                    _uiState.update {
+                        it.copy(
+                            isInCart = inCart,
+                            cartItemId = cartItem?.itemId
+                        )
+                    }
                 }
             }
 
@@ -151,20 +159,39 @@ class ProductDetailsViewModel @Inject constructor(
 
     private fun addToCart() {
         val product = _uiState.value.product ?: return
-        val qty = _uiState.value.quantity
+        val isInCart = _uiState.value.isInCart
+        val cartItemId = _uiState.value.cartItemId
+
         viewModelScope.launch {
             _uiState.update { it.copy(isAddingToCart = true) }
-            when (val result = addToCartUseCase(product.id, qty)) {
-                is AppResult.Success -> {
-                    _uiState.update { it.copy(isAddingToCart = false, isInCart = true) }
-                    sendEffect(ProductDetailsUiEffect.ShowSnackbar("Added to cart successfully!"))
+            if (isInCart && cartItemId != null) {
+                when (val result = removeCartItemUseCase(cartItemId)) {
+                    is AppResult.Success -> {
+                        _uiState.update { it.copy(isAddingToCart = false, isInCart = false) }
+                        sendEffect(ProductDetailsUiEffect.ShowSnackbar("Removed from cart"))
+                    }
+                    is AppResult.Error -> {
+                        _uiState.update { it.copy(isAddingToCart = false) }
+                        sendEffect(ProductDetailsUiEffect.ShowSnackbar(result.message ?: "Failed to remove item"))
+                    }
+                    is AppResult.Loading -> {
+                        _uiState.update { it.copy(isAddingToCart = true) }
+                    }
                 }
-                is AppResult.Error -> {
-                    _uiState.update { it.copy(isAddingToCart = false) }
-                    sendEffect(ProductDetailsUiEffect.ShowSnackbar(result.message ?: "Failed to add to cart"))
-                }
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isAddingToCart = true) }
+            } else {
+                val qty = _uiState.value.quantity
+                when (val result = addToCartUseCase(product.id, qty)) {
+                    is AppResult.Success -> {
+                        _uiState.update { it.copy(isAddingToCart = false, isInCart = true) }
+                        sendEffect(ProductDetailsUiEffect.ShowSnackbar("Added to cart successfully!"))
+                    }
+                    is AppResult.Error -> {
+                        _uiState.update { it.copy(isAddingToCart = false) }
+                        sendEffect(ProductDetailsUiEffect.ShowSnackbar(result.message ?: "Failed to add to cart"))
+                    }
+                    is AppResult.Loading -> {
+                        _uiState.update { it.copy(isAddingToCart = true) }
+                    }
                 }
             }
         }
