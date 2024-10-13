@@ -21,7 +21,6 @@ sealed interface AccountUiEffect {
     data object NavigateToProfile : AccountUiEffect
     data object NavigateToOrders : AccountUiEffect
     data object NavigateToAddress : AccountUiEffect
-    data object NavigateToPayment : AccountUiEffect
     data class NavigateToTab(val tabRoute: String) : AccountUiEffect
     data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : AccountUiEffect
 }

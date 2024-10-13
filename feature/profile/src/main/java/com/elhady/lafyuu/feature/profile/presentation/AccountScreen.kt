@@ -30,7 +30,6 @@ fun AccountRoute(
     onNavigateToProfile: () -> Unit,
     onNavigateToOrders: () -> Unit,
     onNavigateToAddress: () -> Unit,
-    onNavigateToPayment: () -> Unit,
     onNavigateToTab: (String) -> Unit,
     selectedTab: String = "account",
     viewModel: AccountViewModel = hiltViewModel()
@@ -44,7 +43,6 @@ fun AccountRoute(
                 AccountUiEffect.NavigateToProfile -> onNavigateToProfile()
                 AccountUiEffect.NavigateToOrders -> onNavigateToOrders()
                 AccountUiEffect.NavigateToAddress -> onNavigateToAddress()
-                AccountUiEffect.NavigateToPayment -> onNavigateToPayment()
                 is AccountUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
                 is AccountUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(

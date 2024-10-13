@@ -358,7 +358,6 @@ fun MainApp(
             onNavigateToAddress = {
                 navController.navigateToAddress()
             },
-            onNavigateToPayment = {},
             onNavigateToTab = onNavigateToTab,
             selectedTab = selectedTab
         )
