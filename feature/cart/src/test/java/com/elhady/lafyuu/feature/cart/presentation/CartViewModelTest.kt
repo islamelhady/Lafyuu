@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.cart.presentation
 
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
 import com.elhady.lafyuu.feature.cart.domain.model.CartItem
@@ -10,10 +11,12 @@ import com.elhady.lafyuu.feature.cart.domain.usecase.GetCartUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.IncreaseCartItemQuantityUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.RemoveCartItemUseCase
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -34,6 +37,9 @@ class CartViewModelTest {
     private val decreaseCartItemUseCase: DecreaseCartItemUseCase = mockk()
     private val removeCartItemUseCase: RemoveCartItemUseCase = mockk()
     private val applyCouponUseCase: ApplyCouponUseCase = mockk()
+    private val favoritesRepository: FavoritesRepository = mockk(relaxed = true) {
+        every { observeFavoriteIds() } returns flowOf(emptyList())
+    }
 
     @Before
     fun setUp() {
@@ -58,7 +64,8 @@ class CartViewModelTest {
             increaseCartItemQuantityUseCase,
             decreaseCartItemUseCase,
             removeCartItemUseCase,
-            applyCouponUseCase
+            applyCouponUseCase,
+            favoritesRepository
         )
 
         testDispatcher.scheduler.advanceUntilIdle()
@@ -78,7 +85,8 @@ class CartViewModelTest {
             increaseCartItemQuantityUseCase,
             decreaseCartItemUseCase,
             removeCartItemUseCase,
-            applyCouponUseCase
+            applyCouponUseCase,
+            favoritesRepository
         )
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -99,7 +107,8 @@ class CartViewModelTest {
             increaseCartItemQuantityUseCase,
             decreaseCartItemUseCase,
             removeCartItemUseCase,
-            applyCouponUseCase
+            applyCouponUseCase,
+            favoritesRepository
         )
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -120,7 +129,8 @@ class CartViewModelTest {
             increaseCartItemQuantityUseCase,
             decreaseCartItemUseCase,
             removeCartItemUseCase,
-            applyCouponUseCase
+            applyCouponUseCase,
+            favoritesRepository
         )
         testDispatcher.scheduler.advanceUntilIdle()
 

@@ -12,6 +12,7 @@ data class CartUiState(
     val isApplyingCoupon: Boolean = false,
     val couponError: String? = null,
     val updatingItemIds: Set<String> = emptySet(),
+    val favoriteProductIds: Set<String> = emptySet(),
     val error: String? = null,
     val originalTotal: Double? = null,
     val discountAmount: Double? = null,
@@ -32,6 +33,7 @@ sealed interface CartUiEvent {
     data object CheckoutClicked : CartUiEvent
     data object RetryClicked : CartUiEvent
     data class ProductClicked(val productId: String) : CartUiEvent
+    data class FavoriteClicked(val productId: String) : CartUiEvent
     data class BottomTabSelected(val tab: TabBarItem) : CartUiEvent
 }
 

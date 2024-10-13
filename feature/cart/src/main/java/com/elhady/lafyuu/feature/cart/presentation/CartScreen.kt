@@ -148,8 +148,8 @@ fun CartScreen(
                                 imageUrl = item.productCoverUrl,
                                 name = item.productName,
                                 price = String.format("%.2f", item.finalPricePerUnit),
-                                isFavorite = false,
-                                onFavoriteClick = {},
+                                isFavorite = uiState.favoriteProductIds.contains(item.productId),
+                                onFavoriteClick = { onEvent(CartUiEvent.FavoriteClicked(item.productId)) },
                                 onDeleteClick = { onEvent(CartUiEvent.RemoveItem(item.itemId)) },
                                 onClick = { onEvent(CartUiEvent.ProductClicked(item.productId)) },
                                 quantityButton = {
