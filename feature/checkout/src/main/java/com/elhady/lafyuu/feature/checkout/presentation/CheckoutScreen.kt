@@ -33,7 +33,6 @@ import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisual
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.icons.Plus
 import com.elhady.lafyuu.core.designsystem.theme.Theme
-import com.elhady.lafyuu.feature.address.presentation.AddressUiEvent
 
 @Composable
 fun CheckoutRoute(
@@ -151,8 +150,8 @@ fun CheckoutScreen(
                             name = "${address.state}, ${address.city}",
                             address = address.fullAddress,
                             phone = "+2 ${address.phoneNumber}",
-                            isSelected = address.id == uiState.selectedAddress?.id,
-                            onSelected = { onEvent(CheckoutUiEvent.SelectAddress(address = address)) },
+                            isSelected = address.id == uiState.selectedAddressId,
+                            onSelected = { onEvent(CheckoutUiEvent.SelectAddress(addressId = address.id)) },
                             onEditClick = { onEvent(CheckoutUiEvent.OpenEditAddress(addressId = address.id)) },
                             onDeleteClick = { onEvent(CheckoutUiEvent.DeleteAddress(addressId = address.id)) }
                         )

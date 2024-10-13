@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
-import com.elhady.lafyuu.feature.address.domain.model.Address
 import com.elhady.lafyuu.feature.address.domain.usecase.DeleteAddressUseCase
 import com.elhady.lafyuu.feature.address.domain.usecase.GetAddressesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,17 +36,21 @@ class CheckoutViewModel @Inject constructor(
         when (event) {
             CheckoutUiEvent.LoadAddresses -> loadAddresses()
             is CheckoutUiEvent.SelectAddress -> {
-                _uiState.update { it.copy(selectedAddress = event.address) }
+                _uiState.update { it.copy(selectedAddressId = event.addressId) }
             }
+
             is CheckoutUiEvent.SelectPaymentMethod -> {
                 _uiState.update { it.copy(selectedPaymentMethod = event.method) }
             }
+
             CheckoutUiEvent.OpenAddAddress -> {
                 sendEffect(CheckoutUiEffect.NavigateToAddAddress)
             }
+
             is CheckoutUiEvent.OpenEditAddress -> {
                 sendEffect(CheckoutUiEffect.NavigateToEditAddress(event.addressId))
             }
+
             is CheckoutUiEvent.DeleteAddress -> deleteAddress(event.addressId)
             CheckoutUiEvent.NextClicked -> proceedToPayment()
             CheckoutUiEvent.RetryClicked -> loadAddresses()
@@ -61,17 +64,16 @@ class CheckoutViewModel @Inject constructor(
             when (val result = getAddressesUseCase()) {
                 is AppResult.Success -> {
                     val list = result.data
-                    val currentSelectedId = _uiState.value.selectedAddress?.id
-                    val newlySelected = list.find { it.id == currentSelectedId } ?: list.firstOrNull()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             addresses = list,
-                            selectedAddress = newlySelected,
+                            selectedAddressId = it.selectedAddressId ?: list.firstOrNull()?.id,
                             error = null
                         )
                     }
                 }
+
                 is AppResult.Error -> {
                     _uiState.update {
                         it.copy(
@@ -80,6 +82,7 @@ class CheckoutViewModel @Inject constructor(
                         )
                     }
                 }
+
                 is AppResult.Loading -> {
                     _uiState.update { it.copy(isLoading = true) }
                 }
@@ -89,31 +92,34 @@ class CheckoutViewModel @Inject constructor(
 
     private fun deleteAddress(addressId: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             when (val result = deleteAddressUseCase(addressId)) {
                 is AppResult.Success -> {
-                    _uiState.update { state ->
-                        val updatedList = state.addresses.filter { it.id != addressId }
-                        state.copy(
-                            isLoading = false,
-                            addresses = updatedList,
-                            selectedAddress = if (state.selectedAddress?.id == addressId) updatedList.lastOrNull() else state.selectedAddress
-                        )
-                    }
                     sendEffect(CheckoutUiEffect.ShowSnackbar("Address deleted", AlertType.Success))
+                    loadAddresses()
                 }
+
                 is AppResult.Error -> {
-                    _uiState.update { it.copy(isLoading = false) }
-                    sendEffect(CheckoutUiEffect.ShowSnackbar(result.message ?: "Failed to delete address", AlertType.Error))
+                    val errorMessage = result.message ?: "Failed to delete address"
+                    sendEffect(
+                        CheckoutUiEffect.ShowSnackbar(
+                            message = errorMessage, type = AlertType.Error
+                        )
+                    )
                 }
+
                 is AppResult.Loading -> {}
             }
         }
     }
 
     private fun proceedToPayment() {
-        val addressId = _uiState.value.selectedAddress?.id ?: run {
-            sendEffect(CheckoutUiEffect.ShowSnackbar("Please select a shipping address", AlertType.Error))
+        val addressId = _uiState.value.selectedAddressId ?: run {
+            sendEffect(
+                CheckoutUiEffect.ShowSnackbar(
+                    "Please select a shipping address",
+                    AlertType.Error
+                )
+            )
             return
         }
         val paymentMethod = _uiState.value.selectedPaymentMethod
