@@ -62,7 +62,7 @@ class CheckoutViewModel @Inject constructor(
                 is AppResult.Success -> {
                     val list = result.data
                     val currentSelectedId = _uiState.value.selectedAddress?.id
-                    val newlySelected = list.find { it.id == currentSelectedId } ?: list.lastOrNull()
+                    val newlySelected = list.find { it.id == currentSelectedId } ?: list.firstOrNull()
                     _uiState.update {
                         it.copy(
                             isLoading = false,

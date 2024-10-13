@@ -113,7 +113,7 @@ fun AddressScreen(
 
                 uiState.addresses.isEmpty() -> {
                     InfoStateContent(
-                        errorMessage = "No saved addresses yet",
+                        errorMessage = "No addresses found. Please add one",
                         onRetryClick = { onEvent(AddressUiEvent.LoadAddresses) },
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -132,7 +132,7 @@ fun AddressScreen(
                             AddressCard(
                                 name = "${address.city}, ${address.state}",
                                 address = address.fullAddress,
-                                phone = address.phoneNumber,
+                                phone = "+2 ${address.phoneNumber}",
                                 isSelected = address.id == uiState.selectedAddressId,
                                 onSelected = { onEvent(AddressUiEvent.AddressSelected(address.id)) },
                                 onEditClick = { onEvent(AddressUiEvent.EditAddressClicked(address.id)) },

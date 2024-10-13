@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -26,11 +27,13 @@ import com.elhady.lafyuu.core.designsystem.components.appbar.ProductTopBar
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.card.AddressCard
+import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.icons.Plus
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.feature.address.presentation.AddressUiEvent
 
 @Composable
 fun CheckoutRoute(
@@ -125,6 +128,14 @@ fun CheckoutScreen(
                 )
             }
 
+            uiState.addresses.isEmpty() -> {
+                InfoStateContent(
+                    errorMessage = "No addresses found. Please add one",
+                    onRetryClick = { onEvent(CheckoutUiEvent.LoadAddresses) },
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
             else -> {
                 LazyColumn(
                     modifier = Modifier
@@ -132,45 +143,19 @@ fun CheckoutScreen(
                         .padding(Theme.space.large),
                     verticalArrangement = Arrangement.spacedBy(Theme.space.large)
                 ) {
-                    item {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(Theme.space.small)
-                        ) {
-                            if (uiState.addresses.isEmpty()) {
-                                LafyuuText(
-                                    text = "No addresses found. Please add one.",
-                                    style = Theme.typography.normalTextRegular,
-                                    color = Theme.color.neutralGrey
-                                )
-                            } else {
-                                uiState.addresses.forEach { address ->
-                                    val isSelected = uiState.selectedAddress?.id == address.id
-                                    AddressCard(
-                                        name = "${address.state}, ${address.city}",
-                                        address = address.fullAddress,
-                                        phone = "+2${address.phoneNumber}",
-                                        isSelected = isSelected,
-                                        onSelected = {
-                                            onEvent(
-                                                CheckoutUiEvent.SelectAddress(
-                                                    address = address
-                                                )
-                                            )
-                                        },
-                                        onEditClick = {
-                                            onEvent(
-                                                CheckoutUiEvent.OpenEditAddress(addressId = address.id)
-                                            )
-                                        },
-                                        onDeleteClick = {
-                                            onEvent(
-                                                CheckoutUiEvent.DeleteAddress(addressId = address.id)
-                                            )
-                                        }
-                                    )
-                                }
-                            }
-                        }
+                    items(
+                        items = uiState.addresses,
+                        key = { it.id }
+                    ) { address ->
+                        AddressCard(
+                            name = "${address.state}, ${address.city}",
+                            address = address.fullAddress,
+                            phone = "+2 ${address.phoneNumber}",
+                            isSelected = address.id == uiState.selectedAddress?.id,
+                            onSelected = { onEvent(CheckoutUiEvent.SelectAddress(address = address)) },
+                            onEditClick = { onEvent(CheckoutUiEvent.OpenEditAddress(addressId = address.id)) },
+                            onDeleteClick = { onEvent(CheckoutUiEvent.DeleteAddress(addressId = address.id)) }
+                        )
                     }
                 }
             }
