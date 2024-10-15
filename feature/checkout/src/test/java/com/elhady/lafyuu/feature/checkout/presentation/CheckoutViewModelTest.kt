@@ -48,7 +48,7 @@ class CheckoutViewModelTest {
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)
         assertEquals(1, state.addresses.size)
-        assertEquals("a-1", state.selectedAddress?.id)
+        assertEquals("a-1", state.selectedAddressId)
     }
 
     @Test
