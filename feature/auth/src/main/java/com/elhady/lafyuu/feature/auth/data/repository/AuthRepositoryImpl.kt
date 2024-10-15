@@ -19,6 +19,7 @@ import com.elhady.lafyuu.feature.auth.data.remote.model.VerifyEmailRequest
 import com.elhady.lafyuu.feature.auth.domain.model.AuthToken
 import com.elhady.lafyuu.feature.auth.domain.model.User
 import com.elhady.lafyuu.feature.auth.domain.repository.AuthRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -40,6 +41,8 @@ class AuthRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -53,6 +56,8 @@ class AuthRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -66,6 +71,8 @@ class AuthRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -81,6 +88,8 @@ class AuthRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -96,6 +105,8 @@ class AuthRepositoryImpl @Inject constructor(
             } else {
                 AppResult.Success(Unit)
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             dataStore.clearSession()
             favoritesRepository.clearFavorites()
@@ -111,6 +122,8 @@ class AuthRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -120,6 +133,8 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             val response = authApi.forgotPassword(ForgotPasswordRequest(email))
             if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
     }
 
@@ -127,6 +142,8 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             val response = authApi.resetPassword(ResetPasswordRequest(email, otp, password))
             if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
     }
 
@@ -134,6 +151,8 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             val response = authApi.resendOtp(ResendOtpRequest(email))
             if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
     }
 
@@ -141,6 +160,8 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             val response = authApi.validateOtp(ValidateOtpRequest(email, otp))
             if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
     }
 
@@ -152,7 +173,10 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             val response = authApi.changePassword(ChangePasswordRequest(currentPassword, newPassword, confirmNewPassword))
             if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
-        } catch (e: Exception) {
+        }catch (e: CancellationException) {
+            throw e
+        }
+        catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
     }

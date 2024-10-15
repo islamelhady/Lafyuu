@@ -8,6 +8,7 @@ import com.elhady.lafyuu.feature.notifications.data.remote.NotificationApi
 import com.elhady.lafyuu.feature.notifications.data.remote.model.BulkMarkNotificationsAsReadRequestDto
 import com.elhady.lafyuu.feature.notifications.domain.model.Notification
 import com.elhady.lafyuu.feature.notifications.domain.repository.NotificationRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class NotificationRepositoryImpl @Inject constructor(
@@ -25,6 +26,8 @@ class NotificationRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -38,6 +41,8 @@ class NotificationRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -51,6 +56,8 @@ class NotificationRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }

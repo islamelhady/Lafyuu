@@ -8,6 +8,7 @@ import com.elhady.lafyuu.feature.checkout.data.remote.CheckoutApi
 import com.elhady.lafyuu.feature.checkout.data.remote.model.OrderCheckoutRequestDto
 import com.elhady.lafyuu.feature.checkout.domain.model.CheckoutResult
 import com.elhady.lafyuu.feature.checkout.domain.repository.CheckoutRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class CheckoutRepositoryImpl @Inject constructor(
@@ -38,6 +39,8 @@ class CheckoutRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }

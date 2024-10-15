@@ -9,6 +9,7 @@ import com.elhady.lafyuu.feature.review.data.remote.ReviewApi
 import com.elhady.lafyuu.feature.review.data.remote.model.CreateReviewRequestDto
 import com.elhady.lafyuu.feature.review.domain.model.ProductReviewsInfo
 import com.elhady.lafyuu.feature.review.domain.repository.ReviewRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class ReviewRepositoryImpl @Inject constructor(
@@ -36,6 +37,8 @@ class ReviewRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (ex: Exception) {
             Log.e("ReviewRepository", "getProductReviewsInfo failure: ${ex.message}", ex)
             mapError(apiErrorParser.parseException(ex))
@@ -57,6 +60,8 @@ class ReviewRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (ex: Exception) {
             Log.e("ReviewRepository", "createReview failure: ${ex.message}", ex)
             mapError(apiErrorParser.parseException(ex))

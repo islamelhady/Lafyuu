@@ -8,6 +8,7 @@ import com.elhady.lafyuu.feature.orders.data.remote.OrdersApi
 import com.elhady.lafyuu.feature.orders.domain.model.OrderHistory
 import com.elhady.lafyuu.feature.orders.domain.model.OrderSummary
 import com.elhady.lafyuu.feature.orders.domain.repository.OrdersRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class OrdersRepositoryImpl @Inject constructor(
@@ -28,6 +29,8 @@ class OrdersRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -62,6 +65,8 @@ class OrdersRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(historyResponse))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }

@@ -7,6 +7,7 @@ import com.elhady.lafyuu.feature.offers.data.mapper.toDomain
 import com.elhady.lafyuu.feature.offers.data.remote.OffersApi
 import com.elhady.lafyuu.feature.offers.domain.model.Offer
 import com.elhady.lafyuu.feature.offers.domain.repository.OffersRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class OffersRepositoryImpl @Inject constructor(
@@ -28,6 +29,8 @@ class OffersRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }

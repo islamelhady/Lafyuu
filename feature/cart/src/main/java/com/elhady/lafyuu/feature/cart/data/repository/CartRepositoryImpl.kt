@@ -11,6 +11,7 @@ import com.elhady.lafyuu.feature.cart.data.remote.model.DeleteItemFromCartReques
 import com.elhady.lafyuu.feature.cart.data.remote.model.UpdateItemRequestDto
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
 import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,6 +46,8 @@ class CartRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -59,6 +62,8 @@ class CartRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -73,6 +78,8 @@ class CartRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -80,15 +87,15 @@ class CartRepositoryImpl @Inject constructor(
 
     override suspend fun removeItem(itemId: String): AppResult<Unit> = mutex.withLock {
         return try {
-            val response = cartApi.deleteCartItem(itemId,
-//                DeleteItemFromCartRequestDto(itemId)
-            )
+            val response = cartApi.deleteCartItem(itemId)
             if (response.isSuccessful) {
                 refreshCartUnlocked()
                 AppResult.Success(Unit)
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -116,6 +123,8 @@ class CartRepositoryImpl @Inject constructor(
                     mapError(networkError)
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -129,6 +138,8 @@ class CartRepositoryImpl @Inject constructor(
                     _cartFlow.value = body.toDomain()
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) {}
     }
 

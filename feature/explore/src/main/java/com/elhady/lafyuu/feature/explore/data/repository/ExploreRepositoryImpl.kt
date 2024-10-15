@@ -7,6 +7,7 @@ import com.elhady.lafyuu.feature.explore.data.mapper.toDomain
 import com.elhady.lafyuu.feature.explore.data.remote.ExploreApi
 import com.elhady.lafyuu.feature.explore.domain.model.Category
 import com.elhady.lafyuu.feature.explore.domain.repository.ExploreRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class ExploreRepositoryImpl @Inject constructor(
@@ -27,6 +28,8 @@ class ExploreRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }

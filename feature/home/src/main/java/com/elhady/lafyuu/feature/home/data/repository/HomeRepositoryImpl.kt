@@ -9,6 +9,7 @@ import com.elhady.lafyuu.feature.home.domain.model.Category
 import com.elhady.lafyuu.feature.home.domain.model.Offer
 import com.elhady.lafyuu.feature.home.domain.model.Product
 import com.elhady.lafyuu.feature.home.domain.repository.HomeRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class HomeRepositoryImpl @Inject constructor(
@@ -26,6 +27,8 @@ class HomeRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("HomeRepository", "getCategories parsing/network failure: ${e.message}", e)
             mapError(apiErrorParser.parseException(e))
@@ -42,6 +45,8 @@ class HomeRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("HomeRepository", "getOffers parsing/network failure: ${e.message}", e)
             mapError(apiErrorParser.parseException(e))
@@ -72,6 +77,8 @@ class HomeRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("HomeRepository", "getProducts parsing/network failure: ${e.message}", e)
             mapError(apiErrorParser.parseException(e))

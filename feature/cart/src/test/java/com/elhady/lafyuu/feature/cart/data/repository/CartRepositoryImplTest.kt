@@ -7,6 +7,7 @@ import com.elhady.lafyuu.feature.cart.data.remote.model.ApplyCouponResponseDto
 import com.elhady.lafyuu.feature.cart.data.remote.model.GetCartResponseDto
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -35,6 +36,21 @@ class CartRepositoryImplTest {
 
         assertTrue(result is AppResult.Success)
         assertEquals("c-1", (result as AppResult.Success).data.cartId)
+    }
+
+    @Test(expected = CancellationException::class)
+    fun `getCart rethrows CancellationException`() = runTest {
+        coEvery { cartApi.getCart() } throws CancellationException("Coroutine cancelled")
+
+        repository.getCart()
+    }
+
+    @Test(expected = CancellationException::class)
+    fun `updateItemQuantity rethrows CancellationException from refreshCartUnlocked`() = runTest {
+        coEvery { cartApi.updateCartItem(any(), any()) } returns Response.success(mockk(relaxed = true))
+        coEvery { cartApi.getCart() } throws CancellationException("Coroutine cancelled")
+
+        repository.updateItemQuantity("i-1", 2)
     }
 
     @Test

@@ -12,6 +12,7 @@ import com.elhady.lafyuu.feature.product.data.mapper.toProductDetailsDomain
 import com.elhady.lafyuu.feature.product.data.mapper.toProductSummaryDomain
 import com.elhady.lafyuu.feature.product.data.remote.ProductApi
 import com.elhady.lafyuu.feature.product.data.remote.model.AddItemToCartRequestDto
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class ProductRepositoryImpl @Inject constructor(
@@ -32,6 +33,8 @@ class ProductRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("ProductRepository", "getProductDetails failure: ${e.message}", e)
             mapError(apiErrorParser.parseException(e))
@@ -56,6 +59,8 @@ class ProductRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("ProductRepository", "getProductReviews failure: ${e.message}", e)
             mapError(apiErrorParser.parseException(e))
@@ -72,6 +77,8 @@ class ProductRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("ProductRepository", "getRecommendedProducts failure: ${e.message}", e)
             mapError(apiErrorParser.parseException(e))
@@ -91,6 +98,8 @@ class ProductRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("ProductRepository", "addToCart failure: ${e.message}", e)
             mapError(apiErrorParser.parseException(e))

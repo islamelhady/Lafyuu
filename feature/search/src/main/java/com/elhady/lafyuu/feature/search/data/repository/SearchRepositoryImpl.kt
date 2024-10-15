@@ -8,6 +8,7 @@ import com.elhady.lafyuu.feature.search.data.remote.SearchApi
 import com.elhady.lafyuu.feature.search.domain.model.Category
 import com.elhady.lafyuu.feature.search.domain.model.Product
 import com.elhady.lafyuu.feature.search.domain.repository.SearchRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class SearchRepositoryImpl @Inject constructor(
@@ -48,6 +49,8 @@ class SearchRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -66,6 +69,8 @@ class SearchRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }

@@ -7,6 +7,7 @@ import com.elhady.lafyuu.feature.auth.data.remote.model.ChangePasswordRequest
 import com.elhady.lafyuu.feature.profile.data.remote.ProfileApi
 import com.elhady.lafyuu.feature.profile.domain.model.UserProfile
 import com.elhady.lafyuu.feature.profile.domain.repository.ProfileRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
@@ -34,6 +35,8 @@ class ProfileRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
@@ -57,6 +60,8 @@ class ProfileRepositoryImpl @Inject constructor(
             } else {
                 mapError(apiErrorParser.parseError(response))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             mapError(apiErrorParser.parseException(e))
         }
