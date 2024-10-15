@@ -5,7 +5,7 @@ import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.datastore.LafyuuDataStore
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
 import com.elhady.lafyuu.core.network.error.NetworkError
-import com.elhady.lafyuu.core.network.error.toErrorMessage
+import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.auth.data.mapper.toDomain
 import com.elhady.lafyuu.feature.auth.data.remote.AuthApi
 import com.elhady.lafyuu.feature.auth.data.remote.model.ChangePasswordRequest
@@ -187,15 +187,6 @@ class AuthRepositoryImpl @Inject constructor(
     override fun isAuthenticated(): Flow<Boolean> = dataStore.accessToken.map { !it.isNullOrBlank() }
 
     private fun mapError(networkError: NetworkError): AppResult.Error {
-        return when (networkError) {
-            is NetworkError.ApiError -> AppResult.Error(
-                message = networkError.toErrorMessage(),
-                status = networkError.details.status,
-                validationErrors = networkError.details.errors
-            )
-            is NetworkError.Connectivity -> AppResult.Error(message = networkError.toErrorMessage())
-            is NetworkError.Serialization -> AppResult.Error(message = networkError.toErrorMessage())
-            is NetworkError.Unknown -> AppResult.Error(message = networkError.toErrorMessage(), throwable = networkError.throwable)
-        }
+        return networkError.toAppResultError()
     }
 }

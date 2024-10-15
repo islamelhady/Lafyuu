@@ -49,7 +49,7 @@ class ApiErrorParser(private val json: Json) {
         if (throwable is CancellationException) throw throwable
         return when (throwable) {
             is IOException -> NetworkError.Connectivity
-            is SerializationException -> NetworkError.Serialization
+            is SerializationException -> NetworkError.Serialization(throwable)
             else -> NetworkError.Unknown(throwable)
         }
     }

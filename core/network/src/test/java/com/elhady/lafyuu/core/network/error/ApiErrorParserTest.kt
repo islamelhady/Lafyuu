@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.Response
 import java.io.IOException
@@ -65,7 +66,9 @@ class ApiErrorParserTest {
 
     @Test
     fun `parseException handles SerializationException as Serialization`() {
-        val error = parser.parseException(SerializationException("Parse error"))
-        assertEquals(NetworkError.Serialization, error)
+        val ex = SerializationException("Parse error")
+        val error = parser.parseException(ex)
+        assertTrue(error is NetworkError.Serialization)
+        assertEquals(ex, (error as NetworkError.Serialization).throwable)
     }
 }

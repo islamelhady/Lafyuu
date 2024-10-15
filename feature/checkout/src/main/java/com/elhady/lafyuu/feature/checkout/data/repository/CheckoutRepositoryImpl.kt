@@ -3,7 +3,7 @@ package com.elhady.lafyuu.feature.checkout.data.repository
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
 import com.elhady.lafyuu.core.network.error.NetworkError
-import com.elhady.lafyuu.core.network.error.toErrorMessage
+import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.checkout.data.mapper.toDomain
 import com.elhady.lafyuu.feature.checkout.data.remote.CheckoutApi
 import com.elhady.lafyuu.feature.checkout.data.remote.model.OrderCheckoutRequestDto
@@ -48,15 +48,6 @@ class CheckoutRepositoryImpl @Inject constructor(
     }
 
     private fun mapError(networkError: NetworkError): AppResult.Error {
-        return when (networkError) {
-            is NetworkError.ApiError -> AppResult.Error(
-                message = networkError.toErrorMessage(),
-                status = networkError.details.status,
-                validationErrors = networkError.details.errors
-            )
-            is NetworkError.Connectivity -> AppResult.Error(message = networkError.toErrorMessage())
-            is NetworkError.Serialization -> AppResult.Error(message = networkError.toErrorMessage())
-            is NetworkError.Unknown -> AppResult.Error(message = networkError.toErrorMessage(), throwable = networkError.throwable)
-        }
+        return networkError.toAppResultError()
     }
 }

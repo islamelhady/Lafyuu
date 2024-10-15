@@ -1,25 +1,34 @@
 package com.elhady.lafyuu.core.network.error
 
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.model.ProblemDetails
 
 sealed class NetworkError {
     data class ApiError(val details: ProblemDetails) : NetworkError()
     data object Connectivity : NetworkError()
-    data object Serialization : NetworkError()
+    data class Serialization(val throwable: Throwable? = null) : NetworkError()
     data class Unknown(val throwable: Throwable) : NetworkError()
 }
 
-fun NetworkError.toErrorMessage(): String {
+fun NetworkError.toAppResultError(): AppResult.Error {
     return when (this) {
-        is NetworkError.ApiError -> {
-            details.detail
-                ?: details.title
-                ?: details.errors?.values?.flatten()?.firstOrNull()
-                ?: "Request failed"
-        }
-        is NetworkError.Connectivity -> "No internet connection"
-        is NetworkError.Serialization -> "Server error (Parsing)"
-        is NetworkError.Unknown -> throwable.localizedMessage ?: "An unexpected error occurred"
+        is NetworkError.ApiError -> AppResult.Error(
+            message = details.detail ?: details.title ?: details.errors?.values?.flatten()?.firstOrNull(),
+            status = details.status,
+            validationErrors = details.errors
+        )
+        is NetworkError.Connectivity -> AppResult.Error(
+            message = null,
+            throwable = null
+        )
+        is NetworkError.Serialization -> AppResult.Error(
+            message = throwable?.localizedMessage,
+            throwable = throwable
+        )
+        is NetworkError.Unknown -> AppResult.Error(
+            message = throwable.localizedMessage,
+            throwable = throwable
+        )
     }
 }
 
