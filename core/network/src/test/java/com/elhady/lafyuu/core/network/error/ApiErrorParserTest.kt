@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.Response
@@ -17,34 +18,59 @@ class ApiErrorParserTest {
     private val parser = ApiErrorParser(json)
 
     @Test
-    fun `parseError handles 404 with empty error body`() {
-        val response = Response.error<Any>(404, "".toResponseBody(null))
-        val error = parser.parseError(response)
-
-        val apiError = error as NetworkError.ApiError
-        assertEquals(404, apiError.details.status)
-        assertEquals("Resource not found.", apiError.details.title)
-    }
-
-    @Test
-    fun `parseError handles 500 with empty error body`() {
-        val response = Response.error<Any>(500, "".toResponseBody(null))
-        val error = parser.parseError(response)
-
-        val apiError = error as NetworkError.ApiError
-        assertEquals(500, apiError.details.status)
-        assertEquals("Internal server error (500)", apiError.details.title)
-    }
-
-    @Test
-    fun `parseError handles json error body`() {
-        val errorJson = "{\"title\":\"Bad Request\",\"status\":400}"
+    fun `parseError handles valid ProblemDetails response and preserves status`() {
+        val errorJson = "{\"title\":\"Bad Request\",\"status\":400,\"detail\":\"Invalid parameter\"}"
         val response = Response.error<Any>(400, errorJson.toResponseBody("application/json".toMediaType()))
         val error = parser.parseError(response)
 
         val apiError = error as NetworkError.ApiError
         assertEquals(400, apiError.details.status)
         assertEquals("Bad Request", apiError.details.title)
+        assertEquals("Invalid parameter", apiError.details.detail)
+    }
+
+    @Test
+    fun `parseError handles validation errors response and preserves errors map`() {
+        val errorJson = "{\"title\":\"Validation Error\",\"status\":422,\"errors\":{\"email\":[\"Invalid email format\"]}}"
+        val response = Response.error<Any>(422, errorJson.toResponseBody("application/json".toMediaType()))
+        val error = parser.parseError(response)
+
+        val apiError = error as NetworkError.ApiError
+        assertEquals(422, apiError.details.status)
+        assertEquals(1, apiError.details.errors?.size)
+        assertTrue(apiError.details.errors?.containsKey("email") == true)
+    }
+
+    @Test
+    fun `parseError handles empty error body and preserves status`() {
+        val response = Response.error<Any>(404, "".toResponseBody(null))
+        val error = parser.parseError(response)
+
+        val apiError = error as NetworkError.ApiError
+        assertEquals(404, apiError.details.status)
+        assertNull(apiError.details.title)
+    }
+
+    @Test
+    fun `parseError handles malformed json error body without crashing and preserves status`() {
+        val malformedJson = "{malformed-json"
+        val response = Response.error<Any>(500, malformedJson.toResponseBody("application/json".toMediaType()))
+        val error = parser.parseError(response)
+
+        val apiError = error as NetworkError.ApiError
+        assertEquals(500, apiError.details.status)
+        assertNull(apiError.details.title)
+    }
+
+    @Test
+    fun `parseError handles non-json error body without crashing and preserves status`() {
+        val htmlBody = "<html><body>502 Bad Gateway</body></html>"
+        val response = Response.error<Any>(502, htmlBody.toResponseBody("text/html".toMediaType()))
+        val error = parser.parseError(response)
+
+        val apiError = error as NetworkError.ApiError
+        assertEquals(502, apiError.details.status)
+        assertNull(apiError.details.title)
     }
 
     @Test(expected = CancellationException::class)

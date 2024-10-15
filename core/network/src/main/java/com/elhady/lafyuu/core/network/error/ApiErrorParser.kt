@@ -25,22 +25,13 @@ class ApiErrorParser(private val json: Json) {
             } catch (e: CancellationException) {
                 throw e
             } catch (e: SerializationException) {
-                NetworkError.ApiError(ProblemDetails(title = errorString, status = response.code()))
+                NetworkError.ApiError(ProblemDetails(status = response.code()))
             } catch (e: IllegalArgumentException) {
-                NetworkError.ApiError(ProblemDetails(title = errorString, status = response.code()))
+                NetworkError.ApiError(ProblemDetails(status = response.code()))
             }
         } else {
             NetworkError.ApiError(
-                ProblemDetails(
-                    title = when (response.code()) {
-                        401 -> "Unauthorized. Invalid or unregistered account credentials."
-                        403 -> "Access forbidden."
-                        404 -> "Resource not found."
-                        in 500..599 -> "Internal server error (${response.code()})"
-                        else -> "HTTP ${response.code()} error"
-                    },
-                    status = response.code()
-                )
+                ProblemDetails(status = response.code())
             )
         }
     }
