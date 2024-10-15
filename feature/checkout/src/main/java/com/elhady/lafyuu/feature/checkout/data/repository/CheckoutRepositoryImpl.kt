@@ -2,7 +2,6 @@ package com.elhady.lafyuu.feature.checkout.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.NetworkError
 import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.checkout.data.mapper.toDomain
 import com.elhady.lafyuu.feature.checkout.data.remote.CheckoutApi
@@ -38,16 +37,12 @@ class CheckoutRepositoryImpl @Inject constructor(
                     AppResult.Error(message = "Checkout response is empty")
                 }
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
-    }
-
-    private fun mapError(networkError: NetworkError): AppResult.Error {
-        return networkError.toAppResultError()
     }
 }

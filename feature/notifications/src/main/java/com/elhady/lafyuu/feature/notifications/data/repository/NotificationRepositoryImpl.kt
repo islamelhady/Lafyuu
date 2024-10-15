@@ -2,7 +2,6 @@ package com.elhady.lafyuu.feature.notifications.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.NetworkError
 import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.notifications.data.mapper.toDomain
 import com.elhady.lafyuu.feature.notifications.data.remote.NotificationApi
@@ -25,12 +24,12 @@ class NotificationRepositoryImpl @Inject constructor(
                 val items = body?.notifications?.items.orEmpty()
                 AppResult.Success(items.map { it.toDomain() })
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -40,12 +39,12 @@ class NotificationRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -55,16 +54,12 @@ class NotificationRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
-    }
-
-    private fun mapError(networkError: NetworkError): AppResult.Error {
-        return networkError.toAppResultError()
     }
 }

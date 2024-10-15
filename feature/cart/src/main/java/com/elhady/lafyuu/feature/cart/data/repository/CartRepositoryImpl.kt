@@ -2,7 +2,6 @@ package com.elhady.lafyuu.feature.cart.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.NetworkError
 import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.cart.data.mapper.*
 import com.elhady.lafyuu.feature.cart.data.remote.CartApi
@@ -45,12 +44,12 @@ class CartRepositoryImpl @Inject constructor(
                     AppResult.Error(message = "Empty response body")
                 }
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -61,12 +60,12 @@ class CartRepositoryImpl @Inject constructor(
                 refreshCartUnlocked()
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -77,12 +76,12 @@ class CartRepositoryImpl @Inject constructor(
                 refreshCartUnlocked()
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -93,12 +92,12 @@ class CartRepositoryImpl @Inject constructor(
                 refreshCartUnlocked()
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -121,13 +120,13 @@ class CartRepositoryImpl @Inject constructor(
                 if (response.code() == 400) {
                     AppResult.Error(message = "* Your Coupon Is Not Correct ")
                 } else {
-                    mapError(networkError)
+                    networkError.toAppResultError()
                 }
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -142,9 +141,5 @@ class CartRepositoryImpl @Inject constructor(
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {}
-    }
-
-    private fun mapError(networkError: NetworkError): AppResult.Error {
-        return networkError.toAppResultError()
     }
 }

@@ -2,7 +2,6 @@ package com.elhady.lafyuu.feature.address.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.NetworkError
 import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.address.data.mapper.toDomain
 import com.elhady.lafyuu.feature.address.data.remote.AddressApi
@@ -25,11 +24,11 @@ class AddressRepositoryImpl @Inject constructor(
                 val list = response.body().orEmpty().map { it.toDomain() }
                 AppResult.Success(list)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -44,11 +43,11 @@ class AddressRepositoryImpl @Inject constructor(
                     AppResult.Error(message = "Address not found")
                 }
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -79,11 +78,11 @@ class AddressRepositoryImpl @Inject constructor(
                     AppResult.Error(message = "Failed to create address")
                 }
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -117,11 +116,11 @@ class AddressRepositoryImpl @Inject constructor(
                     AppResult.Error(message = "Failed to update address")
                 }
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -131,15 +130,11 @@ class AddressRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
-    }
-
-    private fun mapError(networkError: NetworkError): AppResult.Error {
-        return networkError.toAppResultError()
     }
 }

@@ -4,7 +4,6 @@ import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.datastore.LafyuuDataStore
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.NetworkError
 import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.auth.data.mapper.toDomain
 import com.elhady.lafyuu.feature.auth.data.remote.AuthApi
@@ -40,12 +39,12 @@ class AuthRepositoryImpl @Inject constructor(
                 dataStore.saveTokens(body.accessToken, body.refreshToken)
                 AppResult.Success(body.toDomain())
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -55,12 +54,12 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -70,12 +69,12 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -87,12 +86,12 @@ class AuthRepositoryImpl @Inject constructor(
                 dataStore.saveTokens(body.accessToken, body.refreshToken)
                 AppResult.Success(body.toDomain())
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -121,49 +120,49 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(response.body()!!.toDomain())
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
     override suspend fun forgotPassword(email: String): AppResult<Unit> {
         return try {
             val response = authApi.forgotPassword(ForgotPasswordRequest(email))
-            if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
+            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
+        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
     }
 
     override suspend fun resetPassword(email: String, otp: String, password: String): AppResult<Unit> {
         return try {
             val response = authApi.resetPassword(ResetPasswordRequest(email, otp, password))
-            if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
+            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
+        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
     }
 
     override suspend fun resendOtp(email: String): AppResult<Unit> {
         return try {
             val response = authApi.resendOtp(ResendOtpRequest(email))
-            if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
+            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
+        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
     }
 
     override suspend fun validateOtp(email: String, otp: String): AppResult<Unit> {
         return try {
             val response = authApi.validateOtp(ValidateOtpRequest(email, otp))
-            if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
+            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
+        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
     }
 
     override suspend fun changePassword(
@@ -173,20 +172,16 @@ class AuthRepositoryImpl @Inject constructor(
     ): AppResult<Unit> {
         return try {
             val response = authApi.changePassword(ChangePasswordRequest(currentPassword, newPassword, confirmNewPassword))
-            if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
+            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
         }catch (e: CancellationException) {
             throw e
         }
         catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
     override fun getAccessToken(): Flow<String?> = dataStore.accessToken
 
     override fun isAuthenticated(): Flow<Boolean> = dataStore.accessToken.map { !it.isNullOrBlank() }
-
-    private fun mapError(networkError: NetworkError): AppResult.Error {
-        return networkError.toAppResultError()
-    }
 }

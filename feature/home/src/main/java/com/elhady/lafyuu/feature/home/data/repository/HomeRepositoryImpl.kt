@@ -2,7 +2,6 @@ package com.elhady.lafyuu.feature.home.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.NetworkError
 import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.home.data.mapper.toDomain
 import com.elhady.lafyuu.feature.home.data.remote.HomeApi
@@ -26,13 +25,13 @@ class HomeRepositoryImpl @Inject constructor(
                 val list = body?.allCategories ?: emptyList()
                 AppResult.Success(list.map { it.toDomain() })
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             android.util.Log.e("HomeRepository", "getCategories parsing/network failure: ${e.message}", e)
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -44,13 +43,13 @@ class HomeRepositoryImpl @Inject constructor(
                 val list = body?.allOffers ?: emptyList()
                 AppResult.Success(list.map { it.toDomain() })
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             android.util.Log.e("HomeRepository", "getOffers parsing/network failure: ${e.message}", e)
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -76,17 +75,13 @@ class HomeRepositoryImpl @Inject constructor(
                 val list = body?.allProducts ?: emptyList()
                 AppResult.Success(list.map { it.toDomain() })
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             android.util.Log.e("HomeRepository", "getProducts parsing/network failure: ${e.message}", e)
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
-    }
-
-    private fun mapError(networkError: NetworkError): AppResult.Error {
-        return networkError.toAppResultError()
     }
 }
