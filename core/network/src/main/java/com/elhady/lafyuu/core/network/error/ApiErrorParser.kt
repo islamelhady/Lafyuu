@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.core.network.error
 
 import com.elhady.lafyuu.core.network.model.ProblemDetails
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
 import retrofit2.Response
 import java.io.IOException
@@ -10,6 +11,8 @@ class ApiErrorParser(private val json: Json) {
     fun <T> parseError(response: Response<T>): NetworkError {
         val errorString = try {
             response.errorBody()?.string()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             null
         }
@@ -18,6 +21,8 @@ class ApiErrorParser(private val json: Json) {
             try {
                 val details = json.decodeFromString<ProblemDetails>(errorString)
                 NetworkError.ApiError(details)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 NetworkError.ApiError(ProblemDetails(title = errorString, status = response.code()))
             }

@@ -1,5 +1,6 @@
 package com.elhady.lafyuu.core.network.error
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -43,6 +44,17 @@ class ApiErrorParserTest {
         val apiError = error as NetworkError.ApiError
         assertEquals(400, apiError.details.status)
         assertEquals("Bad Request", apiError.details.title)
+    }
+
+    @Test(expected = CancellationException::class)
+    fun `parseError rethrows CancellationException when reading error body`() {
+        val responseBody = object : okhttp3.ResponseBody() {
+            override fun contentType() = "application/json".toMediaType()
+            override fun contentLength() = 10L
+            override fun source() = throw CancellationException("Cancelled")
+        }
+        val response = Response.error<Any>(400, responseBody)
+        parser.parseError(response)
     }
 
     @Test
