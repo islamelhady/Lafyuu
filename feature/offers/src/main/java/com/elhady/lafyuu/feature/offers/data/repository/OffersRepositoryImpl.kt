@@ -38,9 +38,15 @@ class OffersRepositoryImpl @Inject constructor(
     }
 
     private fun mapError(networkError: NetworkError): AppResult.Error {
-        return AppResult.Error(
-            message = networkError.toErrorMessage(),
-            throwable = (networkError as? NetworkError.Unknown)?.throwable
-        )
+        return when (networkError) {
+            is NetworkError.ApiError -> AppResult.Error(
+                message = networkError.toErrorMessage(),
+                status = networkError.details.status,
+                validationErrors = networkError.details.errors
+            )
+            is NetworkError.Connectivity -> AppResult.Error(message = networkError.toErrorMessage())
+            is NetworkError.Serialization -> AppResult.Error(message = networkError.toErrorMessage())
+            is NetworkError.Unknown -> AppResult.Error(message = networkError.toErrorMessage(), throwable = networkError.throwable)
+        }
     }
 }
