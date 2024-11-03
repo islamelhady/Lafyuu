@@ -1,17 +1,14 @@
 package com.elhady.lafyuu.feature.cart.data.repository
 
-import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.toAppResultError
-import com.elhady.lafyuu.feature.cart.data.mapper.*
+import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
+import com.elhady.lafyuu.feature.cart.data.mapper.toDomain
 import com.elhady.lafyuu.feature.cart.data.remote.CartApi
 import com.elhady.lafyuu.feature.cart.data.remote.model.ApplyCouponRequestDto
 import com.elhady.lafyuu.feature.cart.data.remote.model.DecrementItemRequestDto
-import com.elhady.lafyuu.feature.cart.data.remote.model.DeleteItemFromCartRequestDto
 import com.elhady.lafyuu.feature.cart.data.remote.model.UpdateItemRequestDto
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
 import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +20,7 @@ import javax.inject.Singleton
 @Singleton
 class CartRepositoryImpl @Inject constructor(
     private val cartApi: CartApi,
-    private val apiErrorParser: ApiErrorParser
+    private val safeApiCaller: SafeApiCaller
 ) : CartRepository {
 
     private val mutex = Mutex()
@@ -32,114 +29,34 @@ class CartRepositoryImpl @Inject constructor(
     override fun observeCart(): Flow<Cart?> = _cartFlow.asStateFlow()
 
     override suspend fun getCart(): AppResult<Cart> = mutex.withLock {
-        return try {
-            val response = cartApi.getCart()
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) {
-                    val cart = body.toDomain()
-                    _cartFlow.value = cart
-                    AppResult.Success(cart)
-                } else {
-                    AppResult.Error(message = "Empty response body")
-                }
-            } else {
-                apiErrorParser.parseError(response).toAppResultError()
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
-        }
+        safeApiCaller.call { cartApi.getCart().toDomain() }
+            .also { if (it is AppResult.Success) _cartFlow.value = it.data }
     }
 
-    override suspend fun updateItemQuantity(itemId: String, quantity: Int): AppResult<Unit> = mutex.withLock {
-        return try {
-            val response = cartApi.updateCartItem(itemId, UpdateItemRequestDto(quantity))
-            if (response.isSuccessful) {
-                refreshCartUnlocked()
-                AppResult.Success(Unit)
-            } else {
-                apiErrorParser.parseError(response).toAppResultError()
+    override suspend fun updateItemQuantity(itemId: String, quantity: Int): AppResult<Unit> =
+        mutex.withLock {
+            safeApiCaller.call {
+                cartApi.updateCartItem(id = itemId, request = UpdateItemRequestDto(quantity))
             }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
         }
-    }
 
-    override suspend fun decrementItem(itemId: String, quantity: Int): AppResult<Unit> = mutex.withLock {
-        return try {
-            val response = cartApi.decrementCartItem(DecrementItemRequestDto(itemId, quantity))
-            if (response.isSuccessful) {
-                refreshCartUnlocked()
-                AppResult.Success(Unit)
-            } else {
-                apiErrorParser.parseError(response).toAppResultError()
+    override suspend fun decrementItem(itemId: String, quantity: Int): AppResult<Unit> =
+        mutex.withLock {
+            safeApiCaller.call {
+                cartApi.decrementCartItem(
+                    request = DecrementItemRequestDto(itemId, quantity)
+                )
             }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
         }
-    }
 
     override suspend fun removeItem(itemId: String): AppResult<Unit> = mutex.withLock {
-        return try {
-            val response = cartApi.deleteCartItem(itemId)
-            if (response.isSuccessful) {
-                refreshCartUnlocked()
-                AppResult.Success(Unit)
-            } else {
-                apiErrorParser.parseError(response).toAppResultError()
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
-        }
+        safeApiCaller.call { cartApi.deleteCartItem(itemId) }
     }
 
     override suspend fun applyCoupon(couponCode: String): AppResult<Cart> = mutex.withLock {
-        return try {
-            val response = cartApi.applyCoupon(ApplyCouponRequestDto(couponCode))
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) {
-                    val summaryCart = body.toDomain()
-                    val currentItems = _cartFlow.value?.items ?: emptyList()
-                    val updatedCart = summaryCart.copy(items = if (summaryCart.items.isEmpty()) currentItems else summaryCart.items)
-                    _cartFlow.value = updatedCart
-                    AppResult.Success(updatedCart)
-                } else {
-                    AppResult.Error(message = "Empty response body")
-                }
-            } else {
-                val networkError = apiErrorParser.parseError(response)
-                if (response.code() == 400) {
-                    AppResult.Error(message = "* Your Coupon Is Not Correct ")
-                } else {
-                    networkError.toAppResultError()
-                }
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
-        }
-    }
-
-    private suspend fun refreshCartUnlocked() {
-        try {
-            val response = cartApi.getCart()
-            if (response.isSuccessful) {
-                response.body()?.let { body ->
-                    _cartFlow.value = body.toDomain()
-                }
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {}
+        safeApiCaller.call {
+            cartApi.applyCoupon(request = ApplyCouponRequestDto(couponCode))
+                .toDomain(fallbackCartId = _cartFlow.value?.cartId.orEmpty())
+        }.also { if (it is AppResult.Success) _cartFlow.value = it.data }
     }
 }

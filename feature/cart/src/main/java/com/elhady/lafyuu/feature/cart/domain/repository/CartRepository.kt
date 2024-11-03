@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.cart.domain.repository
 
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
 import kotlinx.coroutines.flow.Flow
 
