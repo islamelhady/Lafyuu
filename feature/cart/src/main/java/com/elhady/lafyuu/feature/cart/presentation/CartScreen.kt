@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,6 +34,7 @@ import com.elhady.lafyuu.core.designsystem.components.element.NavigationBottomBa
 import com.elhady.lafyuu.core.designsystem.components.element.defaultTabBarItems
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
 import com.elhady.lafyuu.feature.cart.presentation.components.CartSummarySection
 
 @Composable
@@ -46,6 +48,7 @@ fun CartRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -56,7 +59,7 @@ fun CartRoute(
                 is CartUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
-                            message = effect.message,
+                            message = effect.message.asString(context),
                             type = effect.type
                         )
                     )
@@ -115,7 +118,7 @@ fun CartScreen(
 
             uiState.error != null && uiState.items.isEmpty() -> {
                 InfoStateContent(
-                    errorMessage = uiState.error,
+                    errorMessage = uiState.error.asString(),
                     onRetryClick = { onEvent(CartUiEvent.RetryClicked) },
                     errorType = AlertType.Error,
                     modifier = Modifier.align(Alignment.Center),
