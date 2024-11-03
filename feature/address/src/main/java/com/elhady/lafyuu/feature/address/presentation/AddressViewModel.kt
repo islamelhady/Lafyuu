@@ -2,8 +2,11 @@ package com.elhady.lafyuu.feature.address.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.address.R
 import com.elhady.lafyuu.feature.address.domain.usecase.DeleteAddressUseCase
 import com.elhady.lafyuu.feature.address.domain.usecase.GetAddressesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +41,13 @@ class AddressViewModel @Inject constructor(
             is AddressUiEvent.AddressSelected -> {
                 _uiState.update { it.copy(selectedAddressId = event.addressId) }
             }
-            is AddressUiEvent.EditAddressClicked -> sendEffect(AddressUiEffect.NavigateToEditAddress(event.addressId))
+
+            is AddressUiEvent.EditAddressClicked -> sendEffect(
+                AddressUiEffect.NavigateToEditAddress(
+                    event.addressId
+                )
+            )
+
             is AddressUiEvent.DeleteAddressClicked -> deleteAddress(event.addressId)
             AddressUiEvent.AddAddressClicked -> sendEffect(AddressUiEffect.NavigateToAddAddress)
             AddressUiEvent.BackClicked -> sendEffect(AddressUiEffect.NavigateBack)
@@ -60,12 +69,12 @@ class AddressViewModel @Inject constructor(
                         )
                     }
                 }
-                is AppResult.Error -> {
-                    val msg = result.message ?: "Failed to load addresses"
-                    _uiState.update { it.copy(isLoading = false, error = msg) }
-                    sendEffect(AddressUiEffect.ShowSnackbar(msg, AlertType.Error))
+
+                is AppResult.Failure -> {
+                    val errorMessage = result.error.toUiText()
+                    _uiState.update { it.copy(isLoading = false, error = errorMessage) }
+                    sendEffect(AddressUiEffect.ShowSnackbar(errorMessage, type = AlertType.Error))
                 }
-                is AppResult.Loading -> {}
             }
         }
     }
@@ -74,14 +83,24 @@ class AddressViewModel @Inject constructor(
         viewModelScope.launch {
             when (val result = deleteAddressUseCase(addressId)) {
                 is AppResult.Success -> {
-                    sendEffect(AddressUiEffect.ShowSnackbar("Address deleted successfully", AlertType.Success))
+                    sendEffect(
+                        AddressUiEffect.ShowSnackbar(
+                            message = UiText.Resource(id = R.string.address_deleted_successfully),
+                            type = AlertType.Success
+                        )
+                    )
                     loadAddresses()
                 }
-                is AppResult.Error -> {
-                    val errorMessage = result.message ?: "Failed to delete address"
-                    sendEffect(AddressUiEffect.ShowSnackbar(errorMessage, type = AlertType.Error))
+
+                is AppResult.Failure -> {
+                    val errorMessage = result.error.toUiText()
+                    sendEffect(
+                        AddressUiEffect.ShowSnackbar(
+                            message = errorMessage,
+                            type = AlertType.Error
+                        )
+                    )
                 }
-                is AppResult.Loading -> {}
             }
         }
     }

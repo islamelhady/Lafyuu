@@ -94,7 +94,7 @@ class CartViewModel @Inject constructor(
     }
 
     private fun loadCart(showLoading: Boolean = true) {
-        loadJob?.cancel() // ضغطتين Retry ورا بعض ما يعملوش requests متوازية
+        loadJob?.cancel()
         loadJob = viewModelScope.launch {
             if (showLoading) _uiState.update { it.copy(isLoading = true, error = null) }
 
@@ -115,10 +115,8 @@ class CartViewModel @Inject constructor(
                 is AppResult.Failure -> {
                     val message = result.error.toUiText()
                     if (_uiState.value.cart == null) {
-                        // مفيش داتا معروضة: الـ error يبقى State مع زرار Retry
                         _uiState.update { it.copy(isLoading = false, error = message) }
                     } else {
-                        // فيه داتا معروضة: ما نمسحهاش، ننبّه بس
                         _uiState.update { it.copy(isLoading = false) }
                         sendEffect(CartUiEffect.ShowSnackbar(message, AlertType.Error))
                     }
@@ -138,7 +136,6 @@ class CartViewModel @Inject constructor(
         successMessage = UiText.Resource(R.string.cart_item_removed)
     ) { removeCartItemUseCase(itemId) }
 
-    // الـ 3 عمليات كانوا نفس الهيكل بالظبط
     private fun updateItem(
         itemId: String,
         successMessage: UiText? = null,
@@ -152,7 +149,7 @@ class CartViewModel @Inject constructor(
                     successMessage?.let {
                         sendEffect(CartUiEffect.ShowSnackbar(it, AlertType.Success))
                     }
-                    loadCart(showLoading = false) // من غير spinner على الشاشة كلها
+                    loadCart(showLoading = false)
                 }
 
                 is AppResult.Failure -> {
@@ -191,7 +188,6 @@ class CartViewModel @Inject constructor(
                 }
 
                 is AppResult.Failure -> {
-                    // 400 هنا معناه كوبون غير صالح. المعنى ده خاص بالـ action دي، فمكانه الـ ViewModel
                     val message = when (result.error) {
                         is AppError.Validation -> UiText.Resource(R.string.cart_coupon_invalid)
                         else -> result.error.toUiText()

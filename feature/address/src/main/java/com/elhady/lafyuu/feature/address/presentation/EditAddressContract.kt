@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.address.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
 
 data class EditAddressUiState(
     val addressId: String = "",
@@ -12,12 +13,12 @@ data class EditAddressUiState(
     val notes: String = "",
     val isFetching: Boolean = false,
     val isLoading: Boolean = false,
-    val stateError: String? = null,
-    val cityError: String? = null,
-    val streetError: String? = null,
-    val apartmentError: String? = null,
-    val phoneError: String? = null,
-    val error: String? = null
+    val stateError: UiText? = null,
+    val cityError: UiText? = null,
+    val streetError: UiText? = null,
+    val apartmentError: UiText? = null,
+    val phoneError: UiText? = null,
+    val error: UiText? = null
 )
 
 sealed interface EditAddressUiEvent {
@@ -29,5 +30,5 @@ sealed interface EditAddressUiEvent {
 
 sealed interface EditAddressUiEffect {
     data object NavigateBack : EditAddressUiEffect
-    data class ShowSnackBar(val message: String, val type: AlertType = AlertType.Error) : EditAddressUiEffect
+    data class ShowSnackBar(val message: UiText, val type: AlertType = AlertType.Error) : EditAddressUiEffect
 }

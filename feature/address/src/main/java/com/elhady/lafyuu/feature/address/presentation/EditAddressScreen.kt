@@ -18,6 +18,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,6 +30,8 @@ import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisual
 import com.elhady.lafyuu.core.designsystem.components.textfield.DefaultTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.LafyuuFieldState
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
+import com.elhady.lafyuu.feature.address.R
 
 @Composable
 fun EditAddressRoute(
@@ -37,6 +41,7 @@ fun EditAddressRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -45,7 +50,7 @@ fun EditAddressRoute(
                 is EditAddressUiEffect.ShowSnackBar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
-                            message = effect.message,
+                            message = effect.message.asString(context),
                             type = effect.type
                         )
                     )
@@ -73,7 +78,7 @@ fun EditAddressScreen(
         snackbarHostState = snackbarHostState,
         topBar = {
             SingleTopAppBar(
-                title = "Edit Address",
+                title = stringResource(R.string.edit_address),
                 leadingIcon = Left,
                 onLeadingClick = { onEvent(EditAddressUiEvent.BackClicked) }
             )
@@ -116,28 +121,28 @@ fun EditAddressScreen(
                         onValueChange = { onEvent(EditAddressUiEvent.FieldChanged(AddressField.STATE, it)) },
                         placeholder = "State",
                         state = if (uiState.stateError != null) LafyuuFieldState.Error else LafyuuFieldState.Default,
-                        errorMessage = uiState.stateError
+                        errorMessage = uiState.stateError?.asString()
                     )
                     DefaultTextField(
                         value = uiState.city,
                         onValueChange = { onEvent(EditAddressUiEvent.FieldChanged(AddressField.CITY, it)) },
                         placeholder = "City",
                         state = if (uiState.cityError != null) LafyuuFieldState.Error else LafyuuFieldState.Default,
-                        errorMessage = uiState.cityError
+                        errorMessage = uiState.cityError?.asString()
                     )
                     DefaultTextField(
                         value = uiState.street,
                         onValueChange = { onEvent(EditAddressUiEvent.FieldChanged(AddressField.STREET, it)) },
                         placeholder = "Street",
                         state = if (uiState.streetError != null) LafyuuFieldState.Error else LafyuuFieldState.Default,
-                        errorMessage = uiState.streetError
+                        errorMessage = uiState.streetError?.asString()
                     )
                     DefaultTextField(
                         value = uiState.apartment,
                         onValueChange = { onEvent(EditAddressUiEvent.FieldChanged(AddressField.APARTMENT, it)) },
                         placeholder = "Apartment / Suite",
                         state = if (uiState.apartmentError != null) LafyuuFieldState.Error else LafyuuFieldState.Default,
-                        errorMessage = uiState.apartmentError
+                        errorMessage = uiState.apartmentError?.asString()
                     )
                     DefaultTextField(
                         value = uiState.phoneNumber,
@@ -145,7 +150,7 @@ fun EditAddressScreen(
                         placeholder = "Phone Number",
                         keyboardType = KeyboardType.Phone,
                         state = if (uiState.phoneError != null) LafyuuFieldState.Error else LafyuuFieldState.Default,
-                        errorMessage = uiState.phoneError
+                        errorMessage = uiState.phoneError?.asString()
                     )
                     DefaultTextField(
                         value = uiState.notes,

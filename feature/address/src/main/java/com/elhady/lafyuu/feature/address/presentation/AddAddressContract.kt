@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.address.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
 
 enum class AddressField {
     STATE, CITY, STREET, APARTMENT, PHONE, NOTES
@@ -14,12 +15,12 @@ data class AddAddressUiState(
     val phoneNumber: String = "",
     val notes: String = "",
     val isLoading: Boolean = false,
-    val stateError: String? = null,
-    val cityError: String? = null,
-    val streetError: String? = null,
-    val apartmentError: String? = null,
-    val phoneError: String? = null,
-    val error: String? = null
+    val stateError: UiText? = null,
+    val cityError: UiText? = null,
+    val streetError: UiText? = null,
+    val apartmentError: UiText? = null,
+    val phoneError: UiText? = null,
+    val error: UiText? = null
 )
 
 sealed interface AddAddressUiEvent {
@@ -30,5 +31,5 @@ sealed interface AddAddressUiEvent {
 
 sealed interface AddAddressUiEffect {
     data object NavigateBack : AddAddressUiEffect
-    data class ShowSnackBar(val message: String, val type: AlertType = AlertType.Error) : AddAddressUiEffect
+    data class ShowSnackBar(val message: UiText, val type: AlertType = AlertType.Error) : AddAddressUiEffect
 }
