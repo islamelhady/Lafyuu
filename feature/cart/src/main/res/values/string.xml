@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cart_item_removed">Item removed from cart</string>
+    <string name="cart_coupon_applied">Coupon applied successfully!</string>
+    <string name="cart_coupon_invalid">Your coupon is not correct</string>
+    <string name="cart_coupon_empty">Please enter a coupon code</string>
+    <string name="cart_added_favorite">Added to Favorite</string>
+    <string name="cart_removed_favorite">Removed from Favorite</string>
+</resources>

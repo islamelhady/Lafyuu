@@ -2,15 +2,20 @@ package com.elhady.lafyuu.feature.cart.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppError
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.cart.R
 import com.elhady.lafyuu.feature.cart.domain.usecase.ApplyCouponUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.DecreaseCartItemUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.GetCartUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.IncreaseCartItemQuantityUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.RemoveCartItemUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +42,8 @@ class CartViewModel @Inject constructor(
     private val _uiEffect = Channel<CartUiEffect>()
     val uiEffect = _uiEffect.receiveAsFlow()
 
+    private var loadJob: Job? = null
+
     init {
         loadCart()
         observeFavorites()
@@ -53,6 +60,7 @@ class CartViewModel @Inject constructor(
     fun onEvent(event: CartUiEvent) {
         when (event) {
             CartUiEvent.LoadCart -> loadCart()
+            CartUiEvent.RetryClicked -> loadCart()
             is CartUiEvent.IncreaseQuantity -> increaseQuantity(event.itemId)
             is CartUiEvent.DecreaseQuantity -> decreaseQuantity(event.itemId)
             is CartUiEvent.RemoveItem -> removeItem(event.itemId)
@@ -63,7 +71,6 @@ class CartViewModel @Inject constructor(
 
             CartUiEvent.ApplyCouponClicked -> applyCoupon()
             CartUiEvent.CheckoutClicked -> sendEffect(CartUiEffect.NavigateToCheckout)
-            CartUiEvent.RetryClicked -> loadCart()
             is CartUiEvent.ProductClicked -> sendEffect(CartUiEffect.NavigateToProductDetails(event.productId))
             is CartUiEvent.BottomTabSelected -> sendEffect(CartUiEffect.NavigateToTab(event.tab.route))
         }
@@ -74,17 +81,23 @@ class CartViewModel @Inject constructor(
             val isFavorite = _uiState.value.favoriteProductIds.contains(productId)
             if (isFavorite) {
                 favoritesRepository.removeFavorite(productId)
-                sendEffect(CartUiEffect.ShowSnackbar("Removed from Favorite", AlertType.Error))
+                sendEffect(
+                    CartUiEffect.ShowSnackbar(UiText.Resource(R.string.cart_removed_favorite), AlertType.Error)
+                )
             } else {
                 favoritesRepository.addFavorite(productId)
-                sendEffect(CartUiEffect.ShowSnackbar("Added to Favorite", AlertType.Success))
+                sendEffect(
+                    CartUiEffect.ShowSnackbar(UiText.Resource(R.string.cart_added_favorite), AlertType.Success)
+                )
             }
         }
     }
 
-    private fun loadCart() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+    private fun loadCart(showLoading: Boolean = true) {
+        loadJob?.cancel() // ضغطتين Retry ورا بعض ما يعملوش requests متوازية
+        loadJob = viewModelScope.launch {
+            if (showLoading) _uiState.update { it.copy(isLoading = true, error = null) }
+
             when (val result = getCartUseCase()) {
                 is AppResult.Success -> {
                     val cart = result.data
@@ -99,95 +112,53 @@ class CartViewModel @Inject constructor(
                     }
                 }
 
-                is AppResult.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = result.message ?: "Failed to load cart"
-                        )
+                is AppResult.Failure -> {
+                    val message = result.error.toUiText()
+                    if (_uiState.value.cart == null) {
+                        // مفيش داتا معروضة: الـ error يبقى State مع زرار Retry
+                        _uiState.update { it.copy(isLoading = false, error = message) }
+                    } else {
+                        // فيه داتا معروضة: ما نمسحهاش، ننبّه بس
+                        _uiState.update { it.copy(isLoading = false) }
+                        sendEffect(CartUiEffect.ShowSnackbar(message, AlertType.Error))
                     }
                 }
-
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isLoading = true) }
-                }
             }
         }
     }
 
-    private fun increaseQuantity(itemId: String) {
+    private fun increaseQuantity(itemId: String) =
+        updateItem(itemId) { increaseCartItemQuantityUseCase(itemId) }
+
+    private fun decreaseQuantity(itemId: String) =
+        updateItem(itemId) { decreaseCartItemUseCase(itemId) }
+
+    private fun removeItem(itemId: String) = updateItem(
+        itemId = itemId,
+        successMessage = UiText.Resource(R.string.cart_item_removed)
+    ) { removeCartItemUseCase(itemId) }
+
+    // الـ 3 عمليات كانوا نفس الهيكل بالظبط
+    private fun updateItem(
+        itemId: String,
+        successMessage: UiText? = null,
+        action: suspend () -> AppResult<Unit>
+    ) {
         viewModelScope.launch {
             setUpdatingItem(itemId, true)
-            when (val result = increaseCartItemQuantityUseCase(itemId)) {
+            when (val result = action()) {
                 is AppResult.Success -> {
                     setUpdatingItem(itemId, false)
-                    loadCart()
+                    successMessage?.let {
+                        sendEffect(CartUiEffect.ShowSnackbar(it, AlertType.Success))
+                    }
+                    loadCart(showLoading = false) // من غير spinner على الشاشة كلها
                 }
 
-                is AppResult.Error -> {
+                is AppResult.Failure -> {
                     setUpdatingItem(itemId, false)
-                    sendEffect(
-                        CartUiEffect.ShowSnackbar(
-                            message = result.message ?: "Failed to increase quantity",
-                            type = AlertType.Error
-                        )
-                    )
+                    sendEffect(CartUiEffect.ShowSnackbar(result.error.toUiText(), AlertType.Error))
                 }
-
-                is AppResult.Loading -> {}
-            }
-        }
-    }
-
-    private fun decreaseQuantity(itemId: String) {
-        viewModelScope.launch {
-            setUpdatingItem(itemId, true)
-            when (val result = decreaseCartItemUseCase(itemId)) {
-                is AppResult.Success -> {
-                    setUpdatingItem(itemId, false)
-                    loadCart()
-                }
-
-                is AppResult.Error -> {
-                    setUpdatingItem(itemId, false)
-                    sendEffect(
-                        CartUiEffect.ShowSnackbar(
-                            result.message ?: "Failed to decrease quantity", AlertType.Error
-                        )
-                    )
-                }
-
-                is AppResult.Loading -> {}
-            }
-        }
-    }
-
-    private fun removeItem(itemId: String) {
-        viewModelScope.launch {
-            setUpdatingItem(itemId, true)
-            when (val result = removeCartItemUseCase(itemId)) {
-                is AppResult.Success -> {
-                    setUpdatingItem(itemId, false)
-                    sendEffect(
-                        CartUiEffect.ShowSnackbar(
-                            "Item removed from cart",
-                            AlertType.Success
-                        )
-                    )
-                    loadCart()
-                }
-
-                is AppResult.Error -> {
-                    setUpdatingItem(itemId, false)
-                    sendEffect(
-                        CartUiEffect.ShowSnackbar(
-                            result.message ?: "Failed to remove item",
-                            AlertType.Error
-                        )
-                    )
-                }
-
-                is AppResult.Loading -> {}
             }
         }
     }
@@ -195,7 +166,7 @@ class CartViewModel @Inject constructor(
     private fun applyCoupon() {
         val code = _uiState.value.couponCodeInput
         if (code.isBlank()) {
-            _uiState.update { it.copy(couponError = "Please enter a coupon code") }
+            _uiState.update { it.copy(couponError = UiText.Resource(R.string.cart_coupon_empty)) }
             return
         }
 
@@ -215,26 +186,18 @@ class CartViewModel @Inject constructor(
                         )
                     }
                     sendEffect(
-                        CartUiEffect.ShowSnackbar(
-                            "Coupon applied successfully!",
-                            AlertType.Success
-                        )
+                        CartUiEffect.ShowSnackbar(UiText.Resource(R.string.cart_coupon_applied), AlertType.Success)
                     )
                 }
 
-                is AppResult.Error -> {
-                    val errMsg = result.message ?: "Your Cupon Is Not Correct"
-                    _uiState.update {
-                        it.copy(
-                            isApplyingCoupon = false,
-                            couponError = errMsg
-                        )
+                is AppResult.Failure -> {
+                    // 400 هنا معناه كوبون غير صالح. المعنى ده خاص بالـ action دي، فمكانه الـ ViewModel
+                    val message = when (result.error) {
+                        is AppError.Validation -> UiText.Resource(R.string.cart_coupon_invalid)
+                        else -> result.error.toUiText()
                     }
-                    sendEffect(CartUiEffect.ShowSnackbar(errMsg, AlertType.Error))
-                }
-
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isApplyingCoupon = true) }
+                    _uiState.update { it.copy(isApplyingCoupon = false, couponError = message) }
+                    sendEffect(CartUiEffect.ShowSnackbar(message, AlertType.Error))
                 }
             }
         }
