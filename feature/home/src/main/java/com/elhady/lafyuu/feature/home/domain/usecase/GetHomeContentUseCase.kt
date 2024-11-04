@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.home.domain.usecase
 
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppError
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.feature.home.domain.model.HomeContent
 import com.elhady.lafyuu.feature.home.domain.repository.HomeRepository
 import kotlinx.coroutines.async
@@ -17,36 +18,36 @@ class GetHomeContentUseCase @Inject constructor(
         val megaSaleDeferred = async { homeRepository.getProducts(page = 2, pageSize = 10) }
         val recommendedDeferred = async { homeRepository.getProducts(page = 1, pageSize = 20) }
 
-        val categoriesRes = categoriesDeferred.await()
-        val offersRes = offersDeferred.await()
-        val flashSaleRes = flashSaleDeferred.await()
-        val megaSaleRes = megaSaleDeferred.await()
-        val recommendedRes = recommendedDeferred.await()
+        val categoriesResult = categoriesDeferred.await()
+        val offersResult = offersDeferred.await()
+        val flashSaleResult = flashSaleDeferred.await()
+        val megaSaleResult = megaSaleDeferred.await()
+        val recommendedResult = recommendedDeferred.await()
 
-        val categories = (categoriesRes as? AppResult.Success)?.data.orEmpty()
-        val offers = (offersRes as? AppResult.Success)?.data.orEmpty()
+        val categories = (categoriesResult as? AppResult.Success)?.data.orEmpty()
+        val offers = (offersResult as? AppResult.Success)?.data.orEmpty()
 
-        val p1 = (flashSaleRes as? AppResult.Success)?.data.orEmpty()
-        val p2 = (megaSaleRes as? AppResult.Success)?.data.orEmpty()
-        val p3 = (recommendedRes as? AppResult.Success)?.data.orEmpty()
+        val flashSaleItems = (flashSaleResult as? AppResult.Success)?.data.orEmpty()
+        val megaSaleItems = (megaSaleResult as? AppResult.Success)?.data.orEmpty()
+        val recommendedItems = (recommendedResult as? AppResult.Success)?.data.orEmpty()
 
-        val allProducts = (p1 + p2 + p3).distinctBy { it.id }
+        val allProducts = (flashSaleItems + megaSaleItems + recommendedItems).distinctBy { it.id }
 
-        val flashSaleProducts = p1.ifEmpty { allProducts.take(6) }
-        val megaSaleProducts = p2.ifEmpty { allProducts.take(6) }
-        val recommendedProducts = p3.ifEmpty { allProducts }
+        val flashSaleProducts = flashSaleItems.ifEmpty { allProducts.take(6) }
+        val megaSaleProducts = megaSaleItems.ifEmpty { allProducts.take(6) }
+        val recommendedProducts = recommendedItems.ifEmpty { allProducts }
 
-        val hasTotalError = (categoriesRes is AppResult.Error) &&
-                (flashSaleRes is AppResult.Error) &&
-                (recommendedRes is AppResult.Error)
+        val hasTotalError = (categoriesResult is AppResult.Failure) &&
+                (flashSaleResult is AppResult.Failure) &&
+                (recommendedResult is AppResult.Failure)
 
         if (hasTotalError) {
-            val errorMsg = (categoriesRes as AppResult.Error).message
-                ?: (flashSaleRes as? AppResult.Error)?.message
-                ?: (recommendedRes as? AppResult.Error)?.message
-                ?: (offersRes as? AppResult.Error)?.message
+            val errorMsg = (categoriesResult).error
+                ?: (flashSaleResult as? AppResult.Failure)?.error
+                ?: (recommendedResult as? AppResult.Failure)?.error
+                ?: (offersResult as? AppResult.Failure)?.error
                 ?: "Failed to load content. Please check your network connection."
-            AppResult.Error(message = errorMsg)
+            AppResult.Failure(error = errorMsg as AppError)
         } else {
             AppResult.Success(
                 HomeContent(

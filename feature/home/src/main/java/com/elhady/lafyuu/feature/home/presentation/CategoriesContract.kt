@@ -1,12 +1,13 @@
 package com.elhady.lafyuu.feature.home.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.feature.home.domain.model.Category
 
 data class CategoriesUiState(
     val isLoading: Boolean = false,
     val categories: List<Category> = emptyList(),
-    val error: String? = null
+    val error: UiText? = null
 )
 
 sealed interface CategoriesUiEvent {
@@ -19,5 +20,5 @@ sealed interface CategoriesUiEvent {
 sealed interface CategoriesUiEffect {
     data object NavigateBack : CategoriesUiEffect
     data class NavigateToCategoryProducts(val categoryId: String, val categoryName: String) : CategoriesUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : CategoriesUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Error) : CategoriesUiEffect
 }

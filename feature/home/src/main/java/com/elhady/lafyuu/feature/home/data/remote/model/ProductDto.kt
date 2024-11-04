@@ -40,9 +40,4 @@ data class PagedListOfProductDto(
     val totalPages: Int? = 0,
     val hasPreviousPage: Boolean? = false,
     val hasNextPage: Boolean? = false
-) {
-    val allProducts: List<ProductDto>
-        get() = items?.ifEmpty { products?.ifEmpty { data.orEmpty() } ?: data.orEmpty() }
-            ?: products?.ifEmpty { data.orEmpty() }
-            ?: data.orEmpty()
-}
+)

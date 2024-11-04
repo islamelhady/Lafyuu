@@ -1,13 +1,14 @@
 package com.elhady.lafyuu.feature.home.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.feature.home.domain.model.Product
 
 data class ProductListUiState(
     val isLoading: Boolean = false,
     val title: String = "",
     val products: List<Product> = emptyList(),
-    val error: String? = null
+    val error: UiText? = null
 )
 
 sealed interface ProductListUiEvent {
@@ -20,5 +21,5 @@ sealed interface ProductListUiEvent {
 sealed interface ProductListUiEffect {
     data object NavigateBack : ProductListUiEffect
     data class NavigateToProductDetails(val productId: String) : ProductListUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : ProductListUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Error) : ProductListUiEffect
 }

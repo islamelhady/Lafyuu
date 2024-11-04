@@ -3,8 +3,9 @@ package com.elhady.lafyuu.feature.home.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.home.domain.usecase.GetProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -60,18 +61,15 @@ class CategoryProductsViewModel @Inject constructor(
                         )
                     }
                 }
-                is AppResult.Error -> {
-                    val msg = result.message ?: "Failed to load products"
+                is AppResult.Failure -> {
+                    val errorMessage = result.error.toUiText()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = msg
+                            error = errorMessage
                         )
                     }
-                    sendEffect(CategoryProductsUiEffect.ShowSnackbar(msg, AlertType.Error))
-                }
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isLoading = true) }
+                    sendEffect(CategoryProductsUiEffect.ShowSnackbar(errorMessage, type = AlertType.Error))
                 }
             }
         }
