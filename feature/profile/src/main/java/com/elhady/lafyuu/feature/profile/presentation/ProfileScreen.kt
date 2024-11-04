@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
@@ -34,7 +33,6 @@ import com.elhady.lafyuu.core.designsystem.components.list.SingleListItem
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.icons.Password
-import com.elhady.lafyuu.core.designsystem.icons.Trash
 import com.elhady.lafyuu.core.designsystem.icons.User
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
@@ -58,7 +56,7 @@ fun ProfileRoute(
                 is ProfileUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
-                            message = effect.message,
+                            message = effect.message.asString(context),
                             type = effect.type
                         )
                     )

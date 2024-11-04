@@ -2,7 +2,7 @@ package com.elhady.lafyuu.feature.profile.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.UiText
-import com.elhady.lafyuu.feature.auth.domain.model.User
+import com.elhady.lafyuu.feature.profile.domain.models.User
 
 data class ProfileUiState(
     val isLoading: Boolean = false,

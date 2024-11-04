@@ -1,7 +1,7 @@
 package com.elhady.lafyuu.feature.profile.data.remote
 
-import com.elhady.lafyuu.feature.auth.data.remote.model.ChangePasswordRequest
-import com.elhady.lafyuu.feature.auth.data.remote.model.UserInfoResponse
+import com.elhady.lafyuu.feature.profile.data.remote.model.ChangePasswordRequest
+import com.elhady.lafyuu.feature.profile.data.remote.model.UserInfoResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -15,4 +15,7 @@ interface ProfileApi {
     suspend fun changePassword(
         @Body request: ChangePasswordRequest
     )
+
+    @POST("api/auth/logout")
+    suspend fun logout(): Response<Unit>
 }

@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.toUiText
-import com.elhady.lafyuu.feature.auth.domain.usecase.LogoutUseCase
 import com.elhady.lafyuu.feature.profile.domain.usecase.GetUserProfileUseCase
+import com.elhady.lafyuu.feature.profile.domain.usecase.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
