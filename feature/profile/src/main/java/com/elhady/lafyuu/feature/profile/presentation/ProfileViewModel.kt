@@ -2,8 +2,9 @@ package com.elhady.lafyuu.feature.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.auth.domain.usecase.LogoutUseCase
 import com.elhady.lafyuu.feature.profile.domain.usecase.GetUserProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,8 +56,8 @@ class ProfileViewModel @Inject constructor(
                         )
                     }
                 }
-                is AppResult.Error -> {
-                    val msg = result.message ?: "Failed to load profile"
+                is AppResult.Failure -> {
+                    val msg = result.error.toUiText()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -65,9 +66,6 @@ class ProfileViewModel @Inject constructor(
                     }
                     sendEffect(ProfileUiEffect.ShowSnackbar(message = msg, type = AlertType.Error))
                 }
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isLoading = true) }
-                }
             }
         }
     }
@@ -75,18 +73,8 @@ class ProfileViewModel @Inject constructor(
     private fun logout() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            when (val result = logoutUseCase()) {
-                is AppResult.Success -> {
-                    _uiState.update { it.copy(isLoading = false) }
-                    sendEffect(ProfileUiEffect.NavigateToLogin)
-                }
-                is AppResult.Error -> {
-                    _uiState.update { it.copy(isLoading = false) }
-                    // Even if server logout fails, clear local session and navigate to login
-                    sendEffect(ProfileUiEffect.NavigateToLogin)
-                }
-                is AppResult.Loading -> {}
-            }
+            logoutUseCase()
+            sendEffect(ProfileUiEffect.NavigateToLogin)
         }
     }
 

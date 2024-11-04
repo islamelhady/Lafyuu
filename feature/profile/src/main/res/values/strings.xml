@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="payment_feature_is_coming_soon">Payment feature is coming soon</string>
+    <string name="password_changed_successfully">Password changed successfully</string>
+    <string name="please_fill_all_fields">Please fill all fields</string>
+    <string name="new_passwords_do_not_match">New passwords do not match</string>
+</resources>

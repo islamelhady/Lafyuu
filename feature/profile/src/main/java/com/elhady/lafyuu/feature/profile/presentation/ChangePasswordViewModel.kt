@@ -2,8 +2,11 @@ package com.elhady.lafyuu.feature.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.profile.R
 import com.elhady.lafyuu.feature.profile.domain.usecase.ChangePasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -48,11 +51,11 @@ class ChangePasswordViewModel @Inject constructor(
         val confirmNewPassword = _uiState.value.confirmNewPassword
 
         if (currentPassword.isBlank() || newPassword.isBlank() || confirmNewPassword.isBlank()) {
-            _uiState.update { it.copy(error = "Please fill all fields") }
+            _uiState.update { it.copy(error = UiText.Resource(R.string.please_fill_all_fields)) }
             return
         }
         if (newPassword != confirmNewPassword) {
-            _uiState.update { it.copy(error = "New passwords do not match") }
+            _uiState.update { it.copy(error = UiText.Resource(R.string.new_passwords_do_not_match)) }
             return
         }
 
@@ -61,15 +64,14 @@ class ChangePasswordViewModel @Inject constructor(
             when (val result = changePasswordUseCase(currentPassword, newPassword, confirmNewPassword)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    sendEffect(ChangePasswordUiEffect.ShowSnackbar(message = "Password changed successfully", type = AlertType.Success))
+                    sendEffect(ChangePasswordUiEffect.ShowSnackbar(message = UiText.Resource(R.string.password_changed_successfully), type = AlertType.Success))
                     sendEffect(ChangePasswordUiEffect.NavigateBack)
                 }
-                is AppResult.Error -> {
-                    val msg = result.message ?: "Failed to change password"
+                is AppResult.Failure -> {
+                    val msg = result.error.toUiText()
                     _uiState.update { it.copy(isLoading = false, error = msg) }
                     sendEffect(ChangePasswordUiEffect.ShowSnackbar(message = msg, type = AlertType.Error))
                 }
-                is AppResult.Loading -> {}
             }
         }
     }

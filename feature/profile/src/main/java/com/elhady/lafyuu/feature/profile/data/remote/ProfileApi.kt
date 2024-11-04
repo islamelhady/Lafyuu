@@ -9,10 +9,10 @@ import retrofit2.http.POST
 
 interface ProfileApi {
     @GET("api/auth/me")
-    suspend fun getCurrentUserInfo(): Response<UserInfoResponse>
+    suspend fun getCurrentUserInfo(): UserInfoResponse
 
     @POST("api/auth/change-password")
     suspend fun changePassword(
         @Body request: ChangePasswordRequest
-    ): Response<Unit>
+    )
 }

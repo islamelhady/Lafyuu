@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.profile.domain.usecase
 
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.feature.profile.domain.repository.ProfileRepository
 import javax.inject.Inject
 
@@ -12,12 +12,6 @@ class ChangePasswordUseCase @Inject constructor(
         newPassword: String,
         confirmNewPassword: String
     ): AppResult<Unit> {
-        if (currentPassword.isBlank() || newPassword.isBlank() || confirmNewPassword.isBlank()) {
-            return AppResult.Error("Please fill all password fields")
-        }
-        if (newPassword != confirmNewPassword) {
-            return AppResult.Error("New passwords do not match")
-        }
         return repository.changePassword(currentPassword, newPassword, confirmNewPassword)
     }
 }

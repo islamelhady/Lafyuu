@@ -1,12 +1,13 @@
 package com.elhady.lafyuu.feature.profile.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
-import com.elhady.lafyuu.feature.profile.domain.model.UserProfile
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.feature.auth.domain.model.User
 
 data class ProfileUiState(
     val isLoading: Boolean = false,
-    val userProfile: UserProfile? = null,
-    val error: String? = null
+    val userProfile: User? = null,
+    val error: UiText? = null
 )
 
 sealed interface ProfileUiEvent {
@@ -21,5 +22,5 @@ sealed interface ProfileUiEffect {
     data object NavigateToChangePassword : ProfileUiEffect
     data object NavigateToLogin : ProfileUiEffect
     data object NavigateBack: ProfileUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : ProfileUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Error) : ProfileUiEffect
 }
