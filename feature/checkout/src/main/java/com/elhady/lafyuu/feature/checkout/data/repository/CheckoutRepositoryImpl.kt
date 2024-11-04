@@ -1,19 +1,17 @@
 package com.elhady.lafyuu.feature.checkout.data.repository
 
-import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.toAppResultError
+import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.checkout.data.mapper.toDomain
 import com.elhady.lafyuu.feature.checkout.data.remote.CheckoutApi
 import com.elhady.lafyuu.feature.checkout.data.remote.model.OrderCheckoutRequestDto
 import com.elhady.lafyuu.feature.checkout.domain.model.CheckoutResult
 import com.elhady.lafyuu.feature.checkout.domain.repository.CheckoutRepository
-import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class CheckoutRepositoryImpl @Inject constructor(
     private val checkoutApi: CheckoutApi,
-    private val apiErrorParser: ApiErrorParser
+    private val safeApiCaller: SafeApiCaller
 ) : CheckoutRepository {
 
     override suspend fun checkout(
@@ -21,28 +19,14 @@ class CheckoutRepositoryImpl @Inject constructor(
         paymentMethod: String,
         couponCode: String?
     ): AppResult<CheckoutResult> {
-        return try {
-            val response = checkoutApi.checkout(
+        return safeApiCaller.call {
+            checkoutApi.checkout(
                 OrderCheckoutRequestDto(
-                    shippingAddressId = shippingAddressId,
-                    paymentMethod = paymentMethod,
-                    couponCode = couponCode
+                    shippingAddressId,
+                    paymentMethod,
+                    couponCode
                 )
-            )
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) {
-                    AppResult.Success(body.toDomain())
-                } else {
-                    AppResult.Error(message = "Checkout response is empty")
-                }
-            } else {
-                apiErrorParser.parseError(response).toAppResultError()
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
+            ).toDomain()
         }
     }
 }

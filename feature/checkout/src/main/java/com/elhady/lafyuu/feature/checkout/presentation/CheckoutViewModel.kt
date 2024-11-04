@@ -2,10 +2,13 @@ package com.elhady.lafyuu.feature.checkout.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.address.domain.usecase.DeleteAddressUseCase
 import com.elhady.lafyuu.feature.address.domain.usecase.GetAddressesUseCase
+import com.elhady.lafyuu.feature.checkout.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -74,17 +77,13 @@ class CheckoutViewModel @Inject constructor(
                     }
                 }
 
-                is AppResult.Error -> {
+                is AppResult.Failure -> {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = result.message ?: "Failed to load addresses"
+                            error = result.error.toUiText()
                         )
                     }
-                }
-
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isLoading = true) }
                 }
             }
         }
@@ -94,20 +93,18 @@ class CheckoutViewModel @Inject constructor(
         viewModelScope.launch {
             when (val result = deleteAddressUseCase(addressId)) {
                 is AppResult.Success -> {
-                    sendEffect(CheckoutUiEffect.ShowSnackbar("Address deleted", AlertType.Success))
+                    sendEffect(CheckoutUiEffect.ShowSnackbar(message = UiText.Resource(R.string.address_deleted), type = AlertType.Success))
                     loadAddresses()
                 }
 
-                is AppResult.Error -> {
-                    val errorMessage = result.message ?: "Failed to delete address"
+                is AppResult.Failure -> {
+                    val errorMessage = result.error.toUiText()
                     sendEffect(
                         CheckoutUiEffect.ShowSnackbar(
                             message = errorMessage, type = AlertType.Error
                         )
                     )
                 }
-
-                is AppResult.Loading -> {}
             }
         }
     }
@@ -116,8 +113,8 @@ class CheckoutViewModel @Inject constructor(
         val addressId = _uiState.value.selectedAddressId ?: run {
             sendEffect(
                 CheckoutUiEffect.ShowSnackbar(
-                    "Please select a shipping address",
-                    AlertType.Error
+                    message = UiText.Resource(R.string.please_select_shipping_address),
+                    type = AlertType.Error
                 )
             )
             return
