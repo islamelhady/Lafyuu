@@ -2,10 +2,12 @@ package com.elhady.lafyuu.feature.favorites.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.feature.favorites.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -62,7 +64,6 @@ class FavoritesViewModel @Inject constructor(
                         }
                     } else {
                         _uiState.update { it.copy(isLoading = true, error = null) }
-                        try {
                             val deferredProducts = favoriteIds.map { id ->
                                 async {
                                     when (val result = productRepository.getProductDetails(id)) {
@@ -77,7 +78,7 @@ class FavoritesViewModel @Inject constructor(
                                 _uiState.update {
                                     it.copy(
                                         isLoading = false,
-                                        error = "Failed to load favorite products"
+                                        error = UiText.Resource(R.string.failed_to_load_favorite_products)
                                     )
                                 }
                             } else {
@@ -89,15 +90,6 @@ class FavoritesViewModel @Inject constructor(
                                     )
                                 }
                             }
-                        } catch (e: Exception) {
-                            if (e is kotlinx.coroutines.CancellationException) throw e
-                            _uiState.update {
-                                it.copy(
-                                    isLoading = false,
-                                    error = e.localizedMessage ?: "Failed to load favorite products"
-                                )
-                            }
-                        }
                     }
                 }
         }
@@ -106,7 +98,7 @@ class FavoritesViewModel @Inject constructor(
     private fun removeFavorite(productId: String) {
         viewModelScope.launch {
             favoritesRepository.removeFavorite(productId)
-            sendEffect(FavoritesUiEffect.ShowSnackbar("Removed from Favorite", AlertType.Success))
+            sendEffect(FavoritesUiEffect.ShowSnackbar(message = UiText.Resource(R.string.removed_from_favorite), type = AlertType.Success))
         }
     }
 
