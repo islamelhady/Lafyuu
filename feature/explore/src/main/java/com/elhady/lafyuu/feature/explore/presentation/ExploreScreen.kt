@@ -1,7 +1,6 @@
 package com.elhady.lafyuu.feature.explore.presentation
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -19,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SearchTopBarWithNotification
@@ -56,6 +56,7 @@ fun ExploreRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -72,7 +73,7 @@ fun ExploreRoute(
                 is ExploreUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
-                            message = effect.message,
+                            message = effect.message.asString(context),
                             type = effect.type
                         )
                     )
@@ -101,8 +102,6 @@ fun ExploreScreen(
         snackbarHostState = snackbarHostState,
         topBar = {
             SearchTopBarWithNotification(
-//                searchValue = "",
-//                onSearchValueChange = { onEvent(ExploreUiEvent.SearchClicked) },
                 onSearchClick = { onEvent(ExploreUiEvent.SearchClicked) },
                 trailingIcon = Love,
                 onLeadingClick = {},

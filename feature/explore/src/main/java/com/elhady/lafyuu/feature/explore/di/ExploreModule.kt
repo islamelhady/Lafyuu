@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.explore.di
 
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.explore.data.remote.ExploreApi
 import com.elhady.lafyuu.feature.explore.data.repository.ExploreRepositoryImpl
 import com.elhady.lafyuu.feature.explore.domain.repository.ExploreRepository
@@ -25,8 +25,8 @@ object ExploreModule {
     @Singleton
     fun provideExploreRepository(
         exploreApi: ExploreApi,
-        apiErrorParser: ApiErrorParser
+        safeApiCaller: SafeApiCaller
     ): ExploreRepository {
-        return ExploreRepositoryImpl(exploreApi, apiErrorParser)
+        return ExploreRepositoryImpl(exploreApi, safeApiCaller)
     }
 }

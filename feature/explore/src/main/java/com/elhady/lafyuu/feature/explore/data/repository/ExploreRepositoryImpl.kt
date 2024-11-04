@@ -1,37 +1,19 @@
 package com.elhady.lafyuu.feature.explore.data.repository
 
-import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.toAppResultError
+import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.explore.data.mapper.toDomain
 import com.elhady.lafyuu.feature.explore.data.remote.ExploreApi
 import com.elhady.lafyuu.feature.explore.domain.model.Category
 import com.elhady.lafyuu.feature.explore.domain.repository.ExploreRepository
-import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class ExploreRepositoryImpl @Inject constructor(
     private val exploreApi: ExploreApi,
-    private val apiErrorParser: ApiErrorParser
+    private val safeApiCaller: SafeApiCaller
 ) : ExploreRepository {
 
     override suspend fun getCategories(): AppResult<List<Category>> {
-        return try {
-            val response = exploreApi.getCategories()
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) {
-                    AppResult.Success(body.allCategories.map { it.toDomain() })
-                } else {
-                    AppResult.Success(emptyList())
-                }
-            } else {
-                apiErrorParser.parseError(response).toAppResultError()
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
-        }
+        return safeApiCaller.call { exploreApi.getCategories().categories.map { it.toDomain() } }
     }
 }

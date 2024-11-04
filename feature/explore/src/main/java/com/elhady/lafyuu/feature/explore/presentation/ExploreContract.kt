@@ -2,11 +2,12 @@ package com.elhady.lafyuu.feature.explore.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.TabBarItem
+import com.elhady.lafyuu.core.ui.text.UiText
 
 data class ExploreUiState(
     val isLoading: Boolean = false,
     val groups: List<CategoryGroupUiModel> = emptyList(),
-    val error: String? = null
+    val error: UiText? = null
 )
 
 sealed interface ExploreUiEvent {
@@ -25,5 +26,5 @@ sealed interface ExploreUiEffect {
     data object NavigateToWishlist : ExploreUiEffect
     data object NavigateToSearch : ExploreUiEffect
     data class NavigateToTab(val tabRoute: String) : ExploreUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : ExploreUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Error) : ExploreUiEffect
 }
