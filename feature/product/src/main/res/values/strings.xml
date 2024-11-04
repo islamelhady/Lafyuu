@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="removed_from_favorite">Removed from Favorite</string>
+    <string name="added_to_favorite">Added to favorite</string>
+    <string name="removed_from_cart">Removed Successful</string>
+    <string name="failed_to_remove_item">Failed to remove</string>
+    <string name="added_to_cart_successfully">Added to cart successfully!</string>
+    <string name="failed_to_add_to_cart">Failed to add to Cart</string>
+</resources>
