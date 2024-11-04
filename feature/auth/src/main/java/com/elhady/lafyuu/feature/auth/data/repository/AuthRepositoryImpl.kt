@@ -95,24 +95,6 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun logout(): AppResult<Unit> {
-        return try {
-            val response = authApi.logout()
-            dataStore.clearSession()
-            favoritesRepository.clearFavorites()
-            if (response.isSuccessful) {
-                AppResult.Success(Unit)
-            } else {
-                AppResult.Success(Unit)
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            dataStore.clearSession()
-            favoritesRepository.clearFavorites()
-            AppResult.Success(Unit)
-        }
-    }
 
     override suspend fun getCurrentUser(): AppResult<User> {
         return try {

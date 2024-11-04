@@ -47,9 +47,6 @@ interface AuthApi {
     @POST("api/auth/validate-otp")
     suspend fun validateOtp(@Body request: ValidateOtpRequest): Response<Unit>
 
-    @POST("api/auth/logout")
-    suspend fun logout(): Response<Unit>
-
     @GET("api/auth/me")
     suspend fun getCurrentUser(): Response<UserInfoResponse>
 

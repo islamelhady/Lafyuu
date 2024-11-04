@@ -10,7 +10,6 @@ interface AuthRepository {
     suspend fun register(email: String, password: String, firstName: String, lastName: String): AppResult<Unit>
     suspend fun verifyEmail(email: String, otp: String): AppResult<Unit>
     suspend fun googleLogin(idToken: String): AppResult<AuthToken>
-    suspend fun logout(): AppResult<Unit>
     suspend fun getCurrentUser(): AppResult<User>
     suspend fun forgotPassword(email: String): AppResult<Unit>
     suspend fun resetPassword(email: String, otp: String, password: String): AppResult<Unit>
