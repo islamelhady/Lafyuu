@@ -1,11 +1,14 @@
 package com.elhady.lafyuu.feature.auth.presentation.otp
 
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+
 data class OtpUiState(
     val email: String = "",
     val otp: String = "",
     val isLoading: Boolean = false,
-    val otpError: String? = null,
-    val generalError: String? = null
+    val otpError: UiText? = null,
+    val generalError: UiText? = null
 )
 
 sealed interface OtpUiEvent {
@@ -17,6 +20,5 @@ sealed interface OtpUiEvent {
 sealed interface OtpUiEffect {
     data class NavigateToResetPassword(val email: String, val otp: String) : OtpUiEffect
     data object NavigateToLogin : OtpUiEffect
-    data class ShowError(val message: String) : OtpUiEffect
-    data class ShowMessage(val message: String) : OtpUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Success) : OtpUiEffect
 }

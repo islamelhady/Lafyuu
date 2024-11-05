@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +37,7 @@ import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -46,15 +48,16 @@ fun RegisterScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
                 RegisterUiEffect.NavigateToLogin -> onNavigateToLogin()
                 is RegisterUiEffect.NavigateToEmailVerification -> onNavigateToEmailVerification(effect.email)
-                is RegisterUiEffect.ShowError -> snackbarHostState.showSnackbar(
+                is RegisterUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(
                     visuals = LafyuuSnackBarVisuals(
-                        message = effect.message,
+                        message = effect.message.asString(context),
                         type = AlertType.Error
                     )
                 )
@@ -115,7 +118,7 @@ private fun RegisterContent(
                     value = uiState.firstName,
                     onValueChange = { onEvent(RegisterUiEvent.FirstNameChanged(it)) },
                     placeholder = "First Name",
-                    errorMessage = uiState.firstNameError,
+                    errorMessage = uiState.firstNameError?.asString(),
                     modifier = Modifier.weight(1f)
                 )
                 VerticalSpacerLarge()
@@ -123,7 +126,7 @@ private fun RegisterContent(
                     value = uiState.lastName,
                     onValueChange = { onEvent(RegisterUiEvent.LastNameChanged(it)) },
                     placeholder = "Last Name",
-                    errorMessage = uiState.lastNameError,
+                    errorMessage = uiState.lastNameError?.asString(),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -132,7 +135,7 @@ private fun RegisterContent(
                 value = uiState.email,
                 onValueChange = { onEvent(RegisterUiEvent.EmailChanged(it)) },
                 placeholder = "Email",
-                errorMessage = uiState.emailError,
+                errorMessage = uiState.emailError?.asString(),
                 modifier = Modifier.fillMaxWidth()
             )
             VerticalSpacerLarge()
@@ -140,7 +143,7 @@ private fun RegisterContent(
                 value = uiState.password,
                 onValueChange = { onEvent(RegisterUiEvent.PasswordChanged(it)) },
                 placeholder = "Password",
-                errorMessage = uiState.passwordError,
+                errorMessage = uiState.passwordError?.asString(),
                 modifier = Modifier.fillMaxWidth()
             )
             VerticalSpacerLarge()
@@ -148,7 +151,7 @@ private fun RegisterContent(
                 value = uiState.confirmPassword,
                 onValueChange = { onEvent(RegisterUiEvent.ConfirmPasswordChanged(it)) },
                 placeholder = "Password Again",
-                errorMessage = uiState.confirmPasswordError,
+                errorMessage = uiState.confirmPasswordError?.asString(),
                 modifier = Modifier.fillMaxWidth()
             )
 

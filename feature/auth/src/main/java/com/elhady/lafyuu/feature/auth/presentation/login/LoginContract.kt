@@ -1,12 +1,15 @@
 package com.elhady.lafyuu.feature.auth.presentation.login
 
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+
 data class LoginUiState(
     val email: String = "",
     val password: String = "",
     val isLoading: Boolean = false,
-    val emailError: String? = null,
-    val passwordError: String? = null,
-    val generalError: String? = null
+    val emailError: UiText? = null,
+    val passwordError: UiText? = null,
+    val generalError: UiText? = null
 )
 
 sealed interface LoginUiEvent {
@@ -20,6 +23,5 @@ sealed interface LoginUiEffect {
     data object NavigateToHome : LoginUiEffect
     data object NavigateToRegister : LoginUiEffect
     data object NavigateToForgotPassword : LoginUiEffect
-    data class ShowError(val message: String) : LoginUiEffect
-    data class ShowMessage(val message: String) : LoginUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Success) : LoginUiEffect
 }

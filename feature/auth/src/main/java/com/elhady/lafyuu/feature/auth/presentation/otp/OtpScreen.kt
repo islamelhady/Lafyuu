@@ -56,7 +56,7 @@ fun OtpScreen(
                     )
                 )
 
-                is OtpUiEffect.ShowMessage -> snackBarHostState.showSnackbar(
+                is OtpUiEffect.ShowSnackbar -> snackBarHostState.showSnackbar(
                     visuals = LafyuuSnackBarVisuals(
                         message = effect.message,
                         type = AlertType.Success

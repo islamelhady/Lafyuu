@@ -2,7 +2,10 @@ package com.elhady.lafyuu.feature.auth.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.auth.domain.model.ValidationResult
 import com.elhady.lafyuu.feature.auth.domain.usecase.GoogleLoginUseCase
 import com.elhady.lafyuu.feature.auth.domain.usecase.LoginUseCase
@@ -60,11 +63,11 @@ class LoginViewModel @Inject constructor(
                     emailError = when (emailResult) {
                         is ValidationResult.Error -> "Oops! Your Email Is Not Correct"
                         else -> null
-                    },
+                    } as UiText?,
                     passwordError = when (passwordResult) {
                         is ValidationResult.Error -> "Oops! Your Password Is Not Correct"
                         else -> null
-                    }
+                    } as UiText?
                 )
             }
             return
@@ -78,12 +81,11 @@ class LoginViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false) }
                     _uiEffect.send(LoginUiEffect.NavigateToHome)
                 }
-                is AppResult.Error -> {
-                    val errorMessage = result.message ?: "Login failed"
-                    _uiState.update { it.copy(isLoading = false, generalError = errorMessage) }
-                    _uiEffect.send(LoginUiEffect.ShowError(errorMessage))
+                is AppResult.Failure -> {
+                    val message = result.error.toUiText()
+                    _uiState.update { it.copy(isLoading = false, generalError = message) }
+                    _uiEffect.send(LoginUiEffect.ShowSnackbar(message, AlertType.Error))
                 }
-                AppResult.Loading -> {}
             }
         }
     }
@@ -99,12 +101,11 @@ class LoginViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false) }
                     _uiEffect.send(LoginUiEffect.NavigateToHome)
                 }
-                is AppResult.Error -> {
-                    val errorMessage = result.message ?: "Google login failed"
+                is AppResult.Failure -> {
+                    val errorMessage = result.error.toUiText()
                     _uiState.update { it.copy(isLoading = false, generalError = errorMessage) }
-                    _uiEffect.send(LoginUiEffect.ShowError(errorMessage))
+                    _uiEffect.send(LoginUiEffect.ShowSnackbar(errorMessage, type = AlertType.Error))
                 }
-                AppResult.Loading -> {}
             }
         }
     }

@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.auth.domain.repository
 
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.feature.auth.domain.model.AuthToken
 import com.elhady.lafyuu.feature.auth.domain.model.User
 import kotlinx.coroutines.flow.Flow

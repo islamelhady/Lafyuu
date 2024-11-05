@@ -3,7 +3,11 @@ package com.elhady.lafyuu.feature.auth.presentation.otp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.auth.R
 import com.elhady.lafyuu.feature.auth.domain.model.ValidationResult
 import com.elhady.lafyuu.feature.auth.domain.usecase.ResendOtpUseCase
 import com.elhady.lafyuu.feature.auth.domain.usecase.ValidateOtpUseCase
@@ -51,7 +55,7 @@ class OtpViewModel @Inject constructor(
         val otpResult = validateOtp(otp)
 
         if (otpResult is ValidationResult.Error) {
-            _uiState.update { it.copy(otpError = "OTP is required") }
+            _uiState.update { it.copy(otpError = UiText.Resource(R.string.otp_is_required)) }
             return
         }
 
@@ -63,12 +67,11 @@ class OtpViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false) }
                     _uiEffect.send(OtpUiEffect.NavigateToResetPassword(email, otp))
                 }
-                is AppResult.Error -> {
-                    val errorMessage = result.message ?: "Verification failed"
-                    _uiState.update { it.copy(isLoading = false, generalError = errorMessage) }
-                    _uiEffect.send(OtpUiEffect.ShowError(errorMessage))
+                is AppResult.Failure -> {
+                    val message = result.error.toUiText()
+                    _uiState.update { it.copy(isLoading = false, generalError = message) }
+                    _uiEffect.send(OtpUiEffect.ShowSnackbar(message, type = AlertType.Error))
                 }
-                AppResult.Loading -> {}
             }
         }
     }
@@ -82,14 +85,13 @@ class OtpViewModel @Inject constructor(
             when (val result = resendOtpUseCase(email)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _uiEffect.send(OtpUiEffect.ShowMessage("OTP resent successfully"))
+                    _uiEffect.send(OtpUiEffect.ShowSnackbar(UiText.Resource(R.string.otp_resent_successfully), type = AlertType.Success))
                 }
-                is AppResult.Error -> {
-                    val errorMessage = result.message ?: "Resend failed"
-                    _uiState.update { it.copy(isLoading = false, generalError = errorMessage) }
-                    _uiEffect.send(OtpUiEffect.ShowError(errorMessage))
+                is AppResult.Failure -> {
+                    val message = result.error.toUiText()
+                    _uiState.update { it.copy(isLoading = false, generalError = message) }
+                    _uiEffect.send(OtpUiEffect.ShowSnackbar(message, type = AlertType.Error))
                 }
-                AppResult.Loading -> {}
             }
         }
     }

@@ -1,15 +1,18 @@
 package com.elhady.lafyuu.feature.auth.presentation.reset_password
 
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+
 data class ResetPasswordUiState(
     val email: String = "",
     val otp: String = "",
     val newPassword: String = "",
     val confirmPassword: String = "",
     val isLoading: Boolean = false,
-    val otpError: String? = null,
-    val newPasswordError: String? = null,
-    val confirmPasswordError: String? = null,
-    val generalError: String? = null
+    val otpError: UiText? = null,
+    val newPasswordError: UiText? = null,
+    val confirmPasswordError: UiText? = null,
+    val generalError: UiText? = null
 )
 
 sealed interface ResetPasswordUiEvent {
@@ -21,5 +24,5 @@ sealed interface ResetPasswordUiEvent {
 
 sealed interface ResetPasswordUiEffect {
     data object NavigateToLogin : ResetPasswordUiEffect
-    data class ShowError(val message: String) : ResetPasswordUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Success) : ResetPasswordUiEffect
 }

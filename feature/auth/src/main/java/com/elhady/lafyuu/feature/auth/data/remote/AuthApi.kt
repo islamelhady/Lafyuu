@@ -21,35 +21,32 @@ import retrofit2.http.POST
 interface AuthApi {
 
     @POST("api/auth/login")
-    suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+    suspend fun login(@Body request: LoginRequest): LoginResponse
 
     @POST("api/auth/register")
-    suspend fun register(@Body request: RegisterRequest): Response<Unit>
+    suspend fun register(@Body request: RegisterRequest)
 
     @POST("api/auth/google/mobile")
-    suspend fun googleLogin(@Body request: MobileLoginRequest): Response<LoginResponse>
+    suspend fun googleLogin(@Body request: MobileLoginRequest): LoginResponse
 
     @POST("api/auth/verify-email")
-    suspend fun verifyEmail(@Body request: VerifyEmailRequest): Response<Unit>
+    suspend fun verifyEmail(@Body request: VerifyEmailRequest)
 
     @POST("api/auth/forgot-password")
-    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): Response<Unit>
+    suspend fun forgotPassword(@Body request: ForgotPasswordRequest)
 
     @POST("api/auth/reset-password")
-    suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<Unit>
+    suspend fun resetPassword(@Body request: ResetPasswordRequest)
 
     @POST("api/auth/change-password")
-    suspend fun changePassword(@Body request: ChangePasswordRequest): Response<Unit>
+    suspend fun changePassword(@Body request: ChangePasswordRequest)
 
     @POST("api/auth/resend-otp")
-    suspend fun resendOtp(@Body request: ResendOtpRequest): Response<Unit>
+    suspend fun resendOtp(@Body request: ResendOtpRequest)
 
     @POST("api/auth/validate-otp")
-    suspend fun validateOtp(@Body request: ValidateOtpRequest): Response<Unit>
+    suspend fun validateOtp(@Body request: ValidateOtpRequest)
 
     @GET("api/auth/me")
-    suspend fun getCurrentUser(): Response<UserInfoResponse>
-
-    @POST("api/auth/refresh-token")
-    suspend fun refreshToken(@Body request: RefreshTokenRequest): Response<RefreshTokenResponse>
+    suspend fun getCurrentUser(): UserInfoResponse
 }

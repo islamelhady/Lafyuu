@@ -46,6 +46,7 @@ import com.elhady.lafyuu.core.designsystem.icons.Google
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.core.network.config.NetworkConfig
+import com.elhady.lafyuu.core.ui.text.asString
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.flow.collectLatest
@@ -60,6 +61,7 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
@@ -67,16 +69,10 @@ fun LoginScreen(
                 LoginUiEffect.NavigateToHome -> onNavigateToHome()
                 LoginUiEffect.NavigateToRegister -> onNavigateToRegister()
                 LoginUiEffect.NavigateToForgotPassword -> onNavigateToForgotPassword()
-                is LoginUiEffect.ShowError -> snackbarHostState.showSnackbar(
-                    visuals = LafyuuSnackBarVisuals(
-                        message = effect.message,
-                        type = AlertType.Error
-                    )
-                )
 
-                is LoginUiEffect.ShowMessage -> snackbarHostState.showSnackbar(
+                is LoginUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(
                     visuals = LafyuuSnackBarVisuals(
-                        message = effect.message,
+                        message = effect.message.asString(context),
                         type = AlertType.Success
                     )
                 )
@@ -137,7 +133,7 @@ private fun LoginContent(
                 value = uiState.email,
                 onValueChange = { onEvent(LoginUiEvent.EmailChanged(it)) },
                 placeholder = "Email",
-                errorMessage = uiState.emailError,
+                errorMessage = uiState.emailError?.asString(),
                 modifier = Modifier.fillMaxWidth()
             )
             VerticalSpacerLarge()
@@ -145,7 +141,7 @@ private fun LoginContent(
                 value = uiState.password,
                 onValueChange = { onEvent(LoginUiEvent.PasswordChanged(it)) },
                 placeholder = "Password",
-                errorMessage = uiState.passwordError,
+                errorMessage = uiState.passwordError?.asString(),
                 modifier = Modifier.fillMaxWidth()
             )
 

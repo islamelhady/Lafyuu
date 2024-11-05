@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="otp_is_required">OTP is required</string>
+    <string name="otp_resent_successfully">OTP resent successfully</string>
+    <string name="first_name_is_required">First name is required</string>
+    <string name="last_name_is_required">Last name is required</string>
+    <string name="email_is_required">Email is required</string>
+    <string name="invalid_email_format">Invalid email format</string>
+    <string name="password_must_contain_at_least_one_digit">Password must contain at least one digit</string>
+    <string name="password_must_contain_at_least_one_uppercase_letter">Password must contain at least one uppercase letter</string>
+    <string name="password_must_contain_at_least_one_special_character">Password must contain at least one special character</string>
+    <string name="password_is_required">Password is required</string>
+    <string name="confirm_password_is_required">Confirm password is required</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="new_password_is_required">New password is required</string>
+</resources>
