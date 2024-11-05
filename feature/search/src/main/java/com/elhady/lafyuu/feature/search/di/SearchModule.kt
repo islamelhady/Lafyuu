@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.search.di
 
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.search.data.remote.SearchApi
 import com.elhady.lafyuu.feature.search.data.repository.SearchRepositoryImpl
 import com.elhady.lafyuu.feature.search.domain.repository.SearchRepository
@@ -25,8 +25,8 @@ object SearchModule {
     @Singleton
     fun provideSearchRepository(
         searchApi: SearchApi,
-        apiErrorParser: ApiErrorParser
+        safeApiCaller: SafeApiCaller
     ): SearchRepository {
-        return SearchRepositoryImpl(searchApi, apiErrorParser)
+        return SearchRepositoryImpl(searchApi, safeApiCaller)
     }
 }

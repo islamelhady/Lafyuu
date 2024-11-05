@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.search.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.feature.search.domain.model.Category
 import com.elhady.lafyuu.feature.search.domain.model.Product
 
@@ -27,7 +28,7 @@ data class SearchUiState(
     val tempMinPrice: Double? = null,
     val tempMaxPrice: Double? = null,
     val tempIsInStock: Boolean? = null,
-    val error: String? = null
+    val error: UiText? = null
 )
 
 sealed interface SearchUiEvent {
@@ -52,5 +53,5 @@ sealed interface SearchUiEffect {
     data class NavigateToProductDetails(val productId: String) : SearchUiEffect
     data object NavigateToHome : SearchUiEffect
     data object NavigateBack : SearchUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : SearchUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Error) : SearchUiEffect
 }

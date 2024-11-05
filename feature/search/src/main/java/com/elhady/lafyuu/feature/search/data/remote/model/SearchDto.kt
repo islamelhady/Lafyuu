@@ -53,11 +53,4 @@ data class CategoryItemDto(
 @Serializable
 data class GetAllCategoriesResponseDto(
     val categories: List<CategoryItemDto>? = emptyList(),
-    val items: List<CategoryItemDto>? = emptyList(),
-    val data: List<CategoryItemDto>? = emptyList()
-) {
-    val allCategories: List<CategoryItemDto>
-        get() = categories?.ifEmpty { items?.ifEmpty { data.orEmpty() } ?: data.orEmpty() }
-            ?: items?.ifEmpty { data.orEmpty() }
-            ?: data.orEmpty()
-}
+)
