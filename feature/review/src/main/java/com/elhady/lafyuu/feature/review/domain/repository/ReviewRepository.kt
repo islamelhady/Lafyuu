@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.review.domain.repository
 
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.feature.review.domain.model.ProductReviewsInfo
 
 interface ReviewRepository {

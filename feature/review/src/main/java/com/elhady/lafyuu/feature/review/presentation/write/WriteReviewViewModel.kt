@@ -3,8 +3,11 @@ package com.elhady.lafyuu.feature.review.presentation.write
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.review.R
 import com.elhady.lafyuu.feature.review.domain.usecase.CreateReviewUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -47,7 +50,7 @@ class WriteReviewViewModel @Inject constructor(
         val state = _uiState.value
         if (state.productId.isBlank()) return
         if (state.rating < 1) {
-            sendEffect(WriteReviewUiEffect.ShowSnackbar("Please select a rating", AlertType.Error))
+            sendEffect(WriteReviewUiEffect.ShowSnackbar(message = UiText.Resource(R.string.please_select_a_rating), type = AlertType.Error))
             return
         }
 
@@ -56,15 +59,12 @@ class WriteReviewViewModel @Inject constructor(
             when (val result = createReviewUseCase(state.productId, state.rating, state.comment)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    sendEffect(WriteReviewUiEffect.ShowSnackbar("Review submitted successfully", AlertType.Success))
+                    sendEffect(WriteReviewUiEffect.ShowSnackbar(message = UiText.Resource(R.string.review_submitted_successfully), type = AlertType.Success))
                     sendEffect(WriteReviewUiEffect.NavigateBack)
                 }
-                is AppResult.Error -> {
+                is AppResult.Failure -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    sendEffect(WriteReviewUiEffect.ShowSnackbar(result.message ?: "Failed to submit review", AlertType.Error))
-                }
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isLoading = true) }
+                    sendEffect(WriteReviewUiEffect.ShowSnackbar(result.error.toUiText(), AlertType.Error))
                 }
             }
         }

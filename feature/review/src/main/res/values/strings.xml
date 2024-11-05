@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="review_submitted_successfully">Review submitted successfully</string>
+    <string name="please_select_a_rating">Please select a rating</string>
+</resources>

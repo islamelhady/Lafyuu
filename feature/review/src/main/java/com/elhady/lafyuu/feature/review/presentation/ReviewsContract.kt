@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.review.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.feature.review.domain.model.ProductReview
 
 data class ReviewsUiState(
@@ -9,8 +10,8 @@ data class ReviewsUiState(
     val averageRating: Double = 0.0,
     val reviewsCount: Int = 0,
     val reviews: List<ProductReview> = emptyList(),
-    val selectedRatingFilter: Int = 0, // 0 for All, 1-5 for stars
-    val error: String? = null
+    val selectedRatingFilter: Int = 0,
+    val error: UiText? = null
 )
 
 sealed interface ReviewsUiEvent {
@@ -24,5 +25,5 @@ sealed interface ReviewsUiEvent {
 sealed interface ReviewsUiEffect {
     data object NavigateBack : ReviewsUiEffect
     data class NavigateToWriteReview(val productId: String) : ReviewsUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : ReviewsUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Error) : ReviewsUiEffect
 }
