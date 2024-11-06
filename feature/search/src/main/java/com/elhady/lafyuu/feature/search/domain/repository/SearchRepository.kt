@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.search.domain.repository
 
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.feature.search.domain.model.Category
 import com.elhady.lafyuu.feature.search.domain.model.Product
 

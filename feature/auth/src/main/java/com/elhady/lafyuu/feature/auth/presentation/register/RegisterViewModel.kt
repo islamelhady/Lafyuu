@@ -2,7 +2,7 @@ package com.elhady.lafyuu.feature.auth.presentation.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.auth.R

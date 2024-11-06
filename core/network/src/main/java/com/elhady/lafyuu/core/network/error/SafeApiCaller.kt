@@ -1,7 +1,7 @@
 package com.elhady.lafyuu.core.network.error
 
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.result.AppError
-import com.elhady.lafyuu.core.common.result.AppResult
 import com.elhady.lafyuu.core.network.model.ProblemDetails
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json

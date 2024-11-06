@@ -3,7 +3,7 @@ package com.elhady.lafyuu.feature.product.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType

@@ -1,7 +1,7 @@
 package com.elhady.lafyuu.feature.cart.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
+import com.elhady.lafyuu.core.network.error.AppResult
 import com.elhady.lafyuu.feature.cart.data.remote.CartApi
 import com.elhady.lafyuu.feature.cart.data.remote.model.ApplyCouponResponseDto
 import com.elhady.lafyuu.feature.cart.data.remote.model.GetCartResponseDto
@@ -18,13 +18,13 @@ import retrofit2.Response
 class CartRepositoryImplTest {
 
     private val cartApi: CartApi = mockk()
-    private val apiErrorParser: ApiErrorParser = mockk(relaxed = true)
+    private val appResult: AppResult = mockk(relaxed = true)
 
     private lateinit var repository: CartRepositoryImpl
 
     @Before
     fun setUp() {
-        repository = CartRepositoryImpl(cartApi, apiErrorParser)
+        repository = CartRepositoryImpl(cartApi, appResult)
     }
 
     @Test

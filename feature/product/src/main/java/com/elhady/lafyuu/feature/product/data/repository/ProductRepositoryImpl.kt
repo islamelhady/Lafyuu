@@ -4,7 +4,7 @@ import com.elhady.lafyuu.core.common.domain.model.Product
 import com.elhady.lafyuu.core.common.domain.model.ProductDetails
 import com.elhady.lafyuu.core.common.domain.model.ProductReview
 import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.product.data.mapper.toDomain
 import com.elhady.lafyuu.feature.product.data.mapper.toProductDetailsDomain

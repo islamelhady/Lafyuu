@@ -1,7 +1,7 @@
 package com.elhady.lafyuu.feature.home.domain.usecase
 
 import com.elhady.lafyuu.core.common.result.AppError
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.feature.home.domain.model.HomeContent
 import com.elhady.lafyuu.feature.home.domain.repository.HomeRepository
 import kotlinx.coroutines.async

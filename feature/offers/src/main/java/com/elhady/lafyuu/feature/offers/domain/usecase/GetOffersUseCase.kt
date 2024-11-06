@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.offers.domain.usecase
 
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.feature.offers.domain.model.Offer
 import com.elhady.lafyuu.feature.offers.domain.repository.OffersRepository
 import javax.inject.Inject

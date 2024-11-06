@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.core.common.domain.usecase
 
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.domain.model.ProductContent
 import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
 import kotlinx.coroutines.async

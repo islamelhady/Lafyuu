@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.profile.data.repository
 
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.datastore.LafyuuDataStore
 import com.elhady.lafyuu.core.network.error.SafeApiCaller

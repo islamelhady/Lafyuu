@@ -1,7 +1,7 @@
 package com.elhady.lafyuu.feature.home.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
+import com.elhady.lafyuu.core.network.error.AppResult
 import com.elhady.lafyuu.feature.home.data.remote.HomeApi
 import com.elhady.lafyuu.feature.home.data.remote.model.CategoryDto
 import com.elhady.lafyuu.feature.home.data.remote.model.GetAllCategoriesResponse
@@ -21,12 +21,12 @@ import retrofit2.Response
 class HomeRepositoryImplTest {
 
     private val homeApi: HomeApi = mockk()
-    private val apiErrorParser: ApiErrorParser = mockk(relaxed = true)
+    private val appResult: AppResult = mockk(relaxed = true)
     private lateinit var repository: HomeRepositoryImpl
 
     @Before
     fun setUp() {
-        repository = HomeRepositoryImpl(homeApi, apiErrorParser)
+        repository = HomeRepositoryImpl(homeApi, appResult)
     }
 
     @Test

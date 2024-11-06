@@ -1,12 +1,13 @@
 package com.elhady.lafyuu.core.common
 
-sealed class AppResult<out T> {
-    data class Success<out T>(val data: T) : AppResult<T>()
-    data class Error(
-        val message: String? = null,
-        val throwable: Throwable? = null,
-        val status: Int? = null,
-        val validationErrors: Map<String, List<String>>? = null
-    ) : AppResult<Nothing>()
-    data object Loading : AppResult<Nothing>()
+import com.elhady.lafyuu.core.common.result.AppError
+
+sealed interface AppResult<out T> {
+    data class Success<out T>(val data: T) : AppResult<T>
+    data class Failure(val error: AppError) : AppResult<Nothing>
+}
+
+inline fun <T, R> AppResult<T>.map(transform: (T) -> R): AppResult<R> = when (this) {
+    is AppResult.Success -> AppResult.Success(transform(data))
+    is AppResult.Failure -> this
 }

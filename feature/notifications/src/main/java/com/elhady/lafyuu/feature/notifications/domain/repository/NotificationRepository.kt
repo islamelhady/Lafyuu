@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.notifications.domain.repository
 
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.feature.notifications.domain.model.Notification
 
 interface NotificationRepository {

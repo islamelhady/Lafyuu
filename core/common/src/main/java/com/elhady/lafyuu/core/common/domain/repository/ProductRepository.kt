@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.core.common.domain.repository
 
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.domain.model.Product
 import com.elhady.lafyuu.core.common.domain.model.ProductDetails
 import com.elhady.lafyuu.core.common.domain.model.ProductReview

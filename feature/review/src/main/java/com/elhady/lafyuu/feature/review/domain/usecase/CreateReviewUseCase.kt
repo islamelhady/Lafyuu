@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.review.domain.usecase
 
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.feature.review.domain.repository.ReviewRepository
 import javax.inject.Inject
 

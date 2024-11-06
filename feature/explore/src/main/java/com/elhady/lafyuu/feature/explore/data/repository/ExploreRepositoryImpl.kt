@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.explore.data.repository
 
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.explore.data.mapper.toDomain
 import com.elhady.lafyuu.feature.explore.data.remote.ExploreApi

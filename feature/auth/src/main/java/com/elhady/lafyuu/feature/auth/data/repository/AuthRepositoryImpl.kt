@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.auth.data.repository
 
-import com.elhady.lafyuu.core.common.result.AppResult
+import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.datastore.LafyuuDataStore
 import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.auth.data.mapper.toDomain

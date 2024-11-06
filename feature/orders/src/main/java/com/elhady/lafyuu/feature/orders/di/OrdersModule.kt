@@ -1,6 +1,5 @@
 package com.elhady.lafyuu.feature.orders.di
 
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
 import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.orders.data.remote.OrdersApi
 import com.elhady.lafyuu.feature.orders.data.repository.OrdersRepositoryImpl
