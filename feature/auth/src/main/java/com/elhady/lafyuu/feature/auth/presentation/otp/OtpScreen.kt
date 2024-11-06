@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +34,7 @@ import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.OtpCodeTextField
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -43,22 +45,17 @@ fun OtpScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
                 is OtpUiEffect.NavigateToResetPassword -> onNavigateToResetPassword(effect.email, effect.otp)
                 OtpUiEffect.NavigateToLogin -> onNavigateToLogin()
-                is OtpUiEffect.ShowError -> snackBarHostState.showSnackbar(
-                    visuals = LafyuuSnackBarVisuals(
-                        message = effect.message,
-                        type = AlertType.Error
-                    )
-                )
 
                 is OtpUiEffect.ShowSnackbar -> snackBarHostState.showSnackbar(
                     visuals = LafyuuSnackBarVisuals(
-                        message = effect.message,
+                        message = effect.message.asString(context),
                         type = AlertType.Success
                     )
                 )
@@ -124,7 +121,7 @@ private fun OtpContent(
                 value = uiState.otp,
                 onValueChange = { onEvent(OtpUiEvent.OtpChanged(it)) },
                 isError = uiState.otpError != null,
-                errorMessage = uiState.otpError,
+                errorMessage = uiState.otpError?.asString(),
             )
             VerticalSpacerLarge()
             LafyuuText(
