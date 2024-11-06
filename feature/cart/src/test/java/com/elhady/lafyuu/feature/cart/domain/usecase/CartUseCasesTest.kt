@@ -41,8 +41,8 @@ class CartUseCasesTest {
 
         val result = useCase("item-1")
 
-        assertTrue(result is AppResult.Error)
-        assertEquals("Cannot exceed available stock (2)", (result as AppResult.Error).message)
+        assertTrue(result is AppResult.Failure)
+        assertEquals("Cannot exceed available stock (2)", (result as AppResult.Failure).error)
     }
 
     @Test
@@ -51,7 +51,7 @@ class CartUseCasesTest {
 
         val result = useCase("")
 
-        assertTrue(result is AppResult.Error)
-        assertEquals("Please enter a coupon code", (result as AppResult.Error).message)
+        assertTrue(result is AppResult.Failure)
+        assertEquals("Please enter a coupon code", (result as AppResult.Failure).error)
     }
 }

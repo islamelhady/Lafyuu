@@ -1,7 +1,7 @@
 package com.elhady.lafyuu.feature.home.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.network.error.AppResult
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.home.data.remote.HomeApi
 import com.elhady.lafyuu.feature.home.data.remote.model.CategoryDto
 import com.elhady.lafyuu.feature.home.data.remote.model.GetAllCategoriesResponse
@@ -16,25 +16,28 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import retrofit2.Response
 
 class HomeRepositoryImplTest {
 
     private val homeApi: HomeApi = mockk()
-    private val appResult: AppResult = mockk(relaxed = true)
+    private val safeApiCaller: SafeApiCaller = mockk {
+        coEvery { call<Any>(any()) } coAnswers {
+            AppResult.Success((firstArg() as suspend () -> Any).invoke())
+        }
+    }
     private lateinit var repository: HomeRepositoryImpl
 
     @Before
     fun setUp() {
-        repository = HomeRepositoryImpl(homeApi, appResult)
+        repository = HomeRepositoryImpl(homeApi, safeApiCaller)
     }
 
     @Test
     fun `getCategories returns Success on successful API response`() = runTest {
         val response = GetAllCategoriesResponse(
-            categories = listOf(CategoryDto(id = "1", name = "Bags"))
+            categories = listOf(CategoryDto(id = "1", name = "Bags")),
         )
-        coEvery { homeApi.getCategories() } returns Response.success(response)
+        coEvery { homeApi.getCategories() } returns response
 
         val result = repository.getCategories()
 
@@ -47,9 +50,9 @@ class HomeRepositoryImplTest {
     @Test
     fun `getOffers returns Success on successful API response`() = runTest {
         val response = GetAllOffersResponse(
-            items = listOf(OfferDto(id = "10", name = "Flash Discount"))
+            items = listOf(OfferDto(id = "10", name = "Flash Discount")),
         )
-        coEvery { homeApi.getOffers() } returns Response.success(response)
+        coEvery { homeApi.getOffers(any(), any()) } returns response
 
         val result = repository.getOffers()
 
@@ -62,9 +65,9 @@ class HomeRepositoryImplTest {
     @Test
     fun `getProducts returns Success with mapped products`() = runTest {
         val response = PagedListOfProductDto(
-            items = listOf(ProductDto(id = "100", name = "Sneakers", price = 80.0))
+            products = listOf(ProductDto(id = "100", name = "Sneakers", price = 80.0)),
         )
-        coEvery { homeApi.getProducts(page = 1, pageSize = 10) } returns Response.success(response)
+        coEvery { homeApi.getProducts(page = 1, pageSize = 10) } returns response
 
         val result = repository.getProducts(page = 1, pageSize = 10)
 

@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.cart.presentation
 
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppError
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
@@ -100,7 +101,7 @@ class CartViewModelTest {
     fun `IncreaseQuantity failure emits Error snackbar effect`() = runTest {
         val cart = Cart(cartId = "c-1", items = emptyList())
         coEvery { getCartUseCase() } returns AppResult.Success(cart)
-        coEvery { increaseCartItemQuantityUseCase("i-1") } returns AppResult.Error("Exceeds stock")
+        coEvery { increaseCartItemQuantityUseCase("i-1") } returns AppResult.Failure(AppError.OutOfStock(9))
 
         val viewModel = CartViewModel(
             getCartUseCase,

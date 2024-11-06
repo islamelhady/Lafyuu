@@ -2,6 +2,7 @@ package com.elhady.lafyuu.feature.orders.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppError
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.feature.orders.domain.model.OrderHistory
 import com.elhady.lafyuu.feature.orders.domain.model.OrderHistoryEntry
@@ -70,7 +71,7 @@ class OrderDetailsViewModelTest {
     @Test
     fun `loads order details failure emits error snackbar effect`() = runTest {
         val orderId = "order-123"
-        coEvery { getOrderHistoryUseCase(orderId) } returns AppResult.Error("Network error")
+        coEvery { getOrderHistoryUseCase(orderId) } returns AppResult.Failure(AppError.Validation("Network error"))
 
         val savedStateHandle = SavedStateHandle(mapOf("orderId" to orderId))
         val viewModel = OrderDetailsViewModel(getOrderHistoryUseCase, savedStateHandle)

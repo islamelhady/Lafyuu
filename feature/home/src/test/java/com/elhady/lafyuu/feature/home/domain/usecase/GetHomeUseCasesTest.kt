@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.home.domain.usecase
 
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.common.result.AppError
 import com.elhady.lafyuu.feature.home.domain.model.Category
 import com.elhady.lafyuu.feature.home.domain.model.Offer
 import com.elhady.lafyuu.feature.home.domain.model.Product
@@ -116,8 +117,8 @@ class GetHomeUseCasesTest {
         val categories = listOf(Category("1", "Bags", null, null))
 
         coEvery { homeRepository.getCategories() } returns AppResult.Success(categories)
-        coEvery { homeRepository.getOffers() } returns AppResult.Error(message = "Network Error")
-        coEvery { homeRepository.getProducts(any(), any(), any(), any(), any(), any()) } returns AppResult.Error(message = "Network Error")
+        coEvery { homeRepository.getOffers() } returns AppResult.Failure(AppError.Validation("Network Error"))
+        coEvery { homeRepository.getProducts(any(), any(), any(), any(), any(), any()) } returns AppResult.Failure(AppError.Validation("Network Error"))
 
         val result = getHomeContentUseCase()
 
@@ -136,7 +137,7 @@ class GetHomeUseCasesTest {
         val product1 = Product("p1", "Item 1", null, 10.0, null, null, null, 4)
 
         coEvery { homeRepository.getCategories() } returns AppResult.Success(categories)
-        coEvery { homeRepository.getOffers() } returns AppResult.Error(message = "Network Error")
+        coEvery { homeRepository.getOffers() } returns AppResult.Failure(AppError.Validation("Network Error"))
         coEvery { homeRepository.getProducts(page = 1, pageSize = 10) } returns AppResult.Success(listOf(product1))
         coEvery { homeRepository.getProducts(page = 2, pageSize = 10) } returns AppResult.Success(emptyList())
         coEvery { homeRepository.getProducts(page = 1, pageSize = 20) } returns AppResult.Success(listOf(product1))
@@ -158,7 +159,7 @@ class GetHomeUseCasesTest {
 
         coEvery { homeRepository.getCategories() } returns AppResult.Success(categories)
         coEvery { homeRepository.getOffers() } returns AppResult.Success(emptyList())
-        coEvery { homeRepository.getProducts(page = 1, pageSize = 10) } returns AppResult.Error(message = "Flash sale error")
+        coEvery { homeRepository.getProducts(page = 1, pageSize = 10) } returns AppResult.Failure(AppError.Validation("Flash sale error"))
         coEvery { homeRepository.getProducts(page = 2, pageSize = 10) } returns AppResult.Success(emptyList())
         coEvery { homeRepository.getProducts(page = 1, pageSize = 20) } returns AppResult.Success(listOf(product1))
 
@@ -173,14 +174,14 @@ class GetHomeUseCasesTest {
 
     @Test
     fun `GetHomeContentUseCase returns Error when all major sections fail`() = runTest {
-        coEvery { homeRepository.getCategories() } returns AppResult.Error(message = "Network Error")
-        coEvery { homeRepository.getOffers() } returns AppResult.Error(message = "Network Error")
-        coEvery { homeRepository.getProducts(any(), any(), any(), any(), any(), any()) } returns AppResult.Error(message = "Network Error")
+        coEvery { homeRepository.getCategories() } returns AppResult.Failure(AppError.Validation("Network Error"))
+        coEvery { homeRepository.getOffers() } returns AppResult.Failure(AppError.Validation("Network Error"))
+        coEvery { homeRepository.getProducts(any(), any(), any(), any(), any(), any()) } returns AppResult.Failure(AppError.Validation("Network Error"))
 
         val result = getHomeContentUseCase()
 
-        assertTrue(result is AppResult.Error)
-        assertEquals("Network Error", (result as AppResult.Error).message)
+        assertTrue(result is AppResult.Failure)
+        assertEquals("Network Error", (result as AppResult.Failure).error)
     }
 
     @Test

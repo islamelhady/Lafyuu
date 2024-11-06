@@ -5,6 +5,7 @@ import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.domain.model.ProductContent
 import com.elhady.lafyuu.core.common.domain.model.ProductDetails
 import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
+import com.elhady.lafyuu.core.common.result.AppError
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
 import com.elhady.lafyuu.feature.cart.domain.usecase.RemoveCartItemUseCase
@@ -73,7 +74,7 @@ class ProductDetailsViewModelTest {
 
     @Test
     fun `loadProductDetails failure sets isLoading false and error state`() = runTest {
-        coEvery { getProductDetailsUseCase("p-err") } returns AppResult.Error(message = "Network error")
+        coEvery { getProductDetailsUseCase("p-err") } returns AppResult.Failure(AppError.Validation("Network error"))
 
         val savedStateHandle = SavedStateHandle(mapOf("productId" to "p-err"))
         val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, removeCartItemUseCase, favoritesRepository, cartRepository, savedStateHandle)
@@ -147,7 +148,7 @@ class ProductDetailsViewModelTest {
     fun `AddToCartClicked failure sets isAddingToCart false and emits error snackbar`() = runTest {
         val details = ProductDetails(id = "p-1", name = "Test Product")
         coEvery { getProductDetailsUseCase("p-1") } returns AppResult.Success(ProductContent(details = details))
-        coEvery { addToCartUseCase("p-1", 1) } returns AppResult.Error(message = "Out of stock")
+        coEvery { addToCartUseCase("p-1", 1) } returns AppResult.Failure(AppError.Validation("Out of stock"))
 
         val savedStateHandle = SavedStateHandle(mapOf("productId" to "p-1"))
         val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, removeCartItemUseCase, favoritesRepository, cartRepository, savedStateHandle)
@@ -170,7 +171,7 @@ class ProductDetailsViewModelTest {
     fun `RetryClicked triggers product loading again and handles success`() = runTest {
         val details = ProductDetails(id = "p-1", name = "Retry Product")
         coEvery { getProductDetailsUseCase("p-1") } returnsMany listOf(
-            AppResult.Error(message = "Failed"),
+            AppResult.Failure(AppError.Validation("Failed")),
             AppResult.Success(ProductContent(details = details))
         )
 
@@ -191,7 +192,7 @@ class ProductDetailsViewModelTest {
 
     @Test
     fun `RetryClicked handles failed retry exposing expected error`() = runTest {
-        coEvery { getProductDetailsUseCase("p-1") } returns AppResult.Error(message = "Still failing")
+        coEvery { getProductDetailsUseCase("p-1") } returns AppResult.Failure(AppError.Validation("Still failing"))
 
         val savedStateHandle = SavedStateHandle(mapOf("productId" to "p-1"))
         val viewModel = ProductDetailsViewModel(getProductDetailsUseCase, addToCartUseCase, removeCartItemUseCase, favoritesRepository, cartRepository, savedStateHandle)

@@ -6,6 +6,7 @@ import com.elhady.lafyuu.core.common.domain.model.ProductDetails
 import com.elhady.lafyuu.core.common.domain.model.ProductReview
 import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
 import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
+import com.elhady.lafyuu.core.common.result.AppError
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -28,8 +29,8 @@ class GetProductDetailsUseCaseTest {
     fun `returns error when product ID is blank`() = runTest {
         val result = useCase("")
 
-        assertTrue(result is AppResult.Error)
-        assertEquals("Invalid product ID", (result as AppResult.Error).message)
+        assertTrue(result is AppResult.Failure)
+        assertEquals("Invalid product ID", (result as AppResult.Failure).error)
     }
 
     @Test
@@ -53,13 +54,13 @@ class GetProductDetailsUseCaseTest {
 
     @Test
     fun `returns error when product details request fails`() = runTest {
-        coEvery { repository.getProductDetails("p-1") } returns AppResult.Error("Product not found")
+        coEvery { repository.getProductDetails("p-1") } returns AppResult.Failure(AppError.Validation("Product not found"))
         coEvery { repository.getProductReviews("p-1", 1, 5) } returns AppResult.Success(emptyList())
         coEvery { repository.getRecommendedProducts(10) } returns AppResult.Success(emptyList())
 
         val result = useCase("p-1")
 
-        assertTrue(result is AppResult.Error)
-        assertEquals("Product not found", (result as AppResult.Error).message)
+        assertTrue(result is AppResult.Failure)
+        assertEquals("Product not found", (result as AppResult.Failure).error)
     }
 }
