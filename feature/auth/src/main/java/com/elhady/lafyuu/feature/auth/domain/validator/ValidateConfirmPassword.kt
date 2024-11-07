@@ -3,14 +3,15 @@ package com.elhady.lafyuu.feature.auth.domain.validator
 import com.elhady.lafyuu.feature.auth.domain.model.ValidationResult
 import javax.inject.Inject
 
-class ValidateConfirmPassword @Inject constructor() {
+class ValidateConfirmPassword @Inject constructor(
+    private val validatePassword: ValidatePassword
+) {
     operator fun invoke(password: String, confirmPassword: String): ValidationResult {
-        if (confirmPassword.isBlank()) {
-            return ValidationResult.Error.ConfirmPasswordRequired
+        val passwordResult = validatePassword(password)
+        return when {
+            passwordResult !is ValidationResult.Success -> passwordResult
+            password != confirmPassword -> ValidationResult.Error.PasswordMismatch
+            else -> ValidationResult.Success
         }
-        if (password != confirmPassword) {
-            return ValidationResult.Error.PasswordMismatch
-        }
-        return ValidationResult.Success
     }
 }

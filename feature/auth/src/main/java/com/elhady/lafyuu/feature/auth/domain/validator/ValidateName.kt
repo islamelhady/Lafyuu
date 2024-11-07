@@ -5,9 +5,9 @@ import javax.inject.Inject
 
 class ValidateName @Inject constructor() {
     operator fun invoke(name: String): ValidationResult {
-        if (name.isBlank()) {
-            return ValidationResult.Error.NameRequired
+        return when{
+            name.isBlank() -> ValidationResult.Error.NameRequired
+            else -> ValidationResult.Success
         }
-        return ValidationResult.Success
     }
 }

@@ -13,4 +13,5 @@
     <string name="confirm_password_is_required">Confirm password is required</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="new_password_is_required">New password is required</string>
+    <string name="oops_your_email_is_not_correct">Oops! Your Email Is Not Correct</string>
 </resources>

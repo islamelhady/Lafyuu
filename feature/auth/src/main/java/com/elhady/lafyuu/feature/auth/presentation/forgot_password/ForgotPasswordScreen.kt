@@ -35,6 +35,7 @@ import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -117,6 +118,7 @@ private fun ForgotPasswordContent(
                 value = uiState.email,
                 onValueChange = { onEvent(ForgotPasswordUiEvent.EmailChanged(it)) },
                 placeholder = "Email",
+                errorMessage = uiState.emailError?.asString(),
                 modifier = Modifier.fillMaxWidth()
             )
 

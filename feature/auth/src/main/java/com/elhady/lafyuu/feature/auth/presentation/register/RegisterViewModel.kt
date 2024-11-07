@@ -80,7 +80,7 @@ class RegisterViewModel @Inject constructor(
                         ValidationResult.Error.EmailRequired -> UiText.Resource(R.string.email_is_required)
                         ValidationResult.Error.InvalidEmailFormat -> UiText.Resource(R.string.invalid_email_format)
                         else -> null
-                    } as UiText,
+                    },
                     passwordError = when (passwordResult) {
                         ValidationResult.Error.PasswordRequired -> UiText.Resource(R.string.password_is_required)
                         ValidationResult.Error.PasswordMissingDigit -> UiText.Resource(R.string.password_must_contain_at_least_one_digit)
