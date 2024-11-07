@@ -11,24 +11,24 @@ class ValidateConfirmPasswordTest {
 
     @Before
     fun setUp() {
-        validateConfirmPassword = ValidateConfirmPassword()
+        validateConfirmPassword = ValidateConfirmPassword(ValidatePassword())
     }
 
     @Test
     fun `empty confirmation password returns ConfirmPasswordRequired error`() {
-        val result = validateConfirmPassword("pass", "")
+        val result = validateConfirmPassword("Password123!", "")
         assertEquals(ValidationResult.Error.ConfirmPasswordRequired, result)
     }
 
     @Test
     fun `mismatched passwords returns PasswordMismatch error`() {
-        val result = validateConfirmPassword("pass1", "pass2")
+        val result = validateConfirmPassword("Password123!", "Password123?&")
         assertEquals(ValidationResult.Error.PasswordMismatch, result)
     }
 
     @Test
     fun `matching passwords returns Success`() {
-        val result = validateConfirmPassword("password123", "password123")
+        val result = validateConfirmPassword("Password123!", "Password123!")
         assertEquals(ValidationResult.Success, result)
     }
 }

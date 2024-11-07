@@ -10,6 +10,7 @@ class ValidateConfirmPassword @Inject constructor(
         val passwordResult = validatePassword(password)
         return when {
             passwordResult !is ValidationResult.Success -> passwordResult
+            confirmPassword.isBlank() -> ValidationResult.Error.ConfirmPasswordRequired
             password != confirmPassword -> ValidationResult.Error.PasswordMismatch
             else -> ValidationResult.Success
         }

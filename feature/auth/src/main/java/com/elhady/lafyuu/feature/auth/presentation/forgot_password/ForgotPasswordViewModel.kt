@@ -43,7 +43,7 @@ class ForgotPasswordViewModel @Inject constructor(
     private fun submit() {
         if (_uiState.value.isLoading) return
 
-        val email = _uiState.value.email
+        val email = _uiState.value.email.trim()
         val emailResult = validateEmail(email)
 
         if (emailResult is ValidationResult.Error) {

@@ -54,7 +54,8 @@ class LoginViewModel @Inject constructor(
         if (_uiState.value.isLoading) return
 
         val state = _uiState.value
-        val emailResult = validateEmail(state.email)
+        val trimmedEmail = state.email.trim()
+        val emailResult = validateEmail(trimmedEmail)
         val passwordResult = validateLoginPassword(state.password)
 
         val hasError = emailResult is ValidationResult.Error || passwordResult is ValidationResult.Error
@@ -84,7 +85,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, generalError = null) }
 
-            when (val result = loginUseCase(state.email, state.password)) {
+            when (val result = loginUseCase(trimmedEmail, state.password)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
                     _uiEffect.send(LoginUiEffect.NavigateToHome)
