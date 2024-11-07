@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.feature.home.presentation
 
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.core.common.result.AppError
 import com.elhady.lafyuu.core.designsystem.components.element.TabBarItem
 import com.elhady.lafyuu.core.designsystem.icons.Search
@@ -84,7 +85,7 @@ class HomeViewModelTest {
 
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)
-        assertEquals("Network error", state.errorMessage)
+        assertEquals(UiText.Dynamic("Network error"), state.errorMessage)
     }
 
     @Test

@@ -42,12 +42,12 @@ class GetHomeContentUseCase @Inject constructor(
                 (recommendedResult is AppResult.Failure)
 
         if (hasTotalError) {
-            val errorMsg = (categoriesResult).error
+            val errorMsg = (categoriesResult as? AppResult.Failure)?.error
                 ?: (flashSaleResult as? AppResult.Failure)?.error
                 ?: (recommendedResult as? AppResult.Failure)?.error
                 ?: (offersResult as? AppResult.Failure)?.error
-                ?: "Failed to load content. Please check your network connection."
-            AppResult.Failure(error = errorMsg as AppError)
+                ?: AppError.Unknown
+            AppResult.Failure(error = errorMsg)
         } else {
             AppResult.Success(
                 HomeContent(
