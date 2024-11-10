@@ -150,7 +150,7 @@ fun ProductDetailsScreen(
                 uiState.product != null -> {
                     ProductDetailsContent(
                         uiState = uiState,
-                        onEvent = onIntent,
+                        onIntent = onIntent,
                         modifier = Modifier.fillMaxSize()
                     )
                 }

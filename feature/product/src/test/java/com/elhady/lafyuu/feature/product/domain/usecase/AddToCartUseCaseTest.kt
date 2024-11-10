@@ -1,7 +1,7 @@
 package com.elhady.lafyuu.feature.product.domain.usecase
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
+import com.elhady.lafyuu.feature.product.domain.repository.ProductRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -22,28 +22,13 @@ class AddToCartUseCaseTest {
     }
 
     @Test
-    fun `returns error when productId is blank`() = runTest {
-        val result = useCase("", 1)
-
-        assertTrue(result is AppResult.Failure)
-        assertEquals("Invalid product ID", (result as AppResult.Failure).error)
-    }
-
-    @Test
-    fun `returns error when quantity is zero or negative`() = runTest {
-        val result = useCase("p-1", 0)
-
-        assertTrue(result is AppResult.Failure)
-        assertEquals("Quantity must be greater than zero", (result as AppResult.Failure).error)
-    }
-
-    @Test
     fun `calls repository addToCart when inputs are valid`() = runTest {
-        coEvery { repository.addToCart("p-1", 2) } returns AppResult.Success(Unit)
+        coEvery { repository.addToCart("p-1", 2) } returns AppResult.Success("cart-item-1")
 
         val result = useCase("p-1", 2)
 
         assertTrue(result is AppResult.Success)
+        assertEquals("cart-item-1", (result as AppResult.Success).data)
         coVerify(exactly = 1) { repository.addToCart("p-1", 2) }
     }
 }

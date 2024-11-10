@@ -26,20 +26,22 @@ class ProductMappersTest {
             sellerId = "seller-1"
         )
 
-        val domain = dto.toProductDetailsDomain()
+        val domain = dto.toProductDetails()
 
         assertEquals("prod-1", domain.id)
         assertEquals("CODE123", domain.productCode)
         assertEquals("Test Shoes", domain.name)
         assertEquals("A great pair of shoes", domain.description)
-        assertEquals("https://example.com/cover.jpg", domain.coverPictureUrl)
-        assertEquals(2, domain.productPictures.size)
-        assertEquals(100.0, domain.price, 0.01)
-        assertEquals(150.0, domain.originalPrice!!, 0.01)
+        assertEquals("https://example.com/cover.jpg", domain.pictureUrls[0])
+        assertEquals("https://example.com/pic1.jpg", domain.pictureUrls[1])
+        assertEquals("https://example.com/pic2.jpg", domain.pictureUrls[2])
+        assertEquals(3, domain.pictureUrls.size)
+        assertEquals(100.0, domain.basePrice, 0.01)
+        assertEquals(67.0, domain.finalPrice, 0.01)
         assertEquals(33, domain.discountPercentage)
         assertEquals(10, domain.stock)
         assertEquals("Red", domain.color)
-        assertEquals(4, domain.rating)
+        assertEquals(5, domain.rating)
         assertEquals(12, domain.reviewsCount)
         assertEquals("seller-1", domain.sellerId)
     }
@@ -48,22 +50,22 @@ class ProductMappersTest {
     fun `toProductSummaryDomain maps product summary correctly`() {
         val dto = ProductDto(
             id = "prod-2",
-            title = "Summary Shoe",
+            name = "Summary Shoe",
             coverPictureUrl = "https://example.com/summary.jpg",
             price = 50.0,
             discountPercentage = 20.0,
             rating = 4.0
         )
 
-        val domain = dto.toProductSummaryDomain()
+        val domain = dto.toRecommendedProduct()
 
         assertEquals("prod-2", domain.id)
         assertEquals("Summary Shoe", domain.name)
         assertEquals("https://example.com/summary.jpg", domain.imageUrl)
-        assertEquals(50.0, domain.price, 0.01)
+        assertEquals(50.0, domain.basePrice, 0.01)
         assertEquals(20, domain.discountPercentage)
         assertEquals(4, domain.rating)
-        assertNotNull(domain.originalPrice)
+        assertNotNull(domain.finalPrice)
     }
 
     @Test

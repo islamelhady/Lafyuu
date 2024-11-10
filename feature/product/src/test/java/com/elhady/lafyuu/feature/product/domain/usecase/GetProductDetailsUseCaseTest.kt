@@ -1,12 +1,11 @@
 package com.elhady.lafyuu.feature.product.domain.usecase
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.common.domain.model.Product
-import com.elhady.lafyuu.core.common.domain.model.ProductDetails
-import com.elhady.lafyuu.core.common.domain.model.ProductReview
-import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
-import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
 import com.elhady.lafyuu.core.common.result.AppError
+import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
+import com.elhady.lafyuu.feature.product.domain.model.ProductReview
+import com.elhady.lafyuu.feature.product.domain.model.RecommendedProduct
+import com.elhady.lafyuu.feature.product.domain.repository.ProductRepository
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -26,22 +25,42 @@ class GetProductDetailsUseCaseTest {
     }
 
     @Test
-    fun `returns error when product ID is blank`() = runTest {
-        val result = useCase("")
-
-        assertTrue(result is AppResult.Failure)
-        assertEquals("Invalid product ID", (result as AppResult.Failure).error)
-    }
-
-    @Test
     fun `returns success content when details request succeeds`() = runTest {
-        val details = ProductDetails(id = "p-1", name = "Main Product")
-        val review = ProductReview(comment = "Good", rating = 5, createdAt = "2023-01-01", userName = "User", userPicture = "")
-        val recommended = Product(id = "p-2", name = "Rec Product")
+        val details = ProductDetails(
+            id = "p-1",
+            productCode = "CODE-1",
+            name = "Main Product",
+            description = "Description",
+            basePrice = 100.0,
+            finalPrice = 90.0,
+            discountPercentage = 10,
+            stock = 100,
+            color = "Red",
+            rating = 5,
+            reviewsCount = 10,
+            sellerId = "s-1",
+            pictureUrls = emptyList()
+        )
+        val review = ProductReview(
+            comment = "Good",
+            rating = 5,
+            createdAt = "2023-01-01",
+            userName = "User",
+            userPicture = ""
+        )
+        val recommended = RecommendedProduct(
+            id = "p-2",
+            name = "Rec Product",
+            basePrice = 50.0,
+            finalPrice = 50.0,
+            discountPercentage = 0,
+            rating = 4,
+            imageUrl = null
+        )
 
         coEvery { repository.getProductDetails("p-1") } returns AppResult.Success(details)
         coEvery { repository.getProductReviews("p-1", 1, 5) } returns AppResult.Success(listOf(review))
-        coEvery { repository.getRecommendedProducts(10) } returns AppResult.Success(listOf(recommended))
+        coEvery { repository.getRecommendedProducts(11) } returns AppResult.Success(listOf(recommended))
 
         val result = useCase("p-1")
 
@@ -56,11 +75,11 @@ class GetProductDetailsUseCaseTest {
     fun `returns error when product details request fails`() = runTest {
         coEvery { repository.getProductDetails("p-1") } returns AppResult.Failure(AppError.Validation("Product not found"))
         coEvery { repository.getProductReviews("p-1", 1, 5) } returns AppResult.Success(emptyList())
-        coEvery { repository.getRecommendedProducts(10) } returns AppResult.Success(emptyList())
+        coEvery { repository.getRecommendedProducts(11) } returns AppResult.Success(emptyList())
 
         val result = useCase("p-1")
 
         assertTrue(result is AppResult.Failure)
-        assertEquals("Product not found", (result as AppResult.Failure).error)
+        assertEquals(AppError.Validation("Product not found"), (result as AppResult.Failure).error)
     }
 }

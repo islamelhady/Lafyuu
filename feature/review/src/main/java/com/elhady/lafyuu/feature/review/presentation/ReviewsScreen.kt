@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.R
@@ -29,7 +30,6 @@ import com.elhady.lafyuu.core.designsystem.components.element.FilterReviewBar
 import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.element.ReviewCard
-import com.elhady.lafyuu.core.designsystem.components.element.ReviewData
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.other.RatingBar
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
@@ -119,6 +119,7 @@ fun ReviewsScreen(
                         color = Theme.color.blue
                     )
                 }
+
                 else -> {
                     Column(
                         modifier = Modifier.fillMaxSize(),
@@ -161,15 +162,15 @@ fun ReviewsScreen(
                                 contentPadding = PaddingValues(bottom = Theme.space.large),
                                 verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
                             ) {
-                                items(filteredReviews, key = { it.userName + it.createdAt }) { review ->
+                                items(
+                                    filteredReviews,
+                                    key = { it.userName + it.createdAt }) { review ->
                                     ReviewCard(
-                                        review = ReviewData(
-                                            userName = review.userName,
-                                            avatarUrl = R.drawable.img_profile_man_bearded,
-                                            rating = review.rating,
-                                            comment = review.comment,
-                                            date = review.createdAt
-                                        )
+                                        userName = review.userName,
+                                        avatarUrl = painterResource(review.userPicture?.toIntOrNull() ?: R.drawable.img_profile_man_bearded),
+                                        rating = review.rating,
+                                        comment = review.comment,
+                                        date = review.createdAt
                                     )
                                 }
                             }
