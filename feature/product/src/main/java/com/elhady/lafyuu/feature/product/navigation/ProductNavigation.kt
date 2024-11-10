@@ -6,8 +6,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.elhady.lafyuu.feature.product.presentation.ProductDetailsRoute
+import com.elhady.lafyuu.feature.product.presentation.ProductDetailsViewModel
 
-const val PRODUCT_DETAILS_ARG = "productId"
+const val PRODUCT_DETAILS_ARG = ProductDetailsViewModel.PRODUCT_ID_ARG
 const val PRODUCT_DETAILS_ROUTE_BASE = "product_details"
 const val PRODUCT_DETAILS_ROUTE = "$PRODUCT_DETAILS_ROUTE_BASE/{$PRODUCT_DETAILS_ARG}"
 
@@ -29,10 +30,8 @@ fun NavGraphBuilder.productDetailsScreen(
                 type = NavType.StringType
             }
         )
-    ) { backStackEntry ->
-        val productId = backStackEntry.arguments?.getString(PRODUCT_DETAILS_ARG).orEmpty()
+    ) {
         ProductDetailsRoute(
-            productId = productId,
             onNavigateBack = onNavigateBack,
             onNavigateToSearch = onNavigateToSearch,
             onNavigateToProductDetails = onNavigateToProductDetails,
