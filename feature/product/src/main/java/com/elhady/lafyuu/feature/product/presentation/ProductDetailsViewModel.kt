@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
+import com.elhady.lafyuu.feature.product.domain.usecase.GetProductDetailsUseCase
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.core.ui.text.toUiText

@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,7 +31,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 @Composable
 fun ReviewCard(
     userName: String,
-    @DrawableRes avatarUrl: Int,
+    avatarUrl: Painter,
     rating: Int,
     comment: String,
     date: String,
@@ -46,7 +47,7 @@ fun ReviewCard(
             horizontalArrangement = Arrangement.spacedBy(Theme.space.large),
         ) {
             Image(
-                painter = painterResource(id = avatarUrl),
+                painter = avatarUrl,
                 contentDescription = null,
                 modifier = Modifier
                     .size(Theme.size.large)
@@ -99,7 +100,7 @@ private fun AllElementComponentsPreview() {
                 SectionTitle("Review")
                 ReviewCard(
                     userName = "James Lawson",
-                    avatarUrl = R.drawable.img_profile_man_bearded,
+                    avatarUrl = painterResource(id = R.drawable.img_profile_man_bearded),
                     rating = 3,
                     comment = "air max are always very comfortable fit, clean and just perfect in every way. just the box was too small and scrunched the sneakers up a little bit, not sure if the box was always this small but the 90s are and will always be one of my favorites.",
                     date = "December 10, 2016",

@@ -37,7 +37,8 @@ fun ProductReview.toUi() = ReviewUi(
     userName = userName,
     rating = rating,
     comment = comment,
-    date = createdAt
+    date = createdAt,
+    userPicture = userPicture.orEmpty()
 )
 
 private fun formatPrice(value: Double): String = String.format(Locale.US, "\$%.2f", value)
