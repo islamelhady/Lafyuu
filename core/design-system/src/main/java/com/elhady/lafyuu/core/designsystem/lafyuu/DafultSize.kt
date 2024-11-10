@@ -18,5 +18,6 @@ val defaultSize = Size(
     smallButtonWidth = 92.dp,
     smallButtonHeight = 50.dp,
     quantityButtonWidth = 104.dp,
-    quantityLabelWidth = 40.dp
+    quantityLabelWidth = 40.dp,
+    productImageHeight = 238.dp
 )

@@ -27,18 +27,14 @@ import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
-data class ReviewData(
-    val userName: String,
-    @DrawableRes val avatarUrl: Int,
-    val rating: Int,
-    val comment: String,
-    val date: String,
-    @DrawableRes val imageUrls: List<Int> = emptyList()
-)
-
 @Composable
 fun ReviewCard(
-    review: ReviewData,
+    userName: String,
+    @DrawableRes avatarUrl: Int,
+    rating: Int,
+    comment: String,
+    date: String,
+    @DrawableRes imageUrls: List<Int> = emptyList(),
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -50,7 +46,7 @@ fun ReviewCard(
             horizontalArrangement = Arrangement.spacedBy(Theme.space.large),
         ) {
             Image(
-                painter = painterResource(id = review.avatarUrl),
+                painter = painterResource(id = avatarUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .size(Theme.size.large)
@@ -59,29 +55,29 @@ fun ReviewCard(
             )
             Column {
                 LafyuuText(
-                    text = review.userName,
+                    text = userName,
                     style = Theme.typography.heading5,
                     color = Theme.color.neutralDark
                 )
                 RatingBar(
-                    rating = review.rating,
+                    rating = rating,
                     iconSize = Theme.size.iconMedium,
                 )
             }
         }
         LafyuuText(
-            text = review.comment,
+            text = comment,
             style = Theme.typography.normalTextRegular,
             color = Theme.color.neutralGrey
         )
-        if (review.imageUrls.isNotEmpty()) {
+        if (imageUrls.isNotEmpty()) {
             ImageReview(
-                imageUrls = review.imageUrls,
+                imageUrls = imageUrls,
                 onAddClick = null
             )
         }
         LafyuuText(
-            text = review.date,
+            text = date,
             style = Theme.typography.normalCaptionRegular,
             color = Theme.color.neutralGrey
         )
@@ -102,17 +98,15 @@ private fun AllElementComponentsPreview() {
 
                 SectionTitle("Review")
                 ReviewCard(
-                    review = ReviewData(
-                        userName = "James Lawson",
-                        avatarUrl = R.drawable.img_profile_man_bearded,
-                        rating = 3,
-                        comment = "air max are always very comfortable fit, clean and just perfect in every way. just the box was too small and scrunched the sneakers up a little bit, not sure if the box was always this small but the 90s are and will always be one of my favorites.",
-                        date = "December 10, 2016",
-                        imageUrls = listOf(
-                            R.drawable.img_product_shoes_bottom,
-                            R.drawable.img_product_shoes_side,
-                            R.drawable.img_product_shoes_back
-                        )
+                    userName = "James Lawson",
+                    avatarUrl = R.drawable.img_profile_man_bearded,
+                    rating = 3,
+                    comment = "air max are always very comfortable fit, clean and just perfect in every way. just the box was too small and scrunched the sneakers up a little bit, not sure if the box was always this small but the 90s are and will always be one of my favorites.",
+                    date = "December 10, 2016",
+                    imageUrls = listOf(
+                        R.drawable.img_product_shoes_bottom,
+                        R.drawable.img_product_shoes_side,
+                        R.drawable.img_product_shoes_back
                     )
                 )
             }
