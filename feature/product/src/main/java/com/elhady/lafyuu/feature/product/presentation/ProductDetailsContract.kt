@@ -1,39 +1,33 @@
 package com.elhady.lafyuu.feature.product.presentation
 
-import com.elhady.lafyuu.core.common.domain.model.Product
-import com.elhady.lafyuu.core.common.domain.model.ProductDetails
-import com.elhady.lafyuu.core.common.domain.model.ProductReview
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.feature.product.presentation.model.ProductDetailsUi
+import com.elhady.lafyuu.feature.product.presentation.model.RecommendedProductUi
+import com.elhady.lafyuu.feature.product.presentation.model.ReviewUi
 
 data class ProductDetailsUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val isAddingToCart: Boolean = false,
-    val isInCart: Boolean = false,
     val cartItemId: String? = null,
-    val product: ProductDetails? = null,
-    val reviews: List<ProductReview> = emptyList(),
-    val recommendedProducts: List<Product> = emptyList(),
-    val selectedSize: String = "",
-    val selectedColorHex: String = "",
-    val quantity: Int = 1,
+    val product: ProductDetailsUi? = null,
+    val reviews: List<ReviewUi> = emptyList(),
+    val recommendedProducts: List<RecommendedProductUi> = emptyList(),
     val isFavorite: Boolean = false,
     val error: UiText? = null
-)
+) {
+    val isInCart: Boolean get() = cartItemId != null
+}
 
-sealed interface ProductDetailsUiEvent {
-    data class LoadProduct(val productId: String) : ProductDetailsUiEvent
-    data class SizeSelected(val size: String) : ProductDetailsUiEvent
-    data class ColorSelected(val colorHex: String) : ProductDetailsUiEvent
-    data class QuantityChanged(val newQuantity: Int) : ProductDetailsUiEvent
-    data object FavoriteToggled : ProductDetailsUiEvent
-    data object AddToCartClicked : ProductDetailsUiEvent
-    data object BackClicked : ProductDetailsUiEvent
-    data object SearchClicked : ProductDetailsUiEvent
-    data object RetryClicked : ProductDetailsUiEvent
-    data class RecommendedProductClicked(val productId: String) : ProductDetailsUiEvent
-    data object SeeMoreReviewsClicked : ProductDetailsUiEvent
-    data object WriteReviewClicked : ProductDetailsUiEvent
+sealed interface ProductDetailsUiIntent {
+    data object FavoriteToggled : ProductDetailsUiIntent
+    data object AddToCartClicked : ProductDetailsUiIntent
+    data object BackClicked : ProductDetailsUiIntent
+    data object SearchClicked : ProductDetailsUiIntent
+    data object RetryClicked : ProductDetailsUiIntent
+    data object SeeMoreReviewsClicked : ProductDetailsUiIntent
+    data object WriteReviewClicked : ProductDetailsUiIntent
+    data class RecommendedProductClicked(val productId: String) : ProductDetailsUiIntent
 }
 
 sealed interface ProductDetailsUiEffect {

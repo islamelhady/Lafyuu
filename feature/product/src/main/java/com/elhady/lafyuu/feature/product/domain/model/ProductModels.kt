@@ -1,4 +1,4 @@
-package com.elhady.lafyuu.feature.product.domain.models
+package com.elhady.lafyuu.feature.product.domain.model
 
 data class ProductDetails(
     val id: String,

@@ -2,14 +2,14 @@ package com.elhady.lafyuu.feature.product.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.SafeApiCaller
+import com.elhady.lafyuu.feature.product.data.mapper.toReview
 import com.elhady.lafyuu.feature.product.data.mapper.toProductDetails
 import com.elhady.lafyuu.feature.product.data.mapper.toRecommendedProduct
-import com.elhady.lafyuu.feature.product.data.mapper.toReview
 import com.elhady.lafyuu.feature.product.data.remote.ProductApi
 import com.elhady.lafyuu.feature.product.data.remote.model.AddItemToCartRequestDto
-import com.elhady.lafyuu.feature.product.domain.models.ProductDetails
-import com.elhady.lafyuu.feature.product.domain.models.ProductReview
-import com.elhady.lafyuu.feature.product.domain.models.RecommendedProduct
+import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
+import com.elhady.lafyuu.feature.product.domain.model.ProductReview
+import com.elhady.lafyuu.feature.product.domain.model.RecommendedProduct
 import com.elhady.lafyuu.feature.product.domain.repository.ProductRepository
 import javax.inject.Inject
 

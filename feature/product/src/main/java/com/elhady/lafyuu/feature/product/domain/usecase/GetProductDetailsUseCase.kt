@@ -2,7 +2,7 @@ package com.elhady.lafyuu.feature.product.domain.usecase
 
 //import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.feature.product.domain.models.ProductContent
+import com.elhady.lafyuu.feature.product.domain.model.ProductContent
 import com.elhady.lafyuu.feature.product.domain.repository.ProductRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

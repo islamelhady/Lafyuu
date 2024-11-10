@@ -76,7 +76,7 @@ class ProductMappersTest {
             userPicture = "https://example.com/avatar.jpg"
         )
 
-        val domain = dto.toDomain()
+        val domain = dto.toReview()
 
         assertEquals("Great product!", domain.comment)
         assertEquals(5, domain.rating)

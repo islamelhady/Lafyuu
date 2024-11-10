@@ -2,9 +2,9 @@ package com.elhady.lafyuu.feature.product.data.mapper
 
 import com.elhady.lafyuu.feature.product.data.remote.model.ProductDto
 import com.elhady.lafyuu.feature.product.data.remote.model.UserReviewDto
-import com.elhady.lafyuu.feature.product.domain.models.ProductDetails
-import com.elhady.lafyuu.feature.product.domain.models.ProductReview
-import com.elhady.lafyuu.feature.product.domain.models.RecommendedProduct
+import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
+import com.elhady.lafyuu.feature.product.domain.model.ProductReview
+import com.elhady.lafyuu.feature.product.domain.model.RecommendedProduct
 import kotlin.math.roundToInt
 
 fun ProductDto.toProductDetails(): ProductDetails {
