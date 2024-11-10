@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface ProductCartGateway {
     fun observeCartItemId(productId: String): Flow<String?>
     suspend fun removeCartItem(cartItemId: String): AppResult<Unit>
+    suspend fun refresh()
 }
 
 interface ProductFavoriteGateway {

@@ -26,6 +26,10 @@ class ProductCartGatewayImpl @Inject constructor(
     override suspend fun removeCartItem(cartItemId: String): AppResult<Unit> {
         return removeCartItemUseCase(cartItemId).map { }
     }
+
+    override suspend fun refresh() {
+        cartRepository.getCart()
+    }
 }
 
 class ProductFavoriteGatewayImpl @Inject constructor(

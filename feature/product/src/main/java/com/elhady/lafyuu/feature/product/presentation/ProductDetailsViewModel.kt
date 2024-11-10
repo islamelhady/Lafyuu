@@ -61,7 +61,12 @@ class ProductDetailsViewModel @Inject constructor(
             observeFavorite()
             observeCart()
             loadProduct()
+            refreshCart()
         }
+    }
+
+    private fun refreshCart() {
+        viewModelScope.launch { cartGateway.refresh() }
     }
 
     fun onIntent(intent: ProductDetailsUiIntent) {
@@ -142,7 +147,8 @@ class ProductDetailsViewModel @Inject constructor(
     private suspend fun addToCart() {
         when (val result = addToCartUseCase(productId, DEFAULT_QUANTITY)) {
             is AppResult.Success -> {
-                _uiState.update { it.copy(cartItemId = result.data) }
+                _uiState.update { it.copy(cartItemId = result.data ?: it.cartItemId) }
+                refreshCart()
                 showSnackbar(R.string.product_add_to_cart_successfully, AlertType.Success)
             }
 
@@ -154,6 +160,7 @@ class ProductDetailsViewModel @Inject constructor(
         when (cartGateway.removeCartItem(cartItemId)) {
             is AppResult.Success -> {
                 _uiState.update { it.copy(cartItemId = null) }
+                refreshCart()
                 showSnackbar(messageRes = R.string.product_remove_from_cart, type = AlertType.Success)
             }
 
