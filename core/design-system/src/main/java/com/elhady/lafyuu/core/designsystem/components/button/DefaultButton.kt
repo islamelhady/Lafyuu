@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.google.android.material.loadingindicator.LoadingIndicator
@@ -55,7 +57,7 @@ private fun PreviewDefaultButtonDisable(){
     LafyuuTheme {
         DefaultButton(
             modifier = Modifier.fillMaxWidth(),
-            caption = "Default Button",
+            caption = stringResource(R.string.default_button),
             onClick = {},
             isEnabled = false,
             isLoading = true

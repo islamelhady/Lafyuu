@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="removed_from_favorite">Removed from Favorite</string>
-    <string name="added_to_favorite">Added to favorite</string>
-    <string name="removed_from_cart">Removed Successful</string>
-    <string name="failed_to_remove_item">Failed to remove</string>
-    <string name="added_to_cart_successfully">Added to cart successfully!</string>
-    <string name="failed_to_add_to_cart">Failed to add to Cart</string>
+    <string name="product_removed_from_favorite">Removed from Favorite</string>
+    <string name="product_added_to_favorite">Added to favorite</string>
+    <string name="product_failed_to_remove_item">Failed to remove from Cart</string>
+    <string name="product_add_to_cart_successfully">Added to cart successfully!</string>
+    <string name="product_failed_to_add_to_cart">Failed to add to Cart</string>
+    <string name="product_details_title">Product Details</string>
+    <string name="product_add_to_cart">Add To Cart</string>
+    <string name="product_remove_from_cart">Remove from Cart</string>
+    <string name="product_favorite_cd">Favorite</string>
+    <string name="product_discount_off">%1$d%% Off</string>
+    <string name="product_discount_label">%1$d%% OFF</string>
+    <string name="product_specification">Specification</string>
+    <string name="product_style_label">Style:</string>
+    <string name="product_stock_label">Stock:</string>
+    <string name="product_stock_items">%1$d items</string>
+    <string name="product_reviews_title">Review Product</string>
+    <string name="product_see_more">See More</string>
+    <string name="product_write_review">Write Review</string>
+    <string name="product_write_first_review">Write the First Review</string>
+    <string name="product_no_reviews">No reviews yet\nBe the first to review this product.</string>
+    <string name="product_you_might_also_like">You Might Also Like</string>
+    <string name="product_error_invalid_id">Invalid product</string>
 </resources>
