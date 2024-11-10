@@ -1,8 +1,8 @@
 package com.elhady.lafyuu.feature.product.di
 
-import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
 import com.elhady.lafyuu.feature.product.data.remote.ProductApi
 import com.elhady.lafyuu.feature.product.data.repository.ProductRepositoryImpl
+import com.elhady.lafyuu.feature.product.domain.repository.ProductRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
