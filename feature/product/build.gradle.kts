@@ -36,8 +36,6 @@ dependencies {
     implementation(project(":core:design-system"))
     implementation(project(":core:ui"))
     implementation(project(":core:network"))
-    implementation(project(":core:database"))
-    implementation(project(":feature:cart"))
 
     implementation(libs.retrofit.core)
     implementation(libs.kotlinx.serialization.json)
