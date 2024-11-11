@@ -43,7 +43,7 @@ dependencies {
     // Modules
     implementation(project(":feature:auth"))
     implementation(project(":feature:home"))
-    implementation(project(":feature:product"))
+    implementation(project(":feature:product-details"))
     implementation(project(":feature:cart"))
     implementation(project(":feature:checkout"))
     implementation(project(":feature:orders"))
