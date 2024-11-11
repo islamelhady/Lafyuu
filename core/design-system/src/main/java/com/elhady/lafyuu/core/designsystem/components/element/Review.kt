@@ -1,7 +1,6 @@
 package com.elhady.lafyuu.core.designsystem.components.element
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,10 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.other.RatingBar
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
@@ -31,7 +30,8 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 @Composable
 fun ReviewCard(
     userName: String,
-    avatarUrl: Painter,
+    avatarUrl: Int? = null,
+    avatarImageUrl: String? = null,
     rating: Int,
     comment: String,
     date: String,
@@ -46,9 +46,12 @@ fun ReviewCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Theme.space.large),
         ) {
-            Image(
-                painter = avatarUrl,
+            AsyncImage(
+                model = avatarImageUrl ?: avatarUrl,
                 contentDescription = null,
+                placeholder = painterResource(R.drawable.img_profile_man_bearded),
+                error = painterResource(R.drawable.img_profile_boy),
+                fallback = painterResource(R.drawable.img_profile_man_young),
                 modifier = Modifier
                     .size(Theme.size.large)
                     .clip(CircleShape)
@@ -100,7 +103,8 @@ private fun AllElementComponentsPreview() {
                 SectionTitle("Review")
                 ReviewCard(
                     userName = "James Lawson",
-                    avatarUrl = painterResource(id = R.drawable.img_profile_man_bearded),
+                    avatarUrl = R.drawable.img_profile_boy,
+                    avatarImageUrl = null,
                     rating = 3,
                     comment = "air max are always very comfortable fit, clean and just perfect in every way. just the box was too small and scrunched the sneakers up a little bit, not sure if the box was always this small but the 90s are and will always be one of my favorites.",
                     date = "December 10, 2016",

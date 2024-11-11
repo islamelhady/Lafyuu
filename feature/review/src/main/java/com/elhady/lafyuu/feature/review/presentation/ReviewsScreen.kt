@@ -167,7 +167,8 @@ fun ReviewsScreen(
                                     key = { it.userName + it.createdAt }) { review ->
                                     ReviewCard(
                                         userName = review.userName,
-                                        avatarUrl = painterResource(review.userPicture?.toIntOrNull() ?: R.drawable.img_profile_man_bearded),
+                                        avatarUrl = R.drawable.img_profile_boy,
+                                        avatarImageUrl = review.userPicture,
                                         rating = review.rating,
                                         comment = review.comment,
                                         date = review.createdAt

@@ -20,7 +20,7 @@ data class ReviewUi(
     val rating: Int,
     val comment: String,
     val date: String,
-    val userPicture: String
+    val userPicture: String?
 )
 
 data class RecommendedProductUi(
