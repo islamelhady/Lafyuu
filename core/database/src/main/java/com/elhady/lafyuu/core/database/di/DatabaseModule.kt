@@ -3,6 +3,7 @@ package com.elhady.lafyuu.core.database.di
 import android.content.Context
 import androidx.room.Room
 import com.elhady.lafyuu.core.database.LafyuuDatabase
+import com.elhady.lafyuu.core.database.MIGRATION_1_2
 import com.elhady.lafyuu.core.database.dao.FavoriteDao
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.database.repository.FavoritesRepositoryImpl
@@ -26,7 +27,8 @@ object DatabaseModule {
             context.applicationContext,
             LafyuuDatabase::class.java,
             "lafyuu_database"
-        ).build()
+        ).addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Provides

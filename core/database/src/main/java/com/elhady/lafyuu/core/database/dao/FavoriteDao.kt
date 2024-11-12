@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface FavoriteDao {
 
-    @Query("SELECT productId FROM favorites")
-    fun observeFavoriteIds(): Flow<List<String>>
+    @Query("SELECT * FROM favorites ORDER BY addedAt DESC")
+    fun observeFavorites(): Flow<List<FavoriteEntity>>
 
     @Query("SELECT EXISTS(SELECT 1 FROM favorites WHERE productId = :productId)")
     fun isFavorite(productId: String): Flow<Boolean>
