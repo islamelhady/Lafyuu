@@ -20,19 +20,7 @@ build/
 local.properties
 
 # IDE settings files
-.idea/caches/
-.idea/libraries/
-.idea/not_loaded.xml
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/usage.statistics.xml
-.idea/dictionaries/
-.idea/shelf/
-.idea/deploymentSettings.xml
-.idea/inspectionProfiles/profiles_stale.xml
-.idea/php.xml
-.idea/sonarlint/
-.idea/assetService/
+*.idea
 
 # Visual Studio Code files
 .vscode/
