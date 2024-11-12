@@ -20,7 +20,7 @@ build/
 local.properties
 
 # IDE settings files
-*.idea
+.idea/
 
 # Visual Studio Code files
 .vscode/
