@@ -2,19 +2,20 @@ package com.elhady.lafyuu.feature.home.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.UiText
-import com.elhady.lafyuu.feature.home.domain.model.Category
+import com.elhady.lafyuu.feature.home.presentation.model.CategoryUiModel
+import com.elhady.lafyuu.feature.home.presentation.model.ProductUiModel
 
 data class CategoriesUiState(
     val isLoading: Boolean = false,
-    val categories: List<Category> = emptyList(),
+    val categories: List<CategoryUiModel> = emptyList(),
     val error: UiText? = null
 )
 
-sealed interface CategoriesUiEvent {
-    data object LoadCategories : CategoriesUiEvent
-    data class SelectCategory(val categoryId: String, val categoryName: String) : CategoriesUiEvent
-    data object BackClicked : CategoriesUiEvent
-    data object RetryClicked : CategoriesUiEvent
+sealed interface CategoriesUiIntent {
+    data object LoadCategories : CategoriesUiIntent
+    data class SelectCategory(val categoryId: String, val categoryName: String) : CategoriesUiIntent
+    data object BackClicked : CategoriesUiIntent
+    data object RetryClicked : CategoriesUiIntent
 }
 
 sealed interface CategoriesUiEffect {

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,24 +16,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SearchTopBarWithNotification
 import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.element.NavigationBottomBar
 import com.elhady.lafyuu.core.designsystem.components.element.defaultTabBarItems
-import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
-import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.icons.Love
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.core.ui.text.asString
+import com.elhady.lafyuu.feature.home.R
 import com.elhady.lafyuu.feature.home.presentation.components.CategoryListSection
+import com.elhady.lafyuu.feature.home.presentation.components.OfferBannerSection
 import com.elhady.lafyuu.feature.home.presentation.components.RecommendedProductsSection
 import com.elhady.lafyuu.feature.home.presentation.components.SaleProductSection
-import com.elhady.lafyuu.feature.home.presentation.components.SuperFlashSaleSection
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -52,31 +54,30 @@ fun HomeRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(Unit) {
-        viewModel.effect.collectLatest { effect ->
-            when (effect) {
-                is HomeUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
-                is HomeUiEffect.NavigateToCategoryProducts -> onNavigateToCategoryProducts(
-                    effect.categoryId,
-                    effect.categoryName
-                )
-
-                is HomeUiEffect.NavigateToFlashSale -> onNavigateToFlashSale()
-                is HomeUiEffect.NavigateToMegaSale -> onNavigateToMegaSale()
-                is HomeUiEffect.NavigateToMoreCategories -> onNavigateToMoreCategories()
-                is HomeUiEffect.NavigateToNotifications -> onNavigateToNotifications()
-                is HomeUiEffect.NavigateToWishlist -> onNavigateToWishlist()
-                is HomeUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
-                HomeUiEffect.NavigateToSearch -> onNavigateToSearch()
-                is HomeUiEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        visuals = LafyuuSnackBarVisuals(
-                            message = effect.message.asString(context),
-                            type = effect.type
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.effect.collect {
+                viewModel.effect.collectLatest { effect ->
+                    when (effect) {
+                        is HomeUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(
+                            effect.productId
                         )
-                    )
+
+                        is HomeUiEffect.NavigateToCategoryProducts -> onNavigateToCategoryProducts(
+                            effect.categoryId,
+                            effect.categoryName
+                        )
+
+                        is HomeUiEffect.NavigateToFlashSale -> onNavigateToFlashSale()
+                        is HomeUiEffect.NavigateToMegaSale -> onNavigateToMegaSale()
+                        is HomeUiEffect.NavigateToMoreCategories -> onNavigateToMoreCategories()
+                        is HomeUiEffect.NavigateToNotifications -> onNavigateToNotifications()
+                        is HomeUiEffect.NavigateToFavourite -> onNavigateToWishlist()
+                        is HomeUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
+                        HomeUiEffect.NavigateToSearch -> onNavigateToSearch()
+                    }
                 }
             }
         }
@@ -84,17 +85,17 @@ fun HomeRoute(
 
     HomeScreen(
         uiState = uiState,
-        onEvent = viewModel::onEvent,
+        onIntent = viewModel::onIntent,
+        snackbarHostState = snackbarHostState,
         cartItemCount = cartItemCount,
-        selectedTab = selectedTab,
-        snackbarHostState = snackbarHostState
+        selectedTab = selectedTab
     )
 }
 
 @Composable
 internal fun HomeScreen(
     uiState: HomeUiState,
-    onEvent: (HomeUiEvent) -> Unit,
+    onIntent: (HomeUiIntent) -> Unit,
     snackbarHostState: SnackbarHostState,
     cartItemCount: Int = 0,
     selectedTab: String = "home"
@@ -103,12 +104,12 @@ internal fun HomeScreen(
         snackbarHostState = snackbarHostState,
         topBar = {
             SearchTopBarWithNotification(
-                onSearchClick = { onEvent(HomeUiEvent.SearchClicked) },
+                onSearchClick = { onIntent(HomeUiIntent.SearchClicked) },
                 trailingIcon = Love,
                 onLeadingClick = {},
-                onTrailingClick = { onEvent(HomeUiEvent.WishlistClicked) },
+                onTrailingClick = { onIntent(HomeUiIntent.FavouriteClicked) },
                 hasNotification = true,
-                onNotificationClick = { onEvent(HomeUiEvent.NotificationClicked) }
+                onNotificationClick = { onIntent(HomeUiIntent.NotificationClicked) }
             )
         },
         bottomBar = {
@@ -121,121 +122,74 @@ internal fun HomeScreen(
                     }
                 },
                 selectedTab = selectedTab,
-                onTabSelected = { onEvent(HomeUiEvent.BottomTabSelected(it)) }
+                onTabSelected = { onIntent(HomeUiIntent.BottomTabSelected(it)) }
             )
         }
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             when {
-                uiState.isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = Theme.color.blue)
-                    }
-                }
+                uiState.isLoading -> CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Theme.color.blue
+                )
 
-                uiState.errorMessage != null && uiState.isContentEmpty -> {
-                    InfoStateContent(
-                        errorMessage = uiState.errorMessage.asString(),
-                        onRetryClick = { onEvent(HomeUiEvent.RetryClicked) },
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+                uiState.isContentEmpty -> InfoStateContent(
+                    errorMessage = uiState.error?.asString() ?: stringResource(R.string.home_empty),
+                    onRetryClick = { onIntent(HomeUiIntent.RetryClicked) },
+                    modifier = Modifier.align(Alignment.Center)
+                )
 
-                uiState.searchQuery.isNotBlank() -> {
-                    when {
-                        uiState.isSearching -> {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(color = Theme.color.blue)
-                            }
-                        }
-
-                        uiState.searchResults.isNotEmpty() -> {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(vertical = Theme.space.large)
-                                    .verticalScroll(rememberScrollState())
-                            ) {
-                                RecommendedProductsSection(
-                                    products = uiState.searchResults,
-                                    onProductClick = { onEvent(HomeUiEvent.ProductClicked(it)) }
-                                )
-                            }
-                        }
-
-                        else -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(Theme.space.large),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                LafyuuText(
-                                    text = "No products found for \"${uiState.searchQuery}\"",
-                                    style = Theme.typography.normalTextRegular,
-                                    color = Theme.color.neutralGrey,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
-                    }
-                }
-
-                else -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(vertical = Theme.space.large)
-                            .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(Theme.space.large)
-                    ) {
-                        SuperFlashSaleSection(
-                            products = uiState.flashSaleProducts,
-                            onProductClick = { productId ->
-                                onEvent(
-                                    HomeUiEvent.ProductClicked(
-                                        productId
-                                    )
-                                )
-                            }
-                        )
-                        CategoryListSection(
-                            categories = uiState.categories,
-                            onCategoryClick = { categoryId, categoryName ->
-                                onEvent(HomeUiEvent.CategoryClicked(categoryId, categoryName))
-                            },
-                            onSeeMoreClick = { onEvent(HomeUiEvent.SeeMoreCategoryClicked) }
-                        )
-                        SaleProductSection(
-                            title = "Flash Sale",
-                            products = uiState.flashSaleProducts,
-                            onProductClick = { onEvent(HomeUiEvent.ProductClicked(it)) },
-                            onSeeMoreClick = { onEvent(HomeUiEvent.SeeMoreFlashSaleClicked) }
-                        )
-
-                        SaleProductSection(
-                            title = "Mega Sale",
-                            products = uiState.megaSaleProducts,
-                            onProductClick = { onEvent(HomeUiEvent.ProductClicked(it)) },
-                            onSeeMoreClick = { onEvent(HomeUiEvent.SeeMoreMegaSaleClicked) }
-                        )
-
-                        RecommendedProductsSection(
-                            products = uiState.recommendedProducts,
-                            onProductClick = { onEvent(HomeUiEvent.ProductClicked(it)) }
-                        )
-                    }
-                }
+                else -> HomeContent(uiState = uiState, onIntent = onIntent)
             }
+        }
+    }
+}
+
+@Composable
+private fun HomeContent(
+    uiState: HomeUiState,
+    onIntent: (HomeUiIntent) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = Theme.space.large),
+        verticalArrangement = Arrangement.spacedBy(Theme.space.large)
+    ) {
+        OfferBannerSection(offers = uiState.offers)
+
+        CategoryListSection(
+            categories = uiState.categories,
+            onCategoryClick = { id, name -> onIntent(HomeUiIntent.CategoryClicked(id, name)) },
+            onSeeMoreClick = { onIntent(HomeUiIntent.SeeMoreCategoryClicked) }
+        )
+
+        SaleProductSection(
+            title = stringResource(R.string.home_flash_sale),
+            products = uiState.flashSaleProducts,
+            onProductClick = { onIntent(HomeUiIntent.ProductClicked(it)) },
+            onSeeMoreClick = { onIntent(HomeUiIntent.SeeMoreFlashSaleClicked) }
+        )
+
+        SaleProductSection(
+            title = stringResource(R.string.home_mega_sale),
+            products = uiState.megaSaleProducts,
+            onProductClick = { onIntent(HomeUiIntent.ProductClicked(it)) },
+            onSeeMoreClick = { onIntent(HomeUiIntent.SeeMoreMegaSaleClicked) }
+        )
+
+        RecommendedProductsSection(
+            products = uiState.recommendedProducts,
+            onProductClick = { onIntent(HomeUiIntent.ProductClicked(it)) }
+        )
+
+        if (uiState.hasLoadProblem) {
+            InfoStateContent(
+                errorMessage = uiState.error?.asString() ?: stringResource(R.string.home_partial_error),
+                onRetryClick = { onIntent(HomeUiIntent.RetryClicked) },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

@@ -69,7 +69,7 @@ fun ProductListRoute(
 fun ProductListScreen(
     uiState: ProductListUiState,
     snackbarHostState: SnackbarHostState,
-    onEvent: (ProductListUiEvent) -> Unit,
+    onEvent: (ProductListUiIntent) -> Unit,
 ) {
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
@@ -77,7 +77,7 @@ fun ProductListScreen(
             SingleTopAppBar(
                 title = uiState.title.ifBlank { "Products" },
                 leadingIcon = Left,
-                onLeadingClick = { onEvent(ProductListUiEvent.BackClicked) }
+                onLeadingClick = { onEvent(ProductListUiIntent.BackClicked) }
             )
         }
     ) {
@@ -97,7 +97,7 @@ fun ProductListScreen(
                 uiState.products.isEmpty() && uiState.error != null -> {
                     InfoStateContent(
                         errorMessage = uiState.error.asString(),
-                        onRetryClick = { onEvent(ProductListUiEvent.RetryClicked) },
+                        onRetryClick = { onEvent(ProductListUiIntent.RetryClicked) },
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -112,17 +112,15 @@ fun ProductListScreen(
                     ) {
                         items(uiState.products, key = { it.id }) { product ->
                             ProductCard(
-                                imageUrl = product.coverPictureUrl,
+                                imageUrl = product.imageUrl,
                                 name = product.name,
                                 price = "$${String.format(Locale.US, "%.2f", product.price)}",
                                 originalPrice = product.originalPrice?.let {
                                     "$${String.format(Locale.US, "%.2f", it)}"
                                 },
-                                discountLabel = if ((product.discountPercentage
-                                        ?: 0.0) > 0.0
-                                ) "${product.discountPercentage!!.toInt()}% OFF" else null,
+                                discountLabel = product.discountPercentage?.let { if ((it  > 0.0)) "${product.discountPercentage}% OFF" else null },
                                 rating = product.rating,
-                                onClick = { onEvent(ProductListUiEvent.ProductClicked(product.id)) }
+                                onClick = { onEvent(ProductListUiIntent.ProductClicked(product.id)) }
                             )
                         }
                     }

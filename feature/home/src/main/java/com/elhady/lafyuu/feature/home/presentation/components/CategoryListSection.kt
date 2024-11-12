@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import com.elhady.lafyuu.core.designsystem.components.other.ProductCategory
 import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.icons.Bikini
@@ -23,11 +24,12 @@ import com.elhady.lafyuu.core.designsystem.icons.WomanPants
 import com.elhady.lafyuu.core.designsystem.icons.WomanShoes
 import com.elhady.lafyuu.core.designsystem.icons.WomanTshirt
 import com.elhady.lafyuu.core.designsystem.theme.Theme
-import com.elhady.lafyuu.feature.home.domain.model.Category
+import com.elhady.lafyuu.feature.home.R
+import com.elhady.lafyuu.feature.home.presentation.model.CategoryUiModel
 
 @Composable
 fun CategoryListSection(
-    categories: List<Category>,
+    categories: List<CategoryUiModel>,
     onCategoryClick: (categoryId: String, categoryName: String) -> Unit,
     onSeeMoreClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -36,8 +38,8 @@ fun CategoryListSection(
 
     Column(modifier = modifier.fillMaxWidth()) {
         SectionTitle(
-            title = "Category",
-            actionText = "More Category",
+            title = stringResource(R.string.home_category),
+            actionText = stringResource(R.string.home_more_category),
             onActionClick = onSeeMoreClick
         )
         LazyRow(
@@ -67,6 +69,7 @@ fun getCategoryIcon(categoryName: String): ImageVector {
         name.contains("earrings") -> Bikini
         name.contains("clothes") -> WomanBag
         name.contains("bags") -> WomanBag
+        name.contains("jewelry-sets") -> WomanTshirt
         name.contains("jewelry") -> ManShoes
         name.contains("necklaces") -> ManUnderwear
         name.contains("bracelets") -> Bikini
@@ -76,7 +79,6 @@ fun getCategoryIcon(categoryName: String): ImageVector {
         name.contains("watches") -> WomanTshirt
         name.contains("brooches") -> WomanTshirt
         name.contains("bangles") -> WomanTshirt
-        name.contains("jewelry-sets") -> WomanTshirt
         else -> Shirt
     }
 }

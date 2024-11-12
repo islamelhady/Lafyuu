@@ -7,6 +7,7 @@ import com.elhady.lafyuu.feature.home.data.remote.HomeApi
 import com.elhady.lafyuu.feature.home.domain.model.Category
 import com.elhady.lafyuu.feature.home.domain.model.Offer
 import com.elhady.lafyuu.feature.home.domain.model.Product
+import com.elhady.lafyuu.feature.home.domain.model.ProductQuery
 import com.elhady.lafyuu.feature.home.domain.repository.HomeRepository
 import javax.inject.Inject
 
@@ -25,23 +26,15 @@ class HomeRepositoryImpl @Inject constructor(
         return safeApiCaller.call { homeApi.getOffers().allOffers.map { it.toDomain() } }
     }
 
-    override suspend fun getProducts(
-        searchTerm: String?,
-        category: String?,
-        sortBy: String?,
-        sortOrder: String?,
-        page: Int,
-        pageSize: Int
-    ): AppResult<List<Product>> {
-        return safeApiCaller.call {
+    override suspend fun getProducts(query: ProductQuery): AppResult<List<Product>> =
+        safeApiCaller.call {
             homeApi.getProducts(
-                searchTerm = searchTerm,
-                category = category,
-                sortBy = sortBy,
-                sortOrder = sortOrder,
-                page = page,
-                pageSize = pageSize
+                searchTerm = query.searchTerm,
+                category = query.category,
+                sortBy = query.sortBy.toString(),
+                sortOrder = query.sortBy.toString(),
+                page = query.page,
+                pageSize = query.pageSize
             ).allProducts.map { it.toDomain() }
         }
-    }
 }

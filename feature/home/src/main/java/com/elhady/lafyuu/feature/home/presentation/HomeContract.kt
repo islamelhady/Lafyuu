@@ -1,42 +1,46 @@
 package com.elhady.lafyuu.feature.home.presentation
 
-import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import androidx.compose.runtime.Immutable
 import com.elhady.lafyuu.core.designsystem.components.element.TabBarItem
 import com.elhady.lafyuu.core.ui.text.UiText
-import com.elhady.lafyuu.feature.home.domain.model.Category
-import com.elhady.lafyuu.feature.home.domain.model.Offer
-import com.elhady.lafyuu.feature.home.domain.model.Product
+import com.elhady.lafyuu.feature.home.domain.model.HomeSection
+import com.elhady.lafyuu.feature.home.presentation.model.CategoryUiModel
+import com.elhady.lafyuu.feature.home.presentation.model.OfferUiModel
+import com.elhady.lafyuu.feature.home.presentation.model.ProductUiModel
 
+@Immutable
 data class HomeUiState(
-    val searchQuery: String = "",
     val isLoading: Boolean = true,
-    val isSearching: Boolean = false,
-    val categories: List<Category> = emptyList(),
-    val offers: List<Offer> = emptyList(),
-    val flashSaleProducts: List<Product> = emptyList(),
-    val megaSaleProducts: List<Product> = emptyList(),
-    val recommendedProducts: List<Product> = emptyList(),
-    val searchResults: List<Product> = emptyList(),
-    val errorMessage: UiText? = null
+    val offers: List<OfferUiModel> = emptyList(),
+    val categories: List<CategoryUiModel> = emptyList(),
+    val flashSaleProducts: List<ProductUiModel> = emptyList(),
+    val megaSaleProducts: List<ProductUiModel> = emptyList(),
+    val recommendedProducts: List<ProductUiModel> = emptyList(),
+    val failedSections: Set<HomeSection> = emptySet(),
+    val error: UiText? = null
 ) {
     val isContentEmpty: Boolean
-        get() = !isLoading && categories.isEmpty() && flashSaleProducts.isEmpty() && megaSaleProducts.isEmpty() && recommendedProducts.isEmpty()
+        get() = offers.isEmpty() &&
+                categories.isEmpty() &&
+                flashSaleProducts.isEmpty() &&
+                megaSaleProducts.isEmpty() &&
+                recommendedProducts.isEmpty()
+
+    val hasLoadProblem: Boolean
+        get() = error != null || failedSections.isNotEmpty()
 }
 
-sealed interface HomeUiEvent {
-    data class SearchQueryChanged(val query: String) : HomeUiEvent
-    data object SearchClicked : HomeUiEvent
-    data class CategoryClicked(val categoryId: String, val categoryName: String) : HomeUiEvent
-    data class ProductClicked(val productId: String) : HomeUiEvent
-    data class FavoriteClicked(val productId: String) : HomeUiEvent
-    data object SeeMoreFlashSaleClicked : HomeUiEvent
-    data object SeeMoreMegaSaleClicked : HomeUiEvent
-    data object SeeMoreCategoryClicked : HomeUiEvent
-    data object NotificationClicked : HomeUiEvent
-    data object WishlistClicked : HomeUiEvent
-    data class OfferBannerClicked(val offerId: String) : HomeUiEvent
-    data class BottomTabSelected(val tab: TabBarItem) : HomeUiEvent
-    data object RetryClicked : HomeUiEvent
+sealed interface HomeUiIntent {
+    data object SearchClicked : HomeUiIntent
+    data class CategoryClicked(val categoryId: String, val categoryName: String) : HomeUiIntent
+    data class ProductClicked(val productId: String) : HomeUiIntent
+    data object SeeMoreFlashSaleClicked : HomeUiIntent
+    data object SeeMoreMegaSaleClicked : HomeUiIntent
+    data object SeeMoreCategoryClicked : HomeUiIntent
+    data object NotificationClicked : HomeUiIntent
+    data object FavouriteClicked : HomeUiIntent
+    data class BottomTabSelected(val tab: TabBarItem) : HomeUiIntent
+    data object RetryClicked : HomeUiIntent
 }
 
 sealed interface HomeUiEffect {
@@ -47,7 +51,6 @@ sealed interface HomeUiEffect {
     data object NavigateToMegaSale : HomeUiEffect
     data object NavigateToMoreCategories : HomeUiEffect
     data object NavigateToNotifications : HomeUiEffect
-    data object NavigateToWishlist : HomeUiEffect
+    data object NavigateToFavourite : HomeUiEffect
     data class NavigateToTab(val tabRoute: String) : HomeUiEffect
-    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Error) : HomeUiEffect
 }

@@ -8,16 +8,16 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.elhady.lafyuu.core.designsystem.components.card.ProductCard
+import androidx.compose.ui.res.stringResource
 import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.theme.Theme
-import com.elhady.lafyuu.feature.home.domain.model.Product
-import java.util.Locale
+import com.elhady.lafyuu.feature.home.R
+import com.elhady.lafyuu.feature.home.presentation.model.ProductUiModel
 
 @Composable
 fun SaleProductSection(
     title: String,
-    products: List<Product>,
+    products: List<ProductUiModel>,
     onProductClick: (productId: String) -> Unit,
     onSeeMoreClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -27,29 +27,15 @@ fun SaleProductSection(
     Column(modifier = modifier.fillMaxWidth()) {
         SectionTitle(
             title = title,
-            actionText = "See More",
+            actionText = stringResource(R.string.home_see_more),
             onActionClick = onSeeMoreClick
         )
         LazyRow(
             contentPadding = PaddingValues(horizontal = Theme.space.large),
             horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
         ) {
-            items(
-                items = products
-            ) { product ->
-                val formattedPrice = String.format(Locale.US, "$%.2f", product.price)
-                val formattedOriginalPrice = product.originalPrice?.let {
-                    String.format(Locale.US, "$%.2f", it)
-                }
-                ProductCard(
-                    imageUrl = product.coverPictureUrl,
-                    name = product.name,
-                    price = formattedPrice,
-                    originalPrice = formattedOriginalPrice,
-                    discountLabel = product.discountLabel,
-                    rating = product.rating,
-                    onClick = { onProductClick(product.id) }
-                )
+            items(items = products, key = { it.id }) { product ->
+                ProductCardItem(product = product, onClick = onProductClick)
             }
         }
     }

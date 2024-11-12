@@ -10,7 +10,6 @@ import com.elhady.lafyuu.feature.home.domain.model.HomeContent
 import com.elhady.lafyuu.feature.home.domain.model.Offer
 import com.elhady.lafyuu.feature.home.domain.model.Product
 import com.elhady.lafyuu.feature.home.domain.usecase.GetHomeContentUseCase
-import com.elhady.lafyuu.feature.home.domain.usecase.SearchProductsUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

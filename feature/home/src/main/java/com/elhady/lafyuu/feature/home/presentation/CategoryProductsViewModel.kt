@@ -6,11 +6,17 @@ import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.home.domain.model.Product
+import com.elhady.lafyuu.feature.home.domain.model.ProductQuery
 import com.elhady.lafyuu.feature.home.domain.usecase.GetProductsUseCase
+import com.elhady.lafyuu.feature.home.presentation.mapper.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -28,8 +34,10 @@ class CategoryProductsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CategoryProductsUiState(categoryName = categoryNameArg))
     val uiState: StateFlow<CategoryProductsUiState> = _uiState.asStateFlow()
 
-    private val _uiEffect = Channel<CategoryProductsUiEffect>()
-    val uiEffect = _uiEffect.receiveAsFlow()
+    private val _uiEffect = MutableSharedFlow<CategoryProductsUiEffect>(
+        replay = 0, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND
+    )
+    val uiEffect = _uiEffect.asSharedFlow()
 
     init {
         if (categoryNameArg.isNotBlank()) {
@@ -37,26 +45,26 @@ class CategoryProductsViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: CategoryProductsUiEvent) {
+    fun onEvent(event: CategoryProductsUiIntent) {
         when (event) {
-            is CategoryProductsUiEvent.LoadCategoryProducts -> loadProducts(event.categoryName)
-            is CategoryProductsUiEvent.ProductClicked -> {
+            is CategoryProductsUiIntent.LoadCategoryProducts -> loadProducts(event.categoryName)
+            is CategoryProductsUiIntent.ProductClicked -> {
                 sendEffect(CategoryProductsUiEffect.NavigateToProductDetails(event.productId))
             }
-            CategoryProductsUiEvent.BackClicked -> sendEffect(CategoryProductsUiEffect.NavigateBack)
-            CategoryProductsUiEvent.RetryClicked -> loadProducts(categoryNameArg)
+            CategoryProductsUiIntent.BackClicked -> sendEffect(CategoryProductsUiEffect.NavigateBack)
+            CategoryProductsUiIntent.RetryClicked -> loadProducts(categoryNameArg)
         }
     }
 
     private fun loadProducts(categoryName: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, categoryName = categoryName) }
-            when (val result = getProductsUseCase(category = categoryName)) {
+            when (val result = getProductsUseCase(ProductQuery(category = categoryName))) {
                 is AppResult.Success -> {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            products = result.data,
+                            products = result.data.map(Product::toUiModel),
                             error = null
                         )
                     }
@@ -76,8 +84,6 @@ class CategoryProductsViewModel @Inject constructor(
     }
 
     private fun sendEffect(effect: CategoryProductsUiEffect) {
-        viewModelScope.launch {
-            _uiEffect.send(effect)
-        }
+        viewModelScope.launch { _uiEffect.emit(effect) }
     }
 }

@@ -2,20 +2,20 @@ package com.elhady.lafyuu.feature.home.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.UiText
-import com.elhady.lafyuu.feature.home.domain.model.Product
+import com.elhady.lafyuu.feature.home.presentation.model.ProductUiModel
 
 data class ProductListUiState(
     val isLoading: Boolean = false,
     val title: String = "",
-    val products: List<Product> = emptyList(),
+    val products: List<ProductUiModel> = emptyList(),
     val error: UiText? = null
 )
 
-sealed interface ProductListUiEvent {
-    data class LoadProducts(val title: String) : ProductListUiEvent
-    data class ProductClicked(val productId: String) : ProductListUiEvent
-    data object BackClicked : ProductListUiEvent
-    data object RetryClicked : ProductListUiEvent
+sealed interface ProductListUiIntent {
+    data class LoadProducts(val title: String) : ProductListUiIntent
+    data class ProductClicked(val productId: String) : ProductListUiIntent
+    data object BackClicked : ProductListUiIntent
+    data object RetryClicked : ProductListUiIntent
 }
 
 sealed interface ProductListUiEffect {

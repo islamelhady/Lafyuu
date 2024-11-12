@@ -5,13 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.home.domain.model.Category
 import com.elhady.lafyuu.feature.home.domain.usecase.GetCategoriesUseCase
+import com.elhady.lafyuu.feature.home.presentation.mapper.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,21 +28,23 @@ class CategoriesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CategoriesUiState())
     val uiState: StateFlow<CategoriesUiState> = _uiState.asStateFlow()
 
-    private val _uiEffect = Channel<CategoriesUiEffect>()
-    val uiEffect = _uiEffect.receiveAsFlow()
+    private val _uiEffect = MutableSharedFlow<CategoriesUiEffect>(
+        replay = 0, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND
+    )
+    val uiEffect: SharedFlow<CategoriesUiEffect> = _uiEffect.asSharedFlow()
 
     init {
         loadCategories()
     }
 
-    fun onEvent(event: CategoriesUiEvent) {
+    fun onEvent(event: CategoriesUiIntent) {
         when (event) {
-            CategoriesUiEvent.LoadCategories -> loadCategories()
-            is CategoriesUiEvent.SelectCategory -> {
+            CategoriesUiIntent.LoadCategories -> loadCategories()
+            is CategoriesUiIntent.SelectCategory -> {
                 sendEffect(CategoriesUiEffect.NavigateToCategoryProducts(event.categoryId, event.categoryName))
             }
-            CategoriesUiEvent.BackClicked -> sendEffect(CategoriesUiEffect.NavigateBack)
-            CategoriesUiEvent.RetryClicked -> loadCategories()
+            CategoriesUiIntent.BackClicked -> sendEffect(CategoriesUiEffect.NavigateBack)
+            CategoriesUiIntent.RetryClicked -> loadCategories()
         }
     }
 
@@ -50,28 +56,26 @@ class CategoriesViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            categories = result.data,
+                            categories = result.data.map(Category::toUiModel),
                             error = null
                         )
                     }
                 }
                 is AppResult.Failure -> {
-                    val msg = result.error.toUiText()
+                    val message = result.error.toUiText()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = msg
+                            error = message
                         )
                     }
-                    sendEffect(CategoriesUiEffect.ShowSnackbar(msg, AlertType.Error))
+                    sendEffect(CategoriesUiEffect.ShowSnackbar(message, AlertType.Error))
                 }
             }
         }
     }
 
     private fun sendEffect(effect: CategoriesUiEffect) {
-        viewModelScope.launch {
-            _uiEffect.send(effect)
-        }
+        viewModelScope.launch { _uiEffect.emit(effect) }
     }
 }

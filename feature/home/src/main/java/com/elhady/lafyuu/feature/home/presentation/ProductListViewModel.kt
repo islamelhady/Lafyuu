@@ -6,7 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.home.domain.model.Product
+import com.elhady.lafyuu.feature.home.domain.model.ProductQuery
+import com.elhady.lafyuu.feature.home.domain.model.SaleSection
 import com.elhady.lafyuu.feature.home.domain.usecase.GetProductsUseCase
+import com.elhady.lafyuu.feature.home.domain.usecase.GetSaleProductsUseCase
+import com.elhady.lafyuu.feature.home.presentation.mapper.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase,
+    private val getSaleProductsUseCase: GetSaleProductsUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -37,15 +43,15 @@ class ProductListViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: ProductListUiEvent) {
+    fun onEvent(event: ProductListUiIntent) {
         when (event) {
-            is ProductListUiEvent.LoadProducts -> loadProducts(event.title)
-            is ProductListUiEvent.ProductClicked -> {
+            is ProductListUiIntent.LoadProducts -> loadProducts(event.title)
+            is ProductListUiIntent.ProductClicked -> {
                 sendEffect(ProductListUiEffect.NavigateToProductDetails(event.productId))
             }
 
-            ProductListUiEvent.BackClicked -> sendEffect(ProductListUiEffect.NavigateBack)
-            ProductListUiEvent.RetryClicked -> loadProducts(titleArg)
+            ProductListUiIntent.BackClicked -> sendEffect(ProductListUiEffect.NavigateBack)
+            ProductListUiIntent.RetryClicked -> loadProducts(titleArg)
         }
     }
 
@@ -53,16 +59,16 @@ class ProductListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, title = title) }
             val result = when (title) {
-                "Flash Sale" -> getProductsUseCase(page = 1, pageSize = 20)
-                "Mega Sale" -> getProductsUseCase(page = 2, pageSize = 20)
-                else -> getProductsUseCase(category = title)
+                "Flash Sale" -> getSaleProductsUseCase(section = SaleSection.Flash)
+                "Mega Sale" -> getSaleProductsUseCase(section = SaleSection.Mega)
+                else -> getProductsUseCase(query = ProductQuery(title))
             }
             when (result) {
                 is AppResult.Success -> {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            products = result.data,
+                            products = result.data.map(Product::toUiModel),
                             error = null
                         )
                     }
@@ -83,8 +89,6 @@ class ProductListViewModel @Inject constructor(
     }
 
     private fun sendEffect(effect: ProductListUiEffect) {
-        viewModelScope.launch {
-            _uiEffect.send(effect)
-        }
+        viewModelScope.launch { _uiEffect.send(effect) }
     }
 }

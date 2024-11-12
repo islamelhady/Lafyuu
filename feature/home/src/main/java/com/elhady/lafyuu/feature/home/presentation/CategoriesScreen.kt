@@ -68,7 +68,7 @@ fun CategoriesRoute(
 fun CategoriesScreen(
     uiState: CategoriesUiState,
     snackbarHostState: SnackbarHostState,
-    onEvent: (CategoriesUiEvent) -> Unit,
+    onEvent: (CategoriesUiIntent) -> Unit,
 ) {
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
@@ -76,7 +76,7 @@ fun CategoriesScreen(
             SingleTopAppBar(
                 title = "Categories",
                 leadingIcon = Left,
-                onLeadingClick = { onEvent(CategoriesUiEvent.BackClicked) }
+                onLeadingClick = { onEvent(CategoriesUiIntent.BackClicked) }
             )
         }
     ) {
@@ -91,7 +91,7 @@ fun CategoriesScreen(
             uiState.categories.isEmpty() && uiState.error != null -> {
                 InfoStateContent(
                     errorMessage = uiState.error.asString(),
-                    onRetryClick = { onEvent(CategoriesUiEvent.RetryClicked) },
+                    onRetryClick = { onEvent(CategoriesUiIntent.RetryClicked) },
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -109,7 +109,7 @@ fun CategoriesScreen(
                             leadingIconTint = Theme.color.blue,
                             onClick = {
                                 onEvent(
-                                    CategoriesUiEvent.SelectCategory(
+                                    CategoriesUiIntent.SelectCategory(
                                         categoryId = category.id,
                                         categoryName = category.name
                                     )

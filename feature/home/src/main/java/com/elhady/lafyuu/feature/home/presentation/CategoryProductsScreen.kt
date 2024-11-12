@@ -69,7 +69,7 @@ fun CategoryProductsRoute(
 @Composable
 fun CategoryProductsScreen(
     uiState: CategoryProductsUiState,
-    onEvent: (CategoryProductsUiEvent) -> Unit,
+    onEvent: (CategoryProductsUiIntent) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
@@ -79,7 +79,7 @@ fun CategoryProductsScreen(
             SingleTopAppBar(
                 title = uiState.categoryName.ifBlank { "Category Products" },
                 leadingIcon = Left,
-                onLeadingClick = { onEvent(CategoryProductsUiEvent.BackClicked) }
+                onLeadingClick = { onEvent(CategoryProductsUiIntent.BackClicked) }
             )
         }
     ) {
@@ -99,7 +99,7 @@ fun CategoryProductsScreen(
                 uiState.error != null && uiState.products.isEmpty() -> {
                     InfoStateContent(
                         errorMessage = uiState.error.asString(),
-                        onRetryClick = { onEvent(CategoryProductsUiEvent.RetryClicked) },
+                        onRetryClick = { onEvent(CategoryProductsUiIntent.RetryClicked) },
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -107,7 +107,7 @@ fun CategoryProductsScreen(
                 uiState.products.isEmpty() -> {
                     InfoStateContent(
                         errorMessage = "No products found in this category",
-                        onRetryClick = { onEvent(CategoryProductsUiEvent.RetryClicked) },
+                        onRetryClick = { onEvent(CategoryProductsUiIntent.RetryClicked) },
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -122,17 +122,15 @@ fun CategoryProductsScreen(
                     ) {
                         items(uiState.products, key = { it.id }) { product ->
                             ProductCard(
-                                imageUrl = product.coverPictureUrl,
+                                imageUrl = product.imageUrl,
                                 name = product.name,
                                 price = "$${String.format(Locale.US, "%.2f", product.price)}",
                                 originalPrice = product.originalPrice?.let {
                                     "$${String.format(Locale.US, "%.2f", it)}"
                                 },
-                                discountLabel = if ((product.discountPercentage
-                                        ?: 0.0) > 0.0
-                                ) "${product.discountPercentage!!.toInt()}% OFF" else null,
+                                discountLabel = product.discountPercentage?.let { if ((it  > 0.0)) "${product.discountPercentage}% OFF" else null },
                                 rating = product.rating,
-                                onClick = { onEvent(CategoryProductsUiEvent.ProductClicked(product.id)) }
+                                onClick = { onEvent(CategoryProductsUiIntent.ProductClicked(product.id)) }
                             )
                         }
                     }

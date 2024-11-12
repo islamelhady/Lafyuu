@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_flash_sale">Flash Sale</string>
+    <string name="home_mega_sale">Mega Sale</string>
+    <string name="home_category">Category</string>
+    <string name="home_more_category">More Category</string>
+    <string name="home_see_more">See More</string>
+    <string name="home_recommended_title">Recommended Products</string>
+    <string name="home_recommended_subtitle">We recommend the best for you</string>
+    <string name="home_discount_off">%1$d%% OFF</string>
+    <string name="home_empty">Nothing to show yet</string>
+    <string name="home_partial_error">Some sections failed to load</string>
+</resources>

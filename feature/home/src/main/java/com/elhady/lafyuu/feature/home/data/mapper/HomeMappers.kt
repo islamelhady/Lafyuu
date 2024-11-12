@@ -14,31 +14,14 @@ fun CategoryDto.toDomain() = Category(
     coverPictureUrl = coverPictureUrl ?: coverUrl ?: iconUrl ?: image ?: imageUrl
 )
 
-fun ProductDto.toDomain(): Product {
-    val rawPrice = price ?: 0.0
-    val discount = discountPercentage ?: 0.0
-    val (calcPrice, origPrice, label) = if (discount > 0) {
-        val calculatedCurrentPrice = rawPrice * (1.0 - discount / 100.0)
-        Triple(
-            calculatedCurrentPrice,
-            originalPrice ?: rawPrice,
-            "${discount.toInt()}% OFF"
-        )
-    } else {
-        Triple(rawPrice, originalPrice, null)
-    }
-
-    return Product(
-        id = id.orEmpty(),
-        name = name ?: title.orEmpty(),
-        coverPictureUrl = coverPictureUrl ?: coverUrl ?: imageUrl ?: image ?: productPictures?.firstOrNull(),
-        price = calcPrice,
-        originalPrice = origPrice,
-        discountPercentage = if (discount > 0) discount else null,
-        discountLabel = label,
-        rating = rating?.toInt()
-    )
-}
+fun ProductDto.toDomain() = Product(
+    id = id.orEmpty(),
+    name = name ?: title.orEmpty(),
+    coverPictureUrl = coverPictureUrl ?: coverUrl ?: imageUrl ?: image ?: productPictures?.firstOrNull(),
+    basePrice = price ?: 0.0,
+    discountPercentage = (discountPercentage ?: 0.0).toInt().coerceIn(0, 100),
+    rating = rating?.toFloat()
+)
 
 fun OfferDto.toDomain() = Offer(
     id = id.orEmpty(),
