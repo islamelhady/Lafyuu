@@ -10,6 +10,7 @@ import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.product.R
+import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
 import com.elhady.lafyuu.feature.product.domain.repository.ProductCartGateway
 import com.elhady.lafyuu.feature.product.domain.repository.ProductFavoriteGateway
 import com.elhady.lafyuu.feature.product.domain.usecase.AddToCartUseCase
@@ -50,6 +51,7 @@ class ProductDetailsViewModel @Inject constructor(
     )
     val uiEffect: SharedFlow<ProductDetailsUiEffect> = _uiEffect.asSharedFlow()
 
+    private var loadedProduct: ProductDetails? = null
     private var loadJob: Job? = null
 
     init {
@@ -104,6 +106,7 @@ class ProductDetailsViewModel @Inject constructor(
             when (val result = getProductDetailsUseCase(productId)) {
                 is AppResult.Success -> {
                     val content = result.data
+                    loadedProduct = content.details
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -122,11 +125,13 @@ class ProductDetailsViewModel @Inject constructor(
     }
 
     private fun toggleFavorite() {
-        val newValue = !_uiState.value.isFavorite
+        val product = loadedProduct ?: return
+        val shouldAdd = !_uiState.value.isFavorite
         viewModelScope.launch {
-            favoriteGateway.setFavorite(productId, newValue)
+            if (shouldAdd) favoriteGateway.addFavorite(product)
+            else favoriteGateway.removeFavorite(product.id)
             showSnackbar(
-                messageRes = if (newValue) R.string.product_added_to_favorite else R.string.product_removed_from_favorite,
+                messageRes = if (shouldAdd) R.string.product_added_to_favorite else R.string.product_removed_from_favorite,
                 type = AlertType.Success
             )
         }
