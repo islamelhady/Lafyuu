@@ -39,10 +39,9 @@ class ProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout(): AppResult<Unit> {
-        return safeApiCaller.call {
-            profileApi.logout()
+         safeApiCaller.call { profileApi.logout()}
             dataStore.clearSession()
             favoritesRepository.clearFavorites()
-        }
+            return AppResult.Success(Unit)
     }
 }

@@ -2,9 +2,11 @@ package com.elhady.lafyuu
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.map
+import com.elhady.lafyuu.core.database.model.Favorite
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
 import com.elhady.lafyuu.feature.cart.domain.usecase.RemoveCartItemUseCase
+import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
 import com.elhady.lafyuu.feature.product.domain.repository.ProductCartGateway
 import com.elhady.lafyuu.feature.product.domain.repository.ProductFavoriteGateway
 import kotlinx.coroutines.flow.Flow
@@ -39,8 +41,21 @@ class ProductFavoriteGatewayImpl @Inject constructor(
     override fun isFavorite(productId: String): Flow<Boolean> =
         favoritesRepository.isFavorite(productId)
 
-    override suspend fun setFavorite(productId: String, isFavorite: Boolean) {
-        if (isFavorite) favoritesRepository.addFavorite(productId)
-        else favoritesRepository.removeFavorite(productId)
+    override suspend fun addFavorite(product: ProductDetails) {
+        favoritesRepository.addFavorite(
+            Favorite(
+                productId = product.id,
+                name = product.name,
+                imageUrl = product.pictureUrls.firstOrNull(),
+                price = product.finalPrice,
+                originalPrice = product.basePrice.takeIf { it > product.finalPrice },
+                discountPercentage = product.discountPercentage,
+                rating = product.rating
+            )
+        )
+    }
+
+    override suspend fun removeFavorite(productId: String) {
+        favoritesRepository.removeFavorite(productId)
     }
 }
