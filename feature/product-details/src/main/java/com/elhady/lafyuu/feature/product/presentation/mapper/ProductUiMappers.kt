@@ -6,6 +6,13 @@ import com.elhady.lafyuu.feature.product.domain.model.RecommendedProduct
 import com.elhady.lafyuu.feature.product.presentation.model.ProductDetailsUi
 import com.elhady.lafyuu.feature.product.presentation.model.RecommendedProductUi
 import com.elhady.lafyuu.feature.product.presentation.model.ReviewUi
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.Locale
 
 fun ProductDetails.toUi() = ProductDetailsUi(
@@ -35,10 +42,31 @@ fun RecommendedProduct.toUi() = RecommendedProductUi(
 
 fun ProductReview.toUi() = ReviewUi(
     userName = userName,
+    userPicture = userPicture?.takeIf { it.isNotBlank() },
     rating = rating,
     comment = comment,
-    date = createdAt,
-    userPicture = userPicture.orEmpty()
+    date = formatReviewDate(createdAt)
 )
+
+
+internal fun formatReviewDate(
+    raw: String,
+    locale: Locale = Locale.getDefault(),
+    zone: ZoneId = ZoneId.systemDefault()
+): String {
+    if (raw.isBlank()) return ""
+    val date = parseLocalDate(raw, zone) ?: return raw
+    return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale))
+}
+
+private fun parseLocalDate(raw: String, zone: ZoneId): LocalDate? =
+    // with offset: 2016-12-10T09:30:00Z / +02:00
+    runCatching { OffsetDateTime.parse(raw).atZoneSameInstant(zone).toLocalDate() }.getOrNull()
+    // without offset: assumed UTC (see assumptions)
+        ?: runCatching {
+            LocalDateTime.parse(raw).atZone(ZoneOffset.UTC).withZoneSameInstant(zone).toLocalDate()
+        }.getOrNull()
+        // date only: no timezone shifting
+        ?: runCatching { LocalDate.parse(raw) }.getOrNull()
 
 private fun formatPrice(value: Double): String = String.format(Locale.US, "\$%.2f", value)
