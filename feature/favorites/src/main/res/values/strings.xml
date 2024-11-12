@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="failed_to_load_favorite_products">Failed to load favorite products</string>
     <string name="removed_from_favorite">Removed from Favorite</string>
+    <string name="favorites_title">Favorite Product</string>
+    <string name="favorites_empty">No favorite products yet</string>
+    <string name="favorites_discount_label">%1$d%% OFF</string>
 </resources>

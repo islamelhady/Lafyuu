@@ -1,20 +1,20 @@
 package com.elhady.lafyuu.feature.favorites.presentation
 
-import com.elhady.lafyuu.core.common.domain.model.ProductDetails
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.feature.favorites.presentation.model.FavoriteProductUi
 
 data class FavoritesUiState(
-    val isLoading: Boolean = false,
-    val favoriteProducts: List<ProductDetails> = emptyList(),
-    val error: UiText? = null
-)
+    val isLoading: Boolean = true,
+    val products: List<FavoriteProductUi> = emptyList()
+) {
+    val isEmpty: Boolean get() = !isLoading && products.isEmpty()
+}
 
-sealed interface FavoritesUiEvent {
-    data object LoadFavorites : FavoritesUiEvent
-    data class RemoveFavorite(val productId: String) : FavoritesUiEvent
-    data class ProductClicked(val productId: String) : FavoritesUiEvent
-    data object BackClicked : FavoritesUiEvent
+sealed interface FavoritesUiIntent {
+    data object BackClicked : FavoritesUiIntent
+    data class ProductClicked(val productId: String) : FavoritesUiIntent
+    data class RemoveFavoriteClicked(val productId: String) : FavoritesUiIntent
 }
 
 sealed interface FavoritesUiEffect {

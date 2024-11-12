@@ -18,15 +18,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
 import com.elhady.lafyuu.core.designsystem.components.card.ProductCard
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.theme.Theme
-import com.elhady.lafyuu.core.ui.text.asString
+import com.elhady.lafyuu.feature.favorites.R
 
 @Composable
 fun FavoritesRoute(
@@ -38,19 +43,25 @@ fun FavoritesRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { effect ->
-            when (effect) {
-                FavoritesUiEffect.NavigateBack -> onNavigateBack()
-                is FavoritesUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
-                is FavoritesUiEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        visuals = LafyuuSnackBarVisuals(
-                            message = effect.message.asString(context),
-                            type = effect.type
-                        )
+    LaunchedEffect(viewModel, lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
+            viewModel.uiEffect.collect { effect ->
+                when (effect) {
+                    FavoritesUiEffect.NavigateBack -> onNavigateBack()
+                    is FavoritesUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(
+                        effect.productId
                     )
+
+                    is FavoritesUiEffect.ShowSnackbar -> {
+                        snackbarHostState.showSnackbar(
+                            visuals = LafyuuSnackBarVisuals(
+                                message = effect.message.asString(context),
+                                type = effect.type
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -59,7 +70,7 @@ fun FavoritesRoute(
     FavoritesScreen(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
-        onEvent = viewModel::onEvent,
+        onIntent = viewModel::onIntent,
         modifier = modifier
     )
 }
@@ -68,7 +79,7 @@ fun FavoritesRoute(
 fun FavoritesScreen(
     uiState: FavoritesUiState,
     snackbarHostState: SnackbarHostState,
-    onEvent: (FavoritesUiEvent) -> Unit,
+    onIntent: (FavoritesUiIntent) -> Unit,
     modifier: Modifier = Modifier.padding(Theme.space.large)
 ) {
     Box(modifier = modifier) {
@@ -76,59 +87,49 @@ fun FavoritesScreen(
             snackbarHostState = snackbarHostState,
             topBar = {
                 SingleTopAppBar(
-                    title = "Favorite Product",
+                    title = stringResource(R.string.favorites_title),
                     leadingIcon = Left,
-                    onLeadingClick = { onEvent(FavoritesUiEvent.BackClicked) }
+                    onLeadingClick = { onIntent(FavoritesUiIntent.BackClicked) }
                 )
             }
         ) {
             when {
-                uiState.isLoading && uiState.favoriteProducts.isEmpty() -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Theme.color.blue
-                    )
-                }
+                uiState.isLoading -> CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Theme.color.blue
+                )
 
-                uiState.error != null && uiState.favoriteProducts.isEmpty() -> {
-                    InfoStateContent(
-                        errorMessage = uiState.error.asString(),
-                        onRetryClick = { onEvent(FavoritesUiEvent.LoadFavorites) },
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+                uiState.isEmpty -> InfoStateContent(
+                    errorMessage = stringResource(R.string.favorites_empty),
+                    errorType = AlertType.Warning,
+                    modifier = Modifier.align(Alignment.Center)
+                )
 
-                uiState.favoriteProducts.isEmpty() -> {
-                    InfoStateContent(
-                        errorMessage = "No favorite products yet",
-                        onRetryClick = { onEvent(FavoritesUiEvent.LoadFavorites) },
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-
-                else -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = Theme.space.large),
-                        verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                    ) {
-                        items(
-                            items = uiState.favoriteProducts,
-                            key = { it.id }
-                        ) { product ->
-                            ProductCard(
-                                imageUrl = product.coverPictureUrl.ifBlank { product.productPictures.firstOrNull() },
-                                name = product.name,
-                                price = "$${"%.2f".format(product.price)}",
-                                rating = product.rating,
-                                discountLabel = product.discountPercentage.toString() + "% OFF",
-                                originalPrice = "$${"%.2f".format(product.originalPrice)}",
-                                isDelete = true,
-                                onDeleteClick = { onEvent(FavoritesUiEvent.RemoveFavorite(product.id)) },
-                                onClick = { onEvent(FavoritesUiEvent.ProductClicked(product.id)) }
-                            )
-                        }
+                else -> LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = Theme.space.large),
+                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                ) {
+                    items(items = uiState.products, key = { it.id }) { product ->
+                        ProductCard(
+                            imageUrl = product.imageUrl,
+                            name = product.name,
+                            price = product.price,
+                            originalPrice = product.originalPrice,
+                            discountLabel = if (product.discountPercentage > 0) {
+                                stringResource(
+                                    R.string.favorites_discount_label,
+                                    product.discountPercentage
+                                )
+                            } else null,
+                            rating = product.rating,
+                            isDelete = true,
+                            onDeleteClick = {
+                                onIntent(FavoritesUiIntent.RemoveFavoriteClicked(product.id))
+                            },
+                            onClick = { onIntent(FavoritesUiIntent.ProductClicked(product.id)) }
+                        )
                     }
                 }
             }
