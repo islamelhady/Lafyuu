@@ -43,30 +43,9 @@ data class UpdateItemRequestDto(
 )
 
 @Serializable
-data class UpdateItemResponseDto(
-    val message: String? = null,
-    val id: String? = null,
-    val productId: String? = null,
-    val quantity: Int? = null
-)
-
-@Serializable
 data class DecrementItemRequestDto(
     val itemId: String,
     val quantity: Int
-)
-
-@Serializable
-data class DecrementItemResponseDto(
-    val message: String? = null,
-    val itemId: String? = null,
-    val productId: String? = null,
-    val quantity: Int? = null
-)
-
-@Serializable
-data class DeleteItemFromCartRequestDto(
-    val id: String
 )
 
 @Serializable

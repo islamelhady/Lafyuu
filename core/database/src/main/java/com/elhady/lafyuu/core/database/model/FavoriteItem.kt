@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.core.database.model
 
-data class Favorite(
+data class FavoriteItem(
     val productId: String,
     val name: String,
     val imageUrl: String?,

@@ -2,7 +2,7 @@ package com.elhady.lafyuu
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.map
-import com.elhady.lafyuu.core.database.model.Favorite
+import com.elhady.lafyuu.core.database.model.FavoriteItem
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
 import com.elhady.lafyuu.feature.cart.domain.usecase.RemoveCartItemUseCase
@@ -43,7 +43,7 @@ class ProductFavoriteGatewayImpl @Inject constructor(
 
     override suspend fun addFavorite(product: ProductDetails) {
         favoritesRepository.addFavorite(
-            Favorite(
+            FavoriteItem(
                 productId = product.id,
                 name = product.name,
                 imageUrl = product.pictureUrls.firstOrNull(),

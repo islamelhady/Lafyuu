@@ -2,7 +2,7 @@ package com.elhady.lafyuu.core.database.repository
 
 import com.elhady.lafyuu.core.database.dao.FavoriteDao
 import com.elhady.lafyuu.core.database.entity.FavoriteEntity
-import com.elhady.lafyuu.core.database.model.Favorite
+import com.elhady.lafyuu.core.database.model.FavoriteItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -13,12 +13,14 @@ class FavoritesRepositoryImpl @Inject constructor(
     private val favoriteDao: FavoriteDao
 ) : FavoritesRepository {
 
-    override fun observeFavorites(): Flow<List<Favorite>> =
+    override fun observeFavorites(): Flow<List<FavoriteItem>> =
         favoriteDao.observeFavorites().map { entities -> entities.map { it.toFavorite() } }
+
+    override fun observeFavoriteIds(): Flow<List<String>> = favoriteDao.observeFavoriteIds()
 
     override fun isFavorite(productId: String): Flow<Boolean> = favoriteDao.isFavorite(productId)
 
-    override suspend fun addFavorite(item: Favorite) {
+    override suspend fun addFavorite(item: FavoriteItem) {
         if (item.productId.isBlank()) return
         favoriteDao.insertFavorite(item.toEntity(addedAt = System.currentTimeMillis()))
     }
@@ -32,7 +34,7 @@ class FavoritesRepositoryImpl @Inject constructor(
     }
 }
 
-private fun FavoriteEntity.toFavorite() = Favorite(
+private fun FavoriteEntity.toFavorite() = FavoriteItem(
     productId = productId,
     name = name,
     imageUrl = imageUrl,
@@ -42,7 +44,7 @@ private fun FavoriteEntity.toFavorite() = Favorite(
     rating = rating
 )
 
-private fun Favorite.toEntity(addedAt: Long) = FavoriteEntity(
+private fun FavoriteItem.toEntity(addedAt: Long) = FavoriteEntity(
     productId = productId,
     name = name,
     imageUrl = imageUrl,

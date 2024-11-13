@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="cart_title">Your Cart</string>
+    <string name="cart_empty">Your Cart is Empty</string>
+    <string name="cart_checkout">Check Out</string>
     <string name="cart_item_removed">Item removed from cart</string>
     <string name="cart_coupon_applied">Coupon applied successfully!</string>
     <string name="cart_coupon_invalid">Your coupon is not correct</string>

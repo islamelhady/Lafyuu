@@ -1,13 +1,9 @@
 package com.elhady.lafyuu.feature.cart.presentation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,9 +16,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.button.QuantityButton
@@ -35,7 +35,9 @@ import com.elhady.lafyuu.core.designsystem.components.element.defaultTabBarItems
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.core.ui.text.asString
+import com.elhady.lafyuu.feature.cart.R
 import com.elhady.lafyuu.feature.cart.presentation.components.CartSummarySection
+import kotlinx.coroutines.launch
 
 @Composable
 fun CartRoute(
@@ -49,20 +51,27 @@ fun CartRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { effect ->
-            when (effect) {
-                CartUiEffect.NavigateToCheckout -> onNavigateToCheckout()
-                is CartUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
-                is CartUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
-                is CartUiEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        visuals = LafyuuSnackBarVisuals(
-                            message = effect.message.asString(context),
-                            type = effect.type
-                        )
-                    )
+    LaunchedEffect(viewModel, lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.uiEffect.collect { effect ->
+                when (effect) {
+                    CartUiEffect.NavigateToCheckout -> onNavigateToCheckout()
+                    is CartUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
+                    is CartUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
+                    is CartUiEffect.ShowSnackbar -> {
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                        // separate coroutine: showSnackbar suspends until dismissed
+                        launch {
+                            snackbarHostState.showSnackbar(
+                                visuals = LafyuuSnackBarVisuals(
+                                    message = effect.message.asString(context),
+                                    type = effect.type
+                                )
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -71,7 +80,7 @@ fun CartRoute(
     CartScreen(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
-        onEvent = viewModel::onEvent,
+        onIntent = viewModel::onIntent,
         modifier = modifier,
         selectedTab = selectedTab
     )
@@ -81,7 +90,7 @@ fun CartRoute(
 fun CartScreen(
     uiState: CartUiState,
     snackbarHostState: SnackbarHostState,
-    onEvent: (CartUiEvent) -> Unit,
+    onIntent: (CartUiIntent) -> Unit,
     modifier: Modifier = Modifier,
     selectedTab: String = "cart"
 ) {
@@ -89,7 +98,7 @@ fun CartScreen(
         snackbarHostState = snackbarHostState,
         topBar = {
             SingleTopAppBar(
-                title = "Your Cart",
+                title = stringResource(R.string.cart_title),
                 onLeadingClick = {}
             )
         },
@@ -97,103 +106,92 @@ fun CartScreen(
             NavigationBottomBar(
                 tabs = defaultTabBarItems.map { tab ->
                     if (tab.route == "cart") {
-                        val totalQty = uiState.items.sumOf { it.quantity }
-                        tab.copy(badgeCount = if (totalQty > 0) totalQty else null)
+                        tab.copy(badgeCount = uiState.totalQuantity.takeIf { it > 0 })
                     } else {
                         tab
                     }
                 },
                 selectedTab = selectedTab,
-                onTabSelected = { onEvent(CartUiEvent.BottomTabSelected(it)) }
+                onTabSelected = { onIntent(CartUiIntent.BottomTabSelected(it)) }
             )
         }
     ) {
+        val cart = uiState.cart
         when {
-            uiState.isLoading && uiState.items.isEmpty() -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Theme.color.blue
-                )
-            }
+            uiState.isLoading && uiState.items.isEmpty() -> CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = Theme.color.blue
+            )
 
-            uiState.error != null && uiState.items.isEmpty() -> {
-                InfoStateContent(
-                    errorMessage = uiState.error.asString(),
-                    onRetryClick = { onEvent(CartUiEvent.RetryClicked) },
-                    errorType = AlertType.Error,
-                    modifier = Modifier.align(Alignment.Center),
-                )
-            }
+            uiState.error != null && uiState.items.isEmpty() -> InfoStateContent(
+                errorMessage = uiState.error.asString(),
+                onRetryClick = { onIntent(CartUiIntent.RetryClicked) },
+                errorType = AlertType.Error,
+                modifier = Modifier.align(Alignment.Center)
+            )
 
-            uiState.items.isEmpty() -> {
-                InfoStateContent(
-                    errorMessage = "Your Cart is Empty",
-                    onRetryClick = { onEvent(CartUiEvent.LoadCart) },
-                    errorType = AlertType.Success
-                )
-            }
+            cart == null || cart.items.isEmpty() -> InfoStateContent(
+                errorMessage = stringResource(R.string.cart_empty),
+                errorType = AlertType.Success,
+                modifier = Modifier.align(Alignment.Center)
+            )
 
-            else -> {
-                Column(
+            else -> Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = Theme.space.large)
+            ) {
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = Theme.space.large)
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
                 ) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                    ) {
-                        items(uiState.items, key = { it.itemId }) { item ->
-                            val isUpdating = uiState.updatingItemIds.contains(item.itemId)
-                            WideProductCard(
-                                imageUrl = item.productCoverUrl,
-                                name = item.productName,
-                                price = String.format("%.2f", item.finalPricePerUnit),
-                                isFavorite = uiState.favoriteProductIds.contains(item.productId),
-                                onFavoriteClick = { onEvent(CartUiEvent.FavoriteClicked(item.productId)) },
-                                onDeleteClick = { onEvent(CartUiEvent.RemoveItem(item.itemId)) },
-                                onClick = { onEvent(CartUiEvent.ProductClicked(item.productId)) },
-                                quantityButton = {
-                                    if (isUpdating) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.padding(8.dp),
-                                            color = Theme.color.blue
-                                        )
-                                    } else {
-                                        QuantityButton(
-                                            quantity = item.quantity,
-                                            onDecrement = {
-                                                onEvent(
-                                                    CartUiEvent.DecreaseQuantity(
-                                                        item.itemId
-                                                    )
-                                                )
-                                            },
-                                            onIncrement = {
-                                                onEvent(
-                                                    CartUiEvent.IncreaseQuantity(
-                                                        item.itemId
-                                                    )
-                                                )
-                                            }
-                                        )
-                                    }
+                    items(cart.items, key = { it.itemId }) { item ->
+                        val isUpdating = item.itemId in uiState.updatingItemIds
+                        WideProductCard(
+                            imageUrl = item.imageUrl,
+                            name = item.name,
+                            price = item.price,
+                            isFavorite = item.productId in uiState.favoriteProductIds,
+                            onFavoriteClick = { onIntent(CartUiIntent.FavoriteClicked(item.productId)) },
+                            onDeleteClick = { onIntent(CartUiIntent.RemoveItem(item.itemId)) },
+                            onClick = { onIntent(CartUiIntent.ProductClicked(item.productId)) },
+                            quantityButton = {
+                                if (isUpdating) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.padding(Theme.space.small),
+                                        color = Theme.color.blue
+                                    )
+                                } else {
+                                    QuantityButton(
+                                        quantity = item.quantity,
+                                        onDecrement = {
+                                            onIntent(CartUiIntent.DecreaseQuantity(item.itemId))
+                                        },
+                                        onIncrement = {
+                                            onIntent(CartUiIntent.IncreaseQuantity(item.itemId))
+                                        }
+                                    )
                                 }
-                            )
-                        }
-                        item {
-                            CartSummarySection(uiState = uiState, onEvent = onEvent)
-                        }
+                            }
+                        )
                     }
-                    DefaultButton(
-                        caption = "Check Out",
-                        isLoading = false,
-                        onClick = { onEvent(CartUiEvent.CheckoutClicked) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    item {
+                        CartSummarySection(
+                            summary = cart.summary,
+                            couponCodeInput = uiState.couponCodeInput,
+                            couponError = uiState.couponError,
+                            onIntent = onIntent
+                        )
+                    }
                 }
+                DefaultButton(
+                    caption = stringResource(R.string.cart_checkout),
+                    isLoading = false,
+                    onClick = { onIntent(CartUiIntent.CheckoutClicked) },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }

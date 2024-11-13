@@ -2,7 +2,7 @@ package com.elhady.lafyuu.core.database.repository
 
 import com.elhady.lafyuu.core.database.dao.FavoriteDao
 import com.elhady.lafyuu.core.database.entity.FavoriteEntity
-import com.elhady.lafyuu.core.database.model.Favorite
+import com.elhady.lafyuu.core.database.model.FavoriteItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -40,7 +40,7 @@ class FavoritesRepositoryImplTest {
 
     private val repository = FavoritesRepositoryImpl(FakeFavoriteDao())
 
-    private fun item(id: String) = Favorite(
+    private fun item(id: String) = FavoriteItem(
         productId = id,
         name = "Shoe $id",
         imageUrl = "https://example.com/$id.jpg",

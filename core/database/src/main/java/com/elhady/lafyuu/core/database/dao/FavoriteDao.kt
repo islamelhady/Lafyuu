@@ -13,6 +13,9 @@ interface FavoriteDao {
     @Query("SELECT * FROM favorites ORDER BY addedAt DESC")
     fun observeFavorites(): Flow<List<FavoriteEntity>>
 
+    @Query("SELECT productId FROM favorites ORDER BY addedAt DESC")
+    fun observeFavoriteIds(): Flow<List<String>>
+
     @Query("SELECT EXISTS(SELECT 1 FROM favorites WHERE productId = :productId)")
     fun isFavorite(productId: String): Flow<Boolean>
 

@@ -3,39 +3,34 @@ package com.elhady.lafyuu.feature.cart.presentation
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.TabBarItem
 import com.elhady.lafyuu.core.ui.text.UiText
-import com.elhady.lafyuu.feature.cart.domain.model.Cart
-import com.elhady.lafyuu.feature.cart.domain.model.CartItem
+import com.elhady.lafyuu.feature.cart.presentation.model.CartItemUi
+import com.elhady.lafyuu.feature.cart.presentation.model.CartUi
 
 data class CartUiState(
-    val isLoading: Boolean = false,
-    val cart: Cart? = null,
+    val isLoading: Boolean = true,
+    val cart: CartUi? = null,
     val couponCodeInput: String = "",
     val isApplyingCoupon: Boolean = false,
     val couponError: UiText? = null,
     val updatingItemIds: Set<String> = emptySet(),
     val favoriteProductIds: Set<String> = emptySet(),
-    val error: UiText? = null,
-    val originalTotal: Double? = null,
-    val discountAmount: Double? = null,
-    val finalTotal: Double? = null,
-    val appliedCouponCode: String? = null
+    val error: UiText? = null
 ) {
-    val items: List<CartItem>
-        get() = cart?.items ?: emptyList()
+    val items: List<CartItemUi> get() = cart?.items.orEmpty()
+    val totalQuantity: Int get() = cart?.summary?.itemsCount ?: 0
 }
 
-sealed interface CartUiEvent {
-    data object LoadCart : CartUiEvent
-    data class IncreaseQuantity(val itemId: String) : CartUiEvent
-    data class DecreaseQuantity(val itemId: String) : CartUiEvent
-    data class RemoveItem(val itemId: String) : CartUiEvent
-    data class CouponCodeChanged(val code: String) : CartUiEvent
-    data object ApplyCouponClicked : CartUiEvent
-    data object CheckoutClicked : CartUiEvent
-    data object RetryClicked : CartUiEvent
-    data class ProductClicked(val productId: String) : CartUiEvent
-    data class FavoriteClicked(val productId: String) : CartUiEvent
-    data class BottomTabSelected(val tab: TabBarItem) : CartUiEvent
+sealed interface CartUiIntent {
+    data object RetryClicked : CartUiIntent
+    data class IncreaseQuantity(val itemId: String) : CartUiIntent
+    data class DecreaseQuantity(val itemId: String) : CartUiIntent
+    data class RemoveItem(val itemId: String) : CartUiIntent
+    data class CouponCodeChanged(val code: String) : CartUiIntent
+    data object ApplyCouponClicked : CartUiIntent
+    data object CheckoutClicked : CartUiIntent
+    data class ProductClicked(val productId: String) : CartUiIntent
+    data class FavoriteClicked(val productId: String) : CartUiIntent
+    data class BottomTabSelected(val tab: TabBarItem) : CartUiIntent
 }
 
 sealed interface CartUiEffect {

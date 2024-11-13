@@ -31,10 +31,13 @@ fun CartItemResponseDto.toDomain(): CartItem {
     )
 }
 
-fun ApplyCouponResponseDto.toDomain(fallbackCartId: String = ""): Cart {
+fun ApplyCouponResponseDto.toDomain(
+    fallbackCartId: String = "",
+    items: List<CartItem> = emptyList()
+): Cart {
     return Cart(
         cartId = cartId ?: fallbackCartId,
-        items = emptyList(),
+        items = items,
         originalTotal = originalTotal,
         discountAmount = discountAmount,
         finalTotal = finalTotal,
