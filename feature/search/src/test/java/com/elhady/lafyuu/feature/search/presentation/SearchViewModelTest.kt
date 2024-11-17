@@ -2,8 +2,6 @@ package com.elhady.lafyuu.feature.search.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.feature.search.domain.model.Category
-import com.elhady.lafyuu.feature.search.domain.model.Product
 import com.elhady.lafyuu.feature.search.domain.usecase.GetCategoriesUseCase
 import com.elhady.lafyuu.feature.search.domain.usecase.SearchProductsUseCase
 import io.mockk.coEvery

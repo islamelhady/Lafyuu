@@ -1,7 +1,6 @@
 package com.elhady.lafyuu.feature.search.presentation
 
 import Left
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,14 +25,19 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SearchBarWithTrailing
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
@@ -49,6 +55,13 @@ import com.elhady.lafyuu.core.designsystem.icons.Filter
 import com.elhady.lafyuu.core.designsystem.icons.Sort
 import com.elhady.lafyuu.core.designsystem.icons.X
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
+import com.elhady.lafyuu.feature.search.R
+import com.elhady.lafyuu.feature.search.domain.model.ProductSort
+import com.elhady.lafyuu.feature.search.presentation.model.ProductUi
+import kotlinx.coroutines.launch
+
+private const val LOAD_MORE_THRESHOLD = 4
 
 @Composable
 fun SearchRoute(
@@ -60,20 +73,29 @@ fun SearchRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { effect ->
-            when (effect) {
-                is SearchUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
-                SearchUiEffect.NavigateToHome -> onNavigateToHome()
-                is SearchUiEffect.NavigateBack -> onNavigateBack()
-                is SearchUiEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        visuals = LafyuuSnackBarVisuals(
-                            message = effect.message.asString(context),
-                            type = effect.type
-                        )
-                    )
+    LaunchedEffect(viewModel, lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.uiEffect.collect { effect ->
+                when (effect) {
+                    is SearchUiEffect.NavigateToProductDetails ->
+                        onNavigateToProductDetails(effect.productId)
+                    SearchUiEffect.NavigateToHome -> onNavigateToHome()
+                    SearchUiEffect.NavigateBack -> onNavigateBack()
+
+                    is SearchUiEffect.ShowSnackbar -> {
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                        // separate coroutine: showSnackbar suspends until dismissed
+                        launch {
+                            snackbarHostState.showSnackbar(
+                                visuals = LafyuuSnackBarVisuals(
+                                    message = effect.message.asString(context),
+                                    type = effect.type
+                                )
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -82,269 +104,317 @@ fun SearchRoute(
     SearchScreen(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
-        onEvent = viewModel::onEvent,
+        onIntent = viewModel::onIntent
     )
 }
 
-@SuppressLint("DefaultLocale")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SearchScreen(
     uiState: SearchUiState,
     snackbarHostState: SnackbarHostState,
-    onEvent: (SearchUiEvent) -> Unit,
+    onIntent: (SearchUiIntent) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState()
-    val sortSheetState = rememberModalBottomSheetState()
-
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
         topBar = {
             SearchBarWithTrailing(
                 searchValue = uiState.query,
-                onSearchValueChange = { onEvent(SearchUiEvent.QueryChanged(it)) },
-                onClearSearchClick = { onEvent(SearchUiEvent.QueryChanged("")) },
+                onSearchValueChange = { onIntent(SearchUiIntent.QueryChanged(it)) },
+                onClearSearchClick = { onIntent(SearchUiIntent.QueryChanged("")) },
                 leadingIcon = Left,
-                onLeadingClick = { onEvent(SearchUiEvent.BackClick) },
+                onLeadingClick = { onIntent(SearchUiIntent.BackClicked) },
                 trailingIcon = Sort,
-                onTrailingClick = { onEvent(SearchUiEvent.SortClicked) },
+                onTrailingClick = { onIntent(SearchUiIntent.SortClicked) },
                 filterIcon = Filter,
-                onFilterClick = { onEvent(SearchUiEvent.FilterClicked) },
+                onFilterClick = { onIntent(SearchUiIntent.FilterClicked) }
             )
         }
     ) {
         when {
-            uiState.query.isBlank() -> {
+            uiState.query.isBlank() -> InfoStateContent(
+                errorMessage = stringResource(R.string.search_prompt),
+                errorType = AlertType.Warning,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            uiState.isSearchPending -> CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = Theme.color.blue
+            )
+
+            uiState.error != null -> InfoStateContent(
+                errorMessage = uiState.error.asString(),
+                onRetryClick = { onIntent(SearchUiIntent.RetryClicked) },
+                errorType = AlertType.Error,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            uiState.products.isEmpty() -> InfoStateContent(
+                errorMessage = stringResource(R.string.search_not_found),
+                caption = stringResource(R.string.search_back_to_home),
+                onRetryClick = { onIntent(SearchUiIntent.BackToHomeClicked) },
+                errorType = AlertType.Error,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            else -> ResultsGrid(
+                products = uiState.products,
+                isLoadingMore = uiState.isLoadingMore,
+                onIntent = onIntent
+            )
+        }
+
+        when (uiState.sheet) {
+            SearchSheet.Filter -> FilterSheet(uiState, onIntent)
+            SearchSheet.Sort -> SortSheet(uiState.sort, onIntent)
+            SearchSheet.None -> Unit
+        }
+    }
+}
+
+@Composable
+private fun ResultsGrid(
+    products: List<ProductUi>,
+    isLoadingMore: Boolean,
+    onIntent: (SearchUiIntent) -> Unit
+) {
+    val gridState = rememberLazyGridState()
+    val isNearEnd by remember(gridState) {
+        derivedStateOf {
+            val info = gridState.layoutInfo
+            val lastVisible = info.visibleItemsInfo.lastOrNull()?.index ?: 0
+            info.totalItemsCount > 0 && lastVisible >= info.totalItemsCount - LOAD_MORE_THRESHOLD
+        }
+    }
+    // keyed on size: after a page is appended the condition is evaluated again
+    LaunchedEffect(isNearEnd, products.size) {
+        if (isNearEnd) onIntent(SearchUiIntent.LoadMore)
+    }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        state = gridState,
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = Theme.space.large),
+        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium),
+        verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+    ) {
+        items(products, key = { it.id }) { product ->
+            ProductCard(
+                imageUrl = product.imageUrl,
+                name = product.name,
+                price = product.price,
+                originalPrice = product.originalPrice,
+                discountLabel = if (product.discountPercentage > 0) {
+                    stringResource(R.string.search_discount_label, product.discountPercentage)
+                } else null,
+                rating = product.rating,
+                onClick = { onIntent(SearchUiIntent.ProductClicked(product.id)) }
+            )
+        }
+        if (isLoadingMore) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(Theme.space.medium),
                     contentAlignment = Alignment.Center
                 ) {
-                    InfoStateContent(
-                        errorMessage = "Type a product name to search",
-                        errorType = AlertType.Warning,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-            }
-
-            uiState.isLoading && uiState.products.isEmpty() -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Theme.color.blue
-                )
-            }
-
-            uiState.products.isEmpty() -> {
-                InfoStateContent(
-                    errorMessage = "Product Not Found",
-                    caption = "Back to Home",
-                    onRetryClick = { onEvent(SearchUiEvent.BackToHomeClick) },
-                    errorType = AlertType.Error,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-
-            else -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = Theme.space.large),
-                    horizontalArrangement = Arrangement.spacedBy(Theme.space.medium),
-                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                ) {
-                    items(uiState.products, key = { it.id }) { product ->
-                        ProductCard(
-                            imageUrl = product.coverPictureUrl,
-                            name = product.name,
-                            price = "$${String.format("%.2f", product.price)}",
-                            originalPrice = product.originalPrice?.let {
-                                "$${String.format("%.2f", it)}"
-                            },
-                            discountLabel = product.discountLabel,
-                            rating = product.rating,
-                            onClick = { onEvent(SearchUiEvent.ProductClicked(product.id)) }
-                        )
-                    }
-                }
-            }
-        }
-
-        if (uiState.isFilterSheetOpen) {
-            ModalBottomSheet(
-                onDismissRequest = { onEvent(SearchUiEvent.FilterDismissed) },
-                sheetState = sheetState
-            ) {
-                SingleTopAppBar(
-                    title = "Filter Search",
-                    leadingIcon = X,
-                    onLeadingClick = { onEvent(SearchUiEvent.FilterDismissed) }
-                )
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = Theme.space.large)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                ) {
-                    LafyuuText(
-                        text = "Price Range",
-                        style = Theme.typography.heading5,
-                        color = Theme.color.neutralDark
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        DefaultTextField(
-                            value = "${uiState.tempMinPrice?.toInt() ?: 0}",
-                            onValueChange = { newValue ->
-                                onEvent(
-                                    SearchUiEvent.PriceRangeChanged(
-                                        newValue.toDoubleOrNull() ?: 0.0,
-                                        uiState.tempMaxPrice ?: 2000.0
-                                    )
-                                )
-                            },
-                            modifier = Modifier.weight(1f)
-                        )
-                        DefaultTextField(
-                            value = "${uiState.tempMaxPrice?.toInt() ?: 2000}",
-                            onValueChange = { newValue ->
-                                onEvent(
-                                    SearchUiEvent.PriceRangeChanged(
-                                        uiState.tempMinPrice ?: 0.0,
-                                        newValue.toDoubleOrNull() ?: 2000.0
-                                    )
-                                )
-                            },
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                    LafyuuSlider(
-                        value = (uiState.tempMinPrice?.toFloat()
-                            ?: 0f)..(uiState.tempMaxPrice?.toFloat() ?: 2000f),
-                        onValueChange = { range ->
-                            onEvent(
-                                SearchUiEvent.PriceRangeChanged(
-                                    range.start.toDouble(),
-                                    range.endInclusive.toDouble()
-                                )
-                            )
-                        },
-                        valueRange = 0f..2000f,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    LafyuuText(
-                        text = "Category",
-                        style = Theme.typography.heading5,
-                        color = Theme.color.neutralDark
-                    )
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(Theme.space.small),
-                        verticalArrangement = Arrangement.spacedBy(Theme.space.small)
-                    ) {
-                        val isAllSelected = uiState.tempCategory == null
-                        LabelButton(
-                            caption = "All",
-                            onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(null)) },
-                            containerColor = if (isAllSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
-                            contentColor = if (isAllSelected) Theme.color.blue else Theme.color.neutralGrey,
-                            style = if (isAllSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
-                            hasBorder = true
-                        )
-                        uiState.categories.forEach { cat ->
-                            val isSelected = uiState.tempCategory == cat.name || uiState.tempCategory == cat.id
-                            LabelButton(
-                                caption = cat.name,
-                                onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(cat.name)) },
-                                containerColor = if (isSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
-                                contentColor = if (isSelected) Theme.color.blue else Theme.color.neutralGrey,
-                                style = if (isSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
-                                hasBorder = true
-                            )
-                        }
-                    }
-                    LafyuuText(
-                        text = "Availability",
-                        style = Theme.typography.heading5,
-                        color = Theme.color.neutralDark
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                    ) {
-                        val isAllAvailability = uiState.tempIsInStock == null
-                        LabelButton(
-                            caption = "All",
-                            onClick = { onEvent(SearchUiEvent.InStockChanged(null)) },
-                            containerColor = if (isAllAvailability) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
-                            contentColor = if (isAllAvailability) Theme.color.blue else Theme.color.neutralGrey,
-                            style = if (isAllAvailability) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
-                            hasBorder = true
-                        )
-                        val isInStockSelected = uiState.tempIsInStock == true
-                        LabelButton(
-                            caption = "In Stock Only",
-                            onClick = { onEvent(SearchUiEvent.InStockChanged(true)) },
-                            containerColor = if (isInStockSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
-                            contentColor = if (isInStockSelected) Theme.color.blue else Theme.color.neutralGrey,
-                            style = if (isInStockSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
-                            hasBorder = true
-                        )
-                    }
-
-                    DefaultButton(
-                        caption = "Apply",
-                        onClick = { onEvent(SearchUiEvent.ApplyFilters) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = Theme.space.large)
-                    )
-                    VerticalSpacerMedium()
-                }
-            }
-        }
-
-        if (uiState.isSortSheetOpen) {
-            ModalBottomSheet(
-                onDismissRequest = { onEvent(SearchUiEvent.SortDismissed) },
-                sheetState = sortSheetState
-            ) {
-                SingleTopAppBar(
-                    title = "Sort By",
-                    leadingIcon = X,
-                    onLeadingClick = { onEvent(SearchUiEvent.SortDismissed) }
-                )
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = Theme.space.large, vertical = Theme.space.medium),
-                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                ) {
-                    val isLowToHigh = uiState.sortBy == "price" && uiState.sortOrder == "asc"
-                    val isHighToLow = uiState.sortBy == "price" && uiState.sortOrder == "desc"
-
-                    LabelButton(
-                        caption = "Price: Low to High",
-                        onClick = { onEvent(SearchUiEvent.SortSelected("price", "asc")) },
-                        containerColor = if (isLowToHigh) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
-                        contentColor = if (isLowToHigh) Theme.color.blue else Theme.color.neutralDark,
-                        style = if (isLowToHigh) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
-                        hasBorder = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    LabelButton(
-                        caption = "Price: High to Low",
-                        onClick = { onEvent(SearchUiEvent.SortSelected("price", "desc")) },
-                        containerColor = if (isHighToLow) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
-                        contentColor = if (isHighToLow) Theme.color.blue else Theme.color.neutralDark,
-                        style = if (isHighToLow) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
-                        hasBorder = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    VerticalSpacerMedium()
+                    CircularProgressIndicator(color = Theme.color.blue)
                 }
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+private fun FilterSheet(
+    uiState: SearchUiState,
+    onIntent: (SearchUiIntent) -> Unit
+) {
+    val draft = uiState.draft
+    ModalBottomSheet(
+        onDismissRequest = { onIntent(SearchUiIntent.SheetDismissed) },
+        sheetState = rememberModalBottomSheetState()
+    ) {
+        SingleTopAppBar(
+            title = stringResource(R.string.search_filter_title),
+            leadingIcon = X,
+            onLeadingClick = { onIntent(SearchUiIntent.SheetDismissed) }
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Theme.space.large)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+        ) {
+            SheetSectionTitle(stringResource(R.string.search_price_range))
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Theme.space.medium),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                DefaultTextField(
+                    value = draft.minPrice.toString(),
+                    onValueChange = {
+                        onIntent(
+                            SearchUiIntent.PriceRangeChanged(
+                                min = it.toIntOrNull() ?: PRICE_RANGE_MIN,
+                                max = draft.maxPrice
+                            )
+                        )
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                DefaultTextField(
+                    value = draft.maxPrice.toString(),
+                    onValueChange = {
+                        onIntent(
+                            SearchUiIntent.PriceRangeChanged(
+                                min = draft.minPrice,
+                                max = it.toIntOrNull() ?: PRICE_RANGE_MAX
+                            )
+                        )
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            // the user can type min > max, the slider always gets an ordered range
+            val low = minOf(draft.minPrice, draft.maxPrice)
+            val high = maxOf(draft.minPrice, draft.maxPrice)
+            LafyuuSlider(
+                value = low.toFloat()..high.toFloat(),
+                onValueChange = { range ->
+                    onIntent(
+                        SearchUiIntent.PriceRangeChanged(
+                            min = range.start.toInt(),
+                            max = range.endInclusive.toInt()
+                        )
+                    )
+                },
+                valueRange = PRICE_RANGE_MIN.toFloat()..PRICE_RANGE_MAX.toFloat(),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            SheetSectionTitle(stringResource(R.string.search_category))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(Theme.space.small),
+                verticalArrangement = Arrangement.spacedBy(Theme.space.small)
+            ) {
+                SelectableChip(
+                    caption = stringResource(R.string.search_all),
+                    selected = draft.category == null,
+                    onClick = { onIntent(SearchUiIntent.CategorySelected(null)) }
+                )
+                uiState.categories.forEach { name ->
+                    SelectableChip(
+                        caption = name,
+                        selected = draft.category == name,
+                        onClick = { onIntent(SearchUiIntent.CategorySelected(name)) }
+                    )
+                }
+            }
+
+            SheetSectionTitle(stringResource(R.string.search_availability))
+            Row(horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)) {
+                SelectableChip(
+                    caption = stringResource(R.string.search_all),
+                    selected = !draft.inStockOnly,
+                    onClick = { onIntent(SearchUiIntent.InStockChanged(false)) }
+                )
+                SelectableChip(
+                    caption = stringResource(R.string.search_in_stock_only),
+                    selected = draft.inStockOnly,
+                    onClick = { onIntent(SearchUiIntent.InStockChanged(true)) }
+                )
+            }
+
+            DefaultButton(
+                caption = stringResource(R.string.search_apply),
+                onClick = { onIntent(SearchUiIntent.ApplyFilters) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            LabelButton(
+                caption = stringResource(R.string.search_reset),
+                onClick = { onIntent(SearchUiIntent.ResetFilters) },
+                contentColor = Theme.color.blue,
+                hasBorder = true,
+                borderColor = Theme.color.blue,
+                style = Theme.typography.largeCaptionBold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Theme.space.large)
+            )
+            VerticalSpacerMedium()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SortSheet(
+    selected: ProductSort?,
+    onIntent: (SearchUiIntent) -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = { onIntent(SearchUiIntent.SheetDismissed) },
+        sheetState = rememberModalBottomSheetState()
+    ) {
+        SingleTopAppBar(
+            title = stringResource(R.string.search_sort_title),
+            leadingIcon = X,
+            onLeadingClick = { onIntent(SearchUiIntent.SheetDismissed) }
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Theme.space.large, vertical = Theme.space.medium),
+            verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+        ) {
+            SelectableChip(
+                caption = stringResource(R.string.search_sort_price_low_high),
+                selected = selected == ProductSort.PRICE_ASC,
+                unselectedColor = Theme.color.neutralDark,
+                onClick = { onIntent(SearchUiIntent.SortSelected(ProductSort.PRICE_ASC)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            SelectableChip(
+                caption = stringResource(R.string.search_sort_price_high_low),
+                selected = selected == ProductSort.PRICE_DESC,
+                unselectedColor = Theme.color.neutralDark,
+                onClick = { onIntent(SearchUiIntent.SortSelected(ProductSort.PRICE_DESC)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            VerticalSpacerMedium()
+        }
+    }
+}
+
+@Composable
+private fun SheetSectionTitle(text: String) {
+    LafyuuText(
+        text = text,
+        style = Theme.typography.heading5,
+        color = Theme.color.neutralDark
+    )
+}
+
+@Composable
+private fun SelectableChip(
+    caption: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    unselectedColor: Color = Theme.color.neutralGrey
+) {
+    LabelButton(
+        caption = caption,
+        onClick = onClick,
+        containerColor = if (selected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+        contentColor = if (selected) Theme.color.blue else unselectedColor,
+        style = if (selected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+        hasBorder = true,
+        modifier = modifier
+    )
 }

@@ -1,5 +1,6 @@
 package com.elhady.lafyuu.feature.search.presentation
 
+import android.net.Uri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -8,10 +9,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 
 const val SEARCH_ROUTE_BASE = "search"
-const val SEARCH_ROUTE = "$SEARCH_ROUTE_BASE?query={query}"
+const val SEARCH_ROUTE = "$SEARCH_ROUTE_BASE?${SearchViewModel.QUERY_ARG}={${SearchViewModel.QUERY_ARG}}"
 
 fun NavController.navigateToSearch(query: String? = null, navOptions: NavOptions? = null) {
-    val route = if (!query.isNullOrBlank()) "$SEARCH_ROUTE_BASE?query=$query" else SEARCH_ROUTE_BASE
+    val route = if (!query.isNullOrBlank()) {
+        "$SEARCH_ROUTE_BASE?${SearchViewModel.QUERY_ARG}=${Uri.encode(query)}"
+    } else {
+        SEARCH_ROUTE_BASE
+    }
     this.navigate(route, navOptions)
 }
 
@@ -23,7 +28,7 @@ fun NavGraphBuilder.searchScreen(
     composable(
         route = SEARCH_ROUTE,
         arguments = listOf(
-            navArgument("query") {
+            navArgument(SearchViewModel.QUERY_ARG) {
                 type = NavType.StringType
                 nullable = true
                 defaultValue = null

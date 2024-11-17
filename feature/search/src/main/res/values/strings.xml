@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_prompt">Type a product name to search</string>
+    <string name="search_not_found">Product Not Found</string>
+    <string name="search_back_to_home">Back to Home</string>
+    <string name="search_filter_title">Filter Search</string>
+    <string name="search_price_range">Price Range</string>
+    <string name="search_category">Category</string>
+    <string name="search_availability">Availability</string>
+    <string name="search_all">All</string>
+    <string name="search_in_stock_only">In Stock Only</string>
+    <string name="search_apply">Apply</string>
+    <string name="search_reset">Reset</string>
+    <string name="search_sort_title">Sort By</string>
+    <string name="search_sort_price_low_high">Price: Low to High</string>
+    <string name="search_sort_price_high_low">Price: High to Low</string>
+    <string name="search_discount_label">%1$d%% OFF</string>
+</resources>

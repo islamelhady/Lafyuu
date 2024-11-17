@@ -60,13 +60,10 @@ internal fun formatReviewDate(
 }
 
 private fun parseLocalDate(raw: String, zone: ZoneId): LocalDate? =
-    // with offset: 2016-12-10T09:30:00Z / +02:00
     runCatching { OffsetDateTime.parse(raw).atZoneSameInstant(zone).toLocalDate() }.getOrNull()
-    // without offset: assumed UTC (see assumptions)
         ?: runCatching {
             LocalDateTime.parse(raw).atZone(ZoneOffset.UTC).withZoneSameInstant(zone).toLocalDate()
         }.getOrNull()
-        // date only: no timezone shifting
         ?: runCatching { LocalDate.parse(raw) }.getOrNull()
 
 private fun formatPrice(value: Double): String = String.format(Locale.US, "\$%.2f", value)
