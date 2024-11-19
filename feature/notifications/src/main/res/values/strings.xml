@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notifications_title">Notification</string>
+    <string name="notifications_empty">No notifications yet</string>
+    <string name="notification_title_read">Notification</string>
+    <string name="notification_title_unread">New Notification</string>
+</resources>

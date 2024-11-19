@@ -2,19 +2,21 @@ package com.elhady.lafyuu.feature.notifications.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.ui.text.UiText
-import com.elhady.lafyuu.feature.notifications.domain.model.Notification
+import com.elhady.lafyuu.feature.notifications.presentation.model.NotificationUi
 
 data class NotificationUiState(
-    val isLoading: Boolean = false,
-    val notifications: List<Notification> = emptyList(),
+    val isLoading: Boolean = true,
+    val isLoadingMore: Boolean = false,
+    val hasNextPage: Boolean = false,
+    val notifications: List<NotificationUi> = emptyList(),
     val error: UiText? = null
 )
 
-sealed interface NotificationUiEvent {
-    data object LoadNotifications : NotificationUiEvent
-    data class NotificationClicked(val notificationId: String) : NotificationUiEvent
-    data object BackClicked : NotificationUiEvent
-    data object RetryClicked : NotificationUiEvent
+sealed interface NotificationUiIntent {
+    data object RetryClicked : NotificationUiIntent
+    data object LoadMore : NotificationUiIntent
+    data class NotificationClicked(val notificationId: String) : NotificationUiIntent
+    data object BackClicked : NotificationUiIntent
 }
 
 sealed interface NotificationUiEffect {
