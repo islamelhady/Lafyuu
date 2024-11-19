@@ -13,7 +13,7 @@ data class NotificationDto(
 @Serializable
 data class PagedListOfNotificationDto(
     val items: List<NotificationDto>? = emptyList(),
-    val page: Int? = 1,
+    val page: Int? = null,
     val pageSize: Int? = 20,
     val totalCount: Int? = 0,
     val hasNextPage: Boolean? = false,

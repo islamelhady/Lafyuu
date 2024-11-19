@@ -58,7 +58,6 @@ fun NotificationRoute(
 
                     is NotificationUiEffect.ShowSnackbar -> {
                         snackbarHostState.currentSnackbarData?.dismiss()
-                        // separate coroutine: showSnackbar suspends until dismissed
                         launch {
                             snackbarHostState.showSnackbar(
                                 visuals = LafyuuSnackBarVisuals(
@@ -138,7 +137,6 @@ private fun NotificationList(
             info.totalItemsCount > 0 && lastVisible >= info.totalItemsCount - LOAD_MORE_THRESHOLD
         }
     }
-    // keyed on size: after a page is appended the condition is evaluated again
     LaunchedEffect(isNearEnd, notifications.size) {
         if (isNearEnd) onIntent(NotificationUiIntent.LoadMore)
     }
