@@ -1,5 +1,6 @@
 package com.elhady.lafyuu.feature.address.presentation
 
+import android.net.Uri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -10,7 +11,7 @@ import androidx.navigation.navArgument
 const val ADDRESS_ROUTE = "address_route"
 const val ADD_ADDRESS_ROUTE = "add_address_route"
 const val EDIT_ADDRESS_ROUTE_BASE = "edit_address_route"
-const val EDIT_ADDRESS_ROUTE = "$EDIT_ADDRESS_ROUTE_BASE/{addressId}"
+const val EDIT_ADDRESS_ROUTE = "$EDIT_ADDRESS_ROUTE_BASE/{${AddressFormViewModel.ADDRESS_ID_ARG}}"
 
 fun NavController.navigateToAddress(navOptions: NavOptions? = null) {
     this.navigate(ADDRESS_ROUTE, navOptions)
@@ -21,7 +22,7 @@ fun NavController.navigateToAddAddress(navOptions: NavOptions? = null) {
 }
 
 fun NavController.navigateToEditAddress(addressId: String, navOptions: NavOptions? = null) {
-    this.navigate("$EDIT_ADDRESS_ROUTE_BASE/$addressId", navOptions)
+    this.navigate("$EDIT_ADDRESS_ROUTE_BASE/${Uri.encode(addressId)}", navOptions)
 }
 
 fun NavGraphBuilder.addressScreen(
@@ -42,9 +43,7 @@ fun NavGraphBuilder.addAddressScreen(
     onNavigateBack: () -> Unit
 ) {
     composable(ADD_ADDRESS_ROUTE) {
-        AddAddressRoute(
-            onNavigateBack = onNavigateBack
-        )
+        AddressFormRoute(onNavigateBack = onNavigateBack)
     }
 }
 
@@ -53,10 +52,10 @@ fun NavGraphBuilder.editAddressScreen(
 ) {
     composable(
         route = EDIT_ADDRESS_ROUTE,
-        arguments = listOf(navArgument("addressId") { type = NavType.StringType })
-    ) {
-        EditAddressRoute(
-            onNavigateBack = onNavigateBack
+        arguments = listOf(
+            navArgument(AddressFormViewModel.ADDRESS_ID_ARG) { type = NavType.StringType }
         )
+    ) {
+        AddressFormRoute(onNavigateBack = onNavigateBack)
     }
 }

@@ -9,12 +9,16 @@ import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.address.R
 import com.elhady.lafyuu.feature.address.domain.usecase.DeleteAddressUseCase
 import com.elhady.lafyuu.feature.address.domain.usecase.GetAddressesUseCase
+import com.elhady.lafyuu.feature.address.presentation.mapper.toUi
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,75 +32,107 @@ class AddressViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AddressUiState())
     val uiState: StateFlow<AddressUiState> = _uiState.asStateFlow()
 
-    private val _uiEffect = Channel<AddressUiEffect>()
-    val uiEffect = _uiEffect.receiveAsFlow()
+    private val _uiEffect = MutableSharedFlow<AddressUiEffect>(
+        replay = 0,
+        extraBufferCapacity = 64,
+        onBufferOverflow = BufferOverflow.SUSPEND
+    )
+    val uiEffect: SharedFlow<AddressUiEffect> = _uiEffect.asSharedFlow()
 
-    init {
-        loadAddresses()
-    }
+    private var loadJob: Job? = null
 
-    fun onEvent(event: AddressUiEvent) {
-        when (event) {
-            AddressUiEvent.LoadAddresses -> loadAddresses()
-            is AddressUiEvent.AddressSelected -> {
-                _uiState.update { it.copy(selectedAddressId = event.addressId) }
+    fun onIntent(intent: AddressUiIntent) {
+        when (intent) {
+            AddressUiIntent.Refresh, AddressUiIntent.RetryClicked -> loadAddresses()
+            is AddressUiIntent.AddressSelected ->
+                _uiState.update { it.copy(selectedAddressId = intent.addressId) }
+
+            is AddressUiIntent.EditAddressClicked ->
+                sendEffect(AddressUiEffect.NavigateToEditAddress(intent.addressId))
+
+            is AddressUiIntent.DeleteAddressClicked -> _uiState.update { state ->
+                state.copy(pendingDelete = state.addresses.firstOrNull { it.id == intent.addressId })
             }
 
-            is AddressUiEvent.EditAddressClicked -> sendEffect(
-                AddressUiEffect.NavigateToEditAddress(
-                    event.addressId
-                )
-            )
+            AddressUiIntent.DeleteConfirmed -> confirmDelete()
+            AddressUiIntent.DeleteDismissed ->
+                _uiState.update { if (it.isDeleting) it else it.copy(pendingDelete = null) }
 
-            is AddressUiEvent.DeleteAddressClicked -> deleteAddress(event.addressId)
-            AddressUiEvent.AddAddressClicked -> sendEffect(AddressUiEffect.NavigateToAddAddress)
-            AddressUiEvent.BackClicked -> sendEffect(AddressUiEffect.NavigateBack)
+            AddressUiIntent.AddAddressClicked -> sendEffect(AddressUiEffect.NavigateToAddAddress)
+            AddressUiIntent.BackClicked -> sendEffect(AddressUiEffect.NavigateBack)
         }
     }
 
-    fun loadAddresses() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+    private fun loadAddresses() {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            // spinner only when there is nothing to show yet
+            _uiState.update { it.copy(isLoading = it.addresses.isEmpty(), error = null) }
             when (val result = getAddressesUseCase()) {
                 is AppResult.Success -> {
-                    val list = result.data
-                    _uiState.update {
-                        it.copy(
+                    val addresses = result.data.map { it.toUi() }
+                    _uiState.update { state ->
+                        state.copy(
                             isLoading = false,
-                            addresses = list,
-                            selectedAddressId = it.selectedAddressId ?: list.firstOrNull()?.id,
-                            error = null
+                            addresses = addresses,
+                            selectedAddressId = state.selectedAddressId
+                                ?.takeIf { id -> addresses.any { it.id == id } }
+                                ?: addresses.firstOrNull()?.id
                         )
                     }
                 }
 
                 is AppResult.Failure -> {
-                    val errorMessage = result.error.toUiText()
-                    _uiState.update { it.copy(isLoading = false, error = errorMessage) }
-                    sendEffect(AddressUiEffect.ShowSnackbar(errorMessage, type = AlertType.Error))
+                    val message = result.error.toUiText()
+                    if (_uiState.value.addresses.isEmpty()) {
+                        _uiState.update { it.copy(isLoading = false, error = message) }
+                    } else {
+                        _uiState.update { it.copy(isLoading = false) }
+                        _uiEffect.emit(
+                            AddressUiEffect.ShowSnackbar(
+                                message,
+                                type = AlertType.Error
+                            )
+                        )
+                    }
                 }
             }
         }
     }
 
-    private fun deleteAddress(addressId: String) {
+    private fun confirmDelete() {
+        val state = _uiState.value
+        val target = state.pendingDelete ?: return
+        if (state.isDeleting) return
+
         viewModelScope.launch {
-            when (val result = deleteAddressUseCase(addressId)) {
+            _uiState.update { it.copy(isDeleting = true) }
+            when (val result = deleteAddressUseCase(target.id)) {
                 is AppResult.Success -> {
-                    sendEffect(
+                    _uiState.update { current ->
+                        val remaining = current.addresses.filterNot { it.id == target.id }
+                        current.copy(
+                            isDeleting = false,
+                            pendingDelete = null,
+                            addresses = remaining,
+                            selectedAddressId = current.selectedAddressId
+                                ?.takeIf { id -> remaining.any { it.id == id } }
+                                ?: remaining.firstOrNull()?.id
+                        )
+                    }
+                    _uiEffect.emit(
                         AddressUiEffect.ShowSnackbar(
-                            message = UiText.Resource(id = R.string.address_deleted_successfully),
+                            message = UiText.Resource(R.string.address_deleted_successfully),
                             type = AlertType.Success
                         )
                     )
-                    loadAddresses()
                 }
 
                 is AppResult.Failure -> {
-                    val errorMessage = result.error.toUiText()
-                    sendEffect(
+                    _uiState.update { it.copy(isDeleting = false, pendingDelete = null) }
+                    _uiEffect.emit(
                         AddressUiEffect.ShowSnackbar(
-                            message = errorMessage,
+                            message = result.error.toUiText(),
                             type = AlertType.Error
                         )
                     )
@@ -106,8 +142,6 @@ class AddressViewModel @Inject constructor(
     }
 
     private fun sendEffect(effect: AddressUiEffect) {
-        viewModelScope.launch {
-            _uiEffect.send(effect)
-        }
+        viewModelScope.launch { _uiEffect.emit(effect) }
     }
 }
