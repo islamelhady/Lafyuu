@@ -9,6 +9,11 @@ data class Address(
     val phoneNumber: String,
     val notes: String
 ) {
+    // Presentation text. Kept here only because feature:checkout still reads it,
+    // move it to a UI mapper when checkout is refactored.
+    // TODO: Refactor feature:checkout
     val fullAddress: String
-        get() = "$street, $apartment, $city, $state"
+    get() = listOf(street, apartment, city, state)
+            .filter { it.isNotBlank() }
+            .joinToString(", ")
 }
