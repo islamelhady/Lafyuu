@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="address_title">Address</string>
+    <string name="add_address">Add Address</string>
+    <string name="edit_address">Edit Address</string>
+    <string name="update_address">Update Address</string>
+    <string name="address_hint_state">State</string>
+    <string name="address_hint_city">City</string>
+    <string name="address_hint_street">Street</string>
+    <string name="address_hint_apartment">Apartment / Suite</string>
+    <string name="address_hint_phone">Phone Number</string>
+    <string name="address_hint_notes">Notes (Optional)</string>
     <string name="error_empty_field">Please Fill The Form</string>
+    <string name="error_invalid_phone">Invalid phone number</string>
     <string name="no_addresses_found_please_add_one">No addresses found. Please add one</string>
     <string name="address_deleted_successfully">Address deleted successfully</string>
-    <string name="edit_address">Edit Address</string>
+    <string name="address_delete_title">Delete address?</string>
+    <string name="address_delete_message">%1$s will be removed permanently.</string>
+    <string name="address_delete_confirm">Delete</string>
+    <string name="address_delete_cancel">Cancel</string>
 </resources>
