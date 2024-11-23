@@ -1,5 +1,6 @@
 package com.elhady.lafyuu.feature.checkout.presentation
 
+import android.net.Uri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -9,19 +10,19 @@ import androidx.navigation.navArgument
 
 const val CHECKOUT_ROUTE = "checkout"
 const val PAYMENT_ROUTE_BASE = "payment"
-const val PAYMENT_ROUTE = "$PAYMENT_ROUTE_BASE/{shippingAddressId}/{paymentMethod}"
+const val PAYMENT_ROUTE = "$PAYMENT_ROUTE_BASE/{${PaymentViewModel.SHIPPING_ADDRESS_ID_ARG}}"
 
 fun NavController.navigateToCheckout(navOptions: NavOptions? = null) {
     this.navigate(CHECKOUT_ROUTE, navOptions)
 }
 
-fun NavController.navigateToPayment(shippingAddressId: String, paymentMethod: String, navOptions: NavOptions? = null) {
-    this.navigate("$PAYMENT_ROUTE_BASE/$shippingAddressId/$paymentMethod", navOptions)
+fun NavController.navigateToPayment(shippingAddressId: String, navOptions: NavOptions? = null) {
+    this.navigate("$PAYMENT_ROUTE_BASE/${Uri.encode(shippingAddressId)}", navOptions)
 }
 
 fun NavGraphBuilder.checkoutScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToPayment: (String, String) -> Unit,
+    onNavigateToPayment: (String) -> Unit,
     onNavigateToAddAddress: () -> Unit,
     onNavigateToEditAddress: (String) -> Unit
 ) {
@@ -43,8 +44,7 @@ fun NavGraphBuilder.paymentScreen(
     composable(
         route = PAYMENT_ROUTE,
         arguments = listOf(
-            navArgument("shippingAddressId") { type = NavType.StringType },
-            navArgument("paymentMethod") { type = NavType.StringType }
+            navArgument(PaymentViewModel.SHIPPING_ADDRESS_ID_ARG) { type = NavType.StringType }
         )
     ) {
         PaymentRoute(

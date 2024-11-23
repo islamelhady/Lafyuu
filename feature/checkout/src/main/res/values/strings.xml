@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="checkout_title">Ship To</string>
+    <string name="checkout_next">Next</string>
+    <string name="checkout_no_addresses">No addresses found. Please add one</string>
+    <string name="checkout_add_address">Add Address</string>
     <string name="address_deleted">Address deleted !</string>
     <string name="please_select_shipping_address">Please select a shipping address</string>
-    <string name="shipping_address_missing">Shipping address is missing</string>
+    <string name="checkout_delete_title">Delete address?</string>
+    <string name="checkout_delete_message">%1$s will be removed permanently.</string>
+    <string name="checkout_delete_confirm">Delete</string>
+    <string name="checkout_delete_cancel">Cancel</string>
+
+    <string name="payment_title">Payment</string>
+    <string name="payment_pay">Pay %1$s</string>
+    <string name="payment_method_credit_card">Credit Card</string>
+    <string name="payment_method_cash">Cash on Delivery</string>
+    <string name="payment_method_bank">Bank Transfer</string>
+    <string name="payment_method_paypal">Paypal</string>
+    <string name="payment_result_title">Order</string>
+    <string name="payment_success_title">Success!</string>
+    <string name="payment_success_default">Checkout successful!</string>
+    <string name="payment_pending_title">Complete your payment</string>
+    <string name="payment_pending_message">Your order was created. Finish the payment to confirm it.</string>
+    <string name="payment_open_page">Open Payment Page</string>
+    <string name="payment_view_orders">View My Orders</string>
 </resources>
