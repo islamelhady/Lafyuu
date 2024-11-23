@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.feature.address.presentation.addAddressScreen
@@ -31,6 +32,7 @@ import com.elhady.lafyuu.feature.address.presentation.navigateToEditAddress
 import com.elhady.lafyuu.feature.auth.presentation.navigation.AUTH_GRAPH_ROUTE
 import com.elhady.lafyuu.feature.auth.presentation.navigation.authGraph
 import com.elhady.lafyuu.feature.cart.navigation.cartScreen
+import com.elhady.lafyuu.feature.checkout.presentation.CHECKOUT_ROUTE
 import com.elhady.lafyuu.feature.checkout.presentation.checkoutScreen
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToCheckout
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToPayment
@@ -91,11 +93,13 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
+
                     is MainUiState.Authenticated -> {
                         key(true) {
                             MainApp(isAuthenticated = true, cartItemCount = cartItemCount)
                         }
                     }
+
                     is MainUiState.Unauthenticated -> {
                         key(false) {
                             MainApp(isAuthenticated = false, cartItemCount = 0)
@@ -119,11 +123,17 @@ fun MainApp(
     val currentRoute = navBackStackEntry?.destination?.route
     val selectedTab = when {
         currentRoute == null -> "home"
-        currentRoute.startsWith("home") || currentRoute.startsWith("categories") || currentRoute.startsWith("category_products") || currentRoute.startsWith("product_list") -> "home"
+        currentRoute.startsWith("home") || currentRoute.startsWith("categories") || currentRoute.startsWith(
+            "category_products"
+        ) || currentRoute.startsWith("product_list") -> "home"
+
         currentRoute.startsWith("explore") -> "explore"
         currentRoute.startsWith("cart") -> "cart"
         currentRoute.startsWith("offer") -> "offer"
-        currentRoute.startsWith("account") || currentRoute.startsWith("profile") || currentRoute.startsWith("change_password") -> "account"
+        currentRoute.startsWith("account") || currentRoute.startsWith("profile") || currentRoute.startsWith(
+            "change_password"
+        ) -> "account"
+
         else -> "home"
     }
 
@@ -292,38 +302,20 @@ fun MainApp(
         )
 
         checkoutScreen(
-            onNavigateBack = {
-                navController.popBackStack()
-            },
-            onNavigateToPayment = { addressId, paymentMethod ->
-                navController.navigateToPayment(addressId, paymentMethod)
-            },
-            onNavigateToAddAddress = {
-                navController.navigateToAddAddress()
-            },
-            onNavigateToEditAddress = { addressId ->
-                navController.navigateToEditAddress(addressId)
-            }
+            onNavigateBack = { navController.popBackStack() },
+            onNavigateToPayment = { addressId -> navController.navigateToPayment(addressId) },
+            onNavigateToAddAddress = { navController.navigateToAddAddress() },
+            onNavigateToEditAddress = { addressId -> navController.navigateToEditAddress(addressId) }
         )
 
-        addAddressScreen(
-            onNavigateBack = {
-                navController.popBackStack()
-            }
-        )
-
-        editAddressScreen(
-            onNavigateBack = {
-                navController.popBackStack()
-            }
-        )
 
         paymentScreen(
-            onNavigateBack = {
-                navController.popBackStack()
-            },
+            onNavigateBack = { navController.popBackStack() },
             onNavigateToSuccess = {
-                navController.navigateToOrders()
+                // checkout + payment are done, they must not stay in the back stack
+                navController.navigateToOrders(
+                    navOptions { popUpTo(CHECKOUT_ROUTE) { inclusive = true } }
+                )
             },
             onOpenUrl = { url ->
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
