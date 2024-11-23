@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.di
 
 import com.elhady.lafyuu.CheckoutAddressGatewayImpl
+import com.elhady.lafyuu.CheckoutCartGatewayImpl
 import com.elhady.lafyuu.feature.checkout.domain.repository.CheckoutAddressGateway
 import com.elhady.lafyuu.feature.checkout.domain.repository.CheckoutCartGateway
 import dagger.Binds
