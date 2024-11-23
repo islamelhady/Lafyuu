@@ -6,6 +6,7 @@ import com.elhady.lafyuu.feature.checkout.data.mapper.toDomain
 import com.elhady.lafyuu.feature.checkout.data.remote.CheckoutApi
 import com.elhady.lafyuu.feature.checkout.data.remote.model.OrderCheckoutRequestDto
 import com.elhady.lafyuu.feature.checkout.domain.model.CheckoutResult
+import com.elhady.lafyuu.feature.checkout.domain.model.PaymentMethod
 import com.elhady.lafyuu.feature.checkout.domain.repository.CheckoutRepository
 import javax.inject.Inject
 
@@ -16,15 +17,15 @@ class CheckoutRepositoryImpl @Inject constructor(
 
     override suspend fun checkout(
         shippingAddressId: String,
-        paymentMethod: String,
+        paymentMethod: PaymentMethod,
         couponCode: String?
     ): AppResult<CheckoutResult> {
         return safeApiCaller.call {
             checkoutApi.checkout(
                 OrderCheckoutRequestDto(
-                    shippingAddressId,
-                    paymentMethod,
-                    couponCode
+                    shippingAddressId = shippingAddressId,
+                    paymentMethod = paymentMethod.value,
+                    couponCode = couponCode
                 )
             ).toDomain()
         }

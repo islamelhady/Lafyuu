@@ -4,9 +4,11 @@ import com.elhady.lafyuu.feature.checkout.data.remote.model.OrderCheckoutRespons
 import com.elhady.lafyuu.feature.checkout.domain.model.CheckoutResult
 
 fun OrderCheckoutResponseDto.toDomain(): CheckoutResult {
-    return CheckoutResult(
-        message = message.orEmpty(),
-        unifiedCheckoutUrl = unifiedCheckoutUrl,
-        paymentClientSecret = paymentClientSecret
-    )
+    val message = message.orEmpty()
+    val paymentUrl = unifiedCheckoutUrl?.takeIf { it.isNotBlank() }
+    return if (paymentUrl != null) {
+        CheckoutResult.PaymentRequired(paymentUrl = paymentUrl, message = message)
+    } else {
+        CheckoutResult.Completed(message = message)
+    }
 }
