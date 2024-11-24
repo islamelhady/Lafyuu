@@ -29,10 +29,7 @@ class HomeRepositoryImpl @Inject constructor(
     override suspend fun getProducts(query: ProductQuery): AppResult<List<Product>> =
         safeApiCaller.call {
             homeApi.getProducts(
-                searchTerm = query.searchTerm,
                 category = query.category,
-                sortBy = query.sortBy.toString(),
-                sortOrder = query.sortBy.toString(),
                 page = query.page,
                 pageSize = query.pageSize
             ).allProducts.map { it.toDomain() }
