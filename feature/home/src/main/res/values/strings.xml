@@ -10,4 +10,7 @@
     <string name="home_discount_off">%1$d%% OFF</string>
     <string name="home_empty">Nothing to show yet</string>
     <string name="home_partial_error">Some sections failed to load</string>
+    <string name="home_categories_title">Categories</string>
+    <string name="home_no_products">No products found</string>
+    <string name="home_no_categories">No categories found</string>
 </resources>

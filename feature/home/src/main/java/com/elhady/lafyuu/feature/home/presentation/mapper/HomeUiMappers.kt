@@ -9,7 +9,7 @@ import com.elhady.lafyuu.feature.home.presentation.model.ProductUiModel
 import java.util.Locale
 import kotlin.math.roundToInt
 
-fun Product.toUiModel() = ProductUiModel(
+fun Product.toUi() = ProductUiModel(
     id = id,
     name = name,
     imageUrl = coverPictureUrl,
@@ -19,9 +19,9 @@ fun Product.toUiModel() = ProductUiModel(
     rating = rating?.roundToInt()?.coerceIn(0, 5)
 )
 
-fun Category.toUiModel() = CategoryUiModel(id = id, name = name)
+fun Category.toUi() = CategoryUiModel(id = id, name = name)
 
-fun Offer.toUiModel() = OfferUiModel(
+fun Offer.toUi() = OfferUiModel(
     id = id,
     title = name,
     subtitle = description,

@@ -26,10 +26,7 @@ enum class SortField { Price, Name, Rating, Discount }
 enum class SortOrder { Ascending, Descending }
 
 data class ProductQuery(
-    val searchTerm: String? = null,
     val category: String? = null,
-    val sortBy: SortField? = null,
-    val sortOrder: SortOrder = SortOrder.Ascending,
     val page: Int = 1,
     val pageSize: Int = 20
 )

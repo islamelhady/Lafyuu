@@ -9,19 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SearchTopBarWithNotification
 import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
@@ -32,61 +26,47 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.core.ui.text.asString
 import com.elhady.lafyuu.feature.home.R
 import com.elhady.lafyuu.feature.home.presentation.components.CategoryListSection
+import com.elhady.lafyuu.feature.home.presentation.components.CollectEffects
 import com.elhady.lafyuu.feature.home.presentation.components.OfferBannerSection
 import com.elhady.lafyuu.feature.home.presentation.components.RecommendedProductsSection
 import com.elhady.lafyuu.feature.home.presentation.components.SaleProductSection
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeRoute(
-    onNavigateToSearch: () -> Unit = {},
-    onNavigateToProductDetails: (String) -> Unit = {},
-    onNavigateToCategoryProducts: (String, String) -> Unit = { _, _ -> },
-    onNavigateToFlashSale: () -> Unit = {},
-    onNavigateToMegaSale: () -> Unit = {},
-    onNavigateToMoreCategories: () -> Unit = {},
-    onNavigateToNotifications: () -> Unit = {},
-    onNavigateToWishlist: () -> Unit = {},
-    onNavigateToTab: (String) -> Unit = {},
-    cartItemCount: Int = 0,
-    selectedTab: String = "home",
+    onNavigateToSearch: () -> Unit,
+    onNavigateToProductDetails: (String) -> Unit,
+    onNavigateToCategoryProducts: (String, String) -> Unit,
+    onNavigateToFlashSale: () -> Unit,
+    onNavigateToMegaSale: () -> Unit,
+    onNavigateToMoreCategories: () -> Unit,
+    onNavigateToNotifications: () -> Unit,
+    onNavigateToWishlist: () -> Unit,
+    onNavigateToTab: (String) -> Unit,
+    cartItemCount: Int,
+    selectedTab: String,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.effect.collect {
-                viewModel.effect.collectLatest { effect ->
-                    when (effect) {
-                        is HomeUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(
-                            effect.productId
-                        )
-
-                        is HomeUiEffect.NavigateToCategoryProducts -> onNavigateToCategoryProducts(
-                            effect.categoryId,
-                            effect.categoryName
-                        )
-
-                        is HomeUiEffect.NavigateToFlashSale -> onNavigateToFlashSale()
-                        is HomeUiEffect.NavigateToMegaSale -> onNavigateToMegaSale()
-                        is HomeUiEffect.NavigateToMoreCategories -> onNavigateToMoreCategories()
-                        is HomeUiEffect.NavigateToNotifications -> onNavigateToNotifications()
-                        is HomeUiEffect.NavigateToFavourite -> onNavigateToWishlist()
-                        is HomeUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
-                        HomeUiEffect.NavigateToSearch -> onNavigateToSearch()
-                    }
-                }
-            }
+    CollectEffects(viewModel.effect) { effect ->
+        when (effect) {
+            HomeUiEffect.NavigateToSearch -> onNavigateToSearch()
+            is HomeUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
+            is HomeUiEffect.NavigateToCategoryProducts ->
+                onNavigateToCategoryProducts(effect.categoryId, effect.categoryName)
+            HomeUiEffect.NavigateToFlashSale -> onNavigateToFlashSale()
+            HomeUiEffect.NavigateToMegaSale -> onNavigateToMegaSale()
+            HomeUiEffect.NavigateToMoreCategories -> onNavigateToMoreCategories()
+            HomeUiEffect.NavigateToNotifications -> onNavigateToNotifications()
+            HomeUiEffect.NavigateToFavourite -> onNavigateToWishlist()
+            is HomeUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
         }
     }
 
     HomeScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
-        snackbarHostState = snackbarHostState,
+//        snackbarHostState = snackbarHostState,
         cartItemCount = cartItemCount,
         selectedTab = selectedTab
     )
@@ -96,12 +76,12 @@ fun HomeRoute(
 internal fun HomeScreen(
     uiState: HomeUiState,
     onIntent: (HomeUiIntent) -> Unit,
-    snackbarHostState: SnackbarHostState,
+//    snackbarHostState: SnackbarHostState,
     cartItemCount: Int = 0,
     selectedTab: String = "home"
 ) {
     LafyuuScaffold(
-        snackbarHostState = snackbarHostState,
+//        snackbarHostState = snackbarHostState,
         topBar = {
             SearchTopBarWithNotification(
                 onSearchClick = { onIntent(HomeUiIntent.SearchClicked) },

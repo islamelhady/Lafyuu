@@ -2,28 +2,27 @@ package com.elhady.lafyuu.feature.home.presentation
 
 import Left
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
 import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.list.SingleListItem
-import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.core.ui.text.asString
+import com.elhady.lafyuu.feature.home.R
+import com.elhady.lafyuu.feature.home.presentation.components.CollectEffects
 import com.elhady.lafyuu.feature.home.presentation.components.getCategoryIcon
 
 @Composable
@@ -33,71 +32,52 @@ fun CategoriesRoute(
     viewModel: CategoriesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { effect ->
-            when (effect) {
-                CategoriesUiEffect.NavigateBack -> onNavigateBack()
-                is CategoriesUiEffect.NavigateToCategoryProducts -> onNavigateToCategoryProducts(
-                    effect.categoryId,
-                    effect.categoryName
-                )
-
-                is CategoriesUiEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        visuals = LafyuuSnackBarVisuals(
-                            message = effect.message.asString(context),
-                            type = effect.type
-                        )
-                    )
-                }
-            }
+    CollectEffects(viewModel.uiEffect) { effect ->
+        when (effect) {
+            CategoriesUiEffect.NavigateBack -> onNavigateBack()
+            is CategoriesUiEffect.NavigateToCategoryProducts ->
+                onNavigateToCategoryProducts(effect.categoryId, effect.categoryName)
         }
     }
 
-    CategoriesScreen(
-        uiState = uiState,
-        snackbarHostState = snackbarHostState,
-        onEvent = viewModel::onEvent,
-    )
+    CategoriesScreen(uiState = uiState, onIntent = viewModel::onIntent)
 }
 
 @Composable
 fun CategoriesScreen(
     uiState: CategoriesUiState,
-    snackbarHostState: SnackbarHostState,
-    onEvent: (CategoriesUiIntent) -> Unit,
+    onIntent: (CategoriesUiIntent) -> Unit
 ) {
     LafyuuScaffold(
-        snackbarHostState = snackbarHostState,
         topBar = {
             SingleTopAppBar(
-                title = "Categories",
+                title = stringResource(R.string.home_categories_title),
                 leadingIcon = Left,
-                onLeadingClick = { onEvent(CategoriesUiIntent.BackClicked) }
+                onLeadingClick = { onIntent(CategoriesUiIntent.BackClicked) }
             )
         }
     ) {
-        when {
-            uiState.isLoading && uiState.categories.isEmpty() -> {
-                CircularProgressIndicator(
+        Box(modifier = Modifier.fillMaxSize()) {
+            when {
+                uiState.isLoading -> CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
                     color = Theme.color.blue
                 )
-            }
 
-            uiState.categories.isEmpty() && uiState.error != null -> {
-                InfoStateContent(
+                uiState.error != null -> InfoStateContent(
                     errorMessage = uiState.error.asString(),
-                    onRetryClick = { onEvent(CategoriesUiIntent.RetryClicked) },
+                    onRetryClick = { onIntent(CategoriesUiIntent.RetryClicked) },
                     modifier = Modifier.align(Alignment.Center)
                 )
-            }
 
-            else -> {
-                LazyColumn(
+                uiState.categories.isEmpty() -> InfoStateContent(
+                    errorMessage = stringResource(R.string.home_no_categories),
+                    onRetryClick = { onIntent(CategoriesUiIntent.RetryClicked) },
+                    modifier = Modifier.align(Alignment.Center)
+                )
+
+                else -> LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = Theme.space.large),
                     verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
@@ -108,13 +88,8 @@ fun CategoriesScreen(
                             leadingIcon = getCategoryIcon(categoryName = category.name),
                             leadingIconTint = Theme.color.blue,
                             onClick = {
-                                onEvent(
-                                    CategoriesUiIntent.SelectCategory(
-                                        categoryId = category.id,
-                                        categoryName = category.name
-                                    )
-                                )
-                            },
+                                onIntent(CategoriesUiIntent.CategoryClicked(category.id, category.name))
+                            }
                         )
                     }
                 }

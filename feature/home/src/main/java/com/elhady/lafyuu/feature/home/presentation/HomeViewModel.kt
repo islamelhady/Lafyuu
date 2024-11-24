@@ -9,7 +9,7 @@ import com.elhady.lafyuu.feature.home.domain.model.HomeContent
 import com.elhady.lafyuu.feature.home.domain.model.Offer
 import com.elhady.lafyuu.feature.home.domain.model.Product
 import com.elhady.lafyuu.feature.home.domain.usecase.GetHomeContentUseCase
-import com.elhady.lafyuu.feature.home.presentation.mapper.toUiModel
+import com.elhady.lafyuu.feature.home.presentation.mapper.toUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -85,10 +85,10 @@ class HomeViewModel @Inject constructor(
 private fun HomeUiState.withContent(content: HomeContent) = copy(
     isLoading = false,
     error = null,
-    offers = content.offers.take(MAX_OFFERS).map(Offer::toUiModel),
-    categories = content.categories.map(Category::toUiModel),
-    flashSaleProducts = content.flashSaleProducts.take(HOME_PREVIEW_SIZE).map(Product::toUiModel),
-    megaSaleProducts = content.megaSaleProducts.take(HOME_PREVIEW_SIZE).map(Product::toUiModel),
-    recommendedProducts = content.recommendedProducts.map(Product::toUiModel),
+    offers = content.offers.take(MAX_OFFERS).map(Offer::toUi),
+    categories = content.categories.map(Category::toUi),
+    flashSaleProducts = content.flashSaleProducts.take(HOME_PREVIEW_SIZE).map(Product::toUi),
+    megaSaleProducts = content.megaSaleProducts.take(HOME_PREVIEW_SIZE).map(Product::toUi),
+    recommendedProducts = content.recommendedProducts.map(Product::toUi),
     failedSections = content.failedSections
 )
