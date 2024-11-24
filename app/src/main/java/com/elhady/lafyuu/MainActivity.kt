@@ -46,7 +46,8 @@ import com.elhady.lafyuu.feature.home.navigation.categoryProductsScreen
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
 import com.elhady.lafyuu.feature.home.navigation.navigateToCategories
 import com.elhady.lafyuu.feature.home.navigation.navigateToCategoryProducts
-import com.elhady.lafyuu.feature.home.navigation.navigateToProductList
+import com.elhady.lafyuu.feature.home.navigation.navigateToFlashSale
+import com.elhady.lafyuu.feature.home.navigation.navigateToMegaSale
 import com.elhady.lafyuu.feature.home.navigation.productListScreen
 import com.elhady.lafyuu.feature.notifications.presentation.navigateToNotifications
 import com.elhady.lafyuu.feature.notifications.presentation.notificationsScreen
@@ -165,15 +166,15 @@ fun MainApp(
                 navController.navigateToProductDetails(productId)
             },
             onNavigateToFlashSale = {
-                navController.navigateToProductList("Flash Sale")
+                navController.navigateToFlashSale()
             },
             onNavigateToMegaSale = {
-                navController.navigateToProductList("Mega Sale")
+                navController.navigateToMegaSale()
             },
             onNavigateToMoreCategories = {
                 navController.navigateToCategories()
             },
-            onNavigateToCategoryProducts = { categoryId, categoryName ->
+            onNavigateToCategoryProducts = { _, categoryName ->
                 navController.navigateToCategoryProducts(categoryName)
             },
             onNavigateToSearch = {

@@ -9,7 +9,9 @@ import com.elhady.lafyuu.feature.home.data.remote.model.GetAllOffersResponse
 import com.elhady.lafyuu.feature.home.data.remote.model.OfferDto
 import com.elhady.lafyuu.feature.home.data.remote.model.PagedListOfProductDto
 import com.elhady.lafyuu.feature.home.data.remote.model.ProductDto
+import com.elhady.lafyuu.feature.home.domain.model.ProductQuery
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -48,6 +50,18 @@ class HomeRepositoryImplTest {
     }
 
     @Test
+    fun `getProducts forwards query params and maps products`() = runTest {
+        coEvery { homeApi.getProducts(category = "Rings", page = 2, pageSize = 20) } returns
+                PagedListOfProductDto(items = listOf(ProductDto(id = "100", name = "Ring", price = 80.0)))
+
+        val result = repository.getProducts(ProductQuery(category = "Rings", page = 2, pageSize = 20))
+
+        assertTrue(result is AppResult.Success)
+        assertEquals("Ring", (result as AppResult.Success).data.single().name)
+        coVerify(exactly = 1) { homeApi.getProducts(category = "Rings", page = 2, pageSize = 20) }
+    }
+
+    @Test
     fun `getOffers returns Success on successful API response`() = runTest {
         val response = GetAllOffersResponse(
             items = listOf(OfferDto(id = "10", name = "Flash Discount")),
@@ -69,7 +83,7 @@ class HomeRepositoryImplTest {
         )
         coEvery { homeApi.getProducts(page = 1, pageSize = 10) } returns response
 
-        val result = repository.getProducts(page = 1, pageSize = 10)
+        val result = repository.getProducts(ProductQuery(page = 1, pageSize = 10))
 
         assertTrue(result is AppResult.Success)
         val products = (result as AppResult.Success).data

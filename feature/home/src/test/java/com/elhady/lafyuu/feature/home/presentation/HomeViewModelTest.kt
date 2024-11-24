@@ -1,12 +1,13 @@
 package com.elhady.lafyuu.feature.home.presentation
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.core.common.result.AppError
 import com.elhady.lafyuu.core.designsystem.components.element.TabBarItem
 import com.elhady.lafyuu.core.designsystem.icons.Search
+import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.feature.home.domain.model.Category
 import com.elhady.lafyuu.feature.home.domain.model.HomeContent
+import com.elhady.lafyuu.feature.home.domain.model.HomeSection
 import com.elhady.lafyuu.feature.home.domain.model.Offer
 import com.elhady.lafyuu.feature.home.domain.model.Product
 import com.elhady.lafyuu.feature.home.domain.usecase.GetHomeContentUseCase
@@ -16,8 +17,11 @@ import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -26,6 +30,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -34,25 +39,11 @@ import org.junit.Test
 class HomeViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
-    private val getHomeContentUseCase: GetHomeContentUseCase = mockk()
-    private val searchProductsUseCase: SearchProductsUseCase = mockk()
-
-    private lateinit var viewModel: HomeViewModel
+    private val getHomeContent: GetHomeContentUseCase = mockk()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-
-        coEvery { getHomeContentUseCase() } returns AppResult.Success(
-            HomeContent(
-                categories = listOf(Category("1", "Clothes", null, null)),
-                offers = listOf(Offer("1", "Summer Sale", "50% Off", null)),
-                flashSaleProducts = listOf(Product("1", "Nike Air", null, 100.0, 120.0, 20.0, "20% OFF", 4)),
-                megaSaleProducts = listOf(Product("1", "Nike Air", null, 100.0, 120.0, 20.0, "20% OFF", 4)),
-                recommendedProducts = listOf(Product("1", "Nike Air", null, 100.0, 120.0, 20.0, "20% OFF", 4))
-            )
-        )
-        coEvery { searchProductsUseCase(any()) } returns AppResult.Success(emptyList())
     }
 
     @After
@@ -60,228 +51,132 @@ class HomeViewModelTest {
         Dispatchers.resetMain()
     }
 
+    private fun product(id: String) = Product(id, "Item $id", null, 100.0, 20, 4f)
+
+    private fun content(
+        flash: List<Product> = listOf(product("f1")),
+        failed: Set<HomeSection> = emptySet()
+    ) = HomeContent(
+        categories = listOf(Category("1", "Rings", null, null)),
+        offers = listOf(Offer("1", "Sale", "50% Off", null)),
+        flashSaleProducts = flash,
+        megaSaleProducts = listOf(product("m1")),
+        recommendedProducts = listOf(product("r1")),
+        failedSections = failed
+    )
+
+    private fun TestScope.collectEffects(viewModel: HomeViewModel): List<HomeUiEffect> {
+        val effects = mutableListOf<HomeUiEffect>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.effect.toList(effects)
+        }
+        return effects
+    }
+
     @Test
-    fun `init loads home content into UiState`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
+    fun `init loads content and maps it to ui models`() = runTest {
+        coEvery { getHomeContent() } returns AppResult.Success(content())
+
+        val viewModel = HomeViewModel(getHomeContent)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-
         assertFalse(state.isLoading)
         assertEquals(1, state.categories.size)
-        assertEquals("Clothes", state.categories.first().name)
-        assertEquals(1, state.offers.size)
-        assertEquals("Summer Sale", state.offers.first().name)
-        assertEquals(1, state.flashSaleProducts.size)
+        assertEquals("$80.00", state.flashSaleProducts.first().price)
+        assertTrue(state.failedSections.isEmpty())
     }
 
     @Test
-    fun `init sets errorMessage when GetHomeContentUseCase returns Error`() = runTest {
-        coEvery { getHomeContentUseCase() } returns AppResult.Failure(AppError.Validation("Network error"))
+    fun `home preview shows at most 10 products per sale section`() = runTest {
+        coEvery { getHomeContent() } returns
+                AppResult.Success(content(flash = (1..12).map { product("f$it") }))
 
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
+        val viewModel = HomeViewModel(getHomeContent)
+        advanceUntilIdle()
+
+        assertEquals(10, viewModel.uiState.value.flashSaleProducts.size)
+    }
+
+    @Test
+    fun `total failure sets error and empty content`() = runTest {
+        coEvery { getHomeContent() } returns AppResult.Failure(AppError.Validation("Network error"))
+
+        val viewModel = HomeViewModel(getHomeContent)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)
-        assertEquals(UiText.Dynamic("Network error"), state.errorMessage)
+        assertEquals(UiText.Dynamic("Network error"), state.error)
+        assertTrue(state.isContentEmpty)
     }
 
     @Test
-    fun `non-blank query immediately sets isSearching true before debounce`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
+    fun `partial failure is exposed in state`() = runTest {
+        coEvery { getHomeContent() } returns
+                AppResult.Success(content(failed = setOf(HomeSection.Offers)))
+
+        val viewModel = HomeViewModel(getHomeContent)
         advanceUntilIdle()
 
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("Puma"))
-
-        val state = viewModel.uiState.value
-        assertEquals("Puma", state.searchQuery)
-        assertTrue(state.isSearching)
+        assertTrue(viewModel.uiState.value.hasLoadProblem)
+        assertFalse(viewModel.uiState.value.isContentEmpty)
     }
 
     @Test
-    fun `blank query clears search state immediately`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
+    fun `retry after failure loads content`() = runTest {
+        coEvery { getHomeContent() } returnsMany listOf(
+            AppResult.Failure(AppError.Validation("Network error")),
+            AppResult.Success(content())
+        )
+
+        val viewModel = HomeViewModel(getHomeContent)
+        advanceUntilIdle()
+        viewModel.onIntent(HomeUiIntent.RetryClicked)
         advanceUntilIdle()
 
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("Puma"))
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("   "))
-
-        val state = viewModel.uiState.value
-        assertEquals("", state.searchQuery)
-        assertFalse(state.isSearching)
-        assertTrue(state.searchResults.isEmpty())
+        assertNull(viewModel.uiState.value.error)
+        assertEquals(1, viewModel.uiState.value.categories.size)
     }
 
     @Test
-    fun `onSearchQueryChange debounces and updates search state with results`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
-        advanceUntilIdle()
-
-        val searchProducts = listOf(Product("2", "Adidas Ultra", null, 90.0, null, null, null, 4))
-        coEvery { searchProductsUseCase("Adidas") } returns AppResult.Success(searchProducts)
-
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("Adidas"))
-        advanceTimeBy(350L)
-        advanceUntilIdle()
-
-        val state = viewModel.uiState.value
-        assertEquals("Adidas", state.searchQuery)
-        assertFalse(state.isSearching)
-        assertEquals(1, state.searchResults.size)
-        assertEquals("Adidas Ultra", state.searchResults.first().name)
-    }
-
-    @Test
-    fun `rapid typing within debounce period only triggers search for the last query`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
-        advanceUntilIdle()
-
-        coEvery { searchProductsUseCase(any()) } returns AppResult.Success(emptyList())
-
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("N"))
-        advanceTimeBy(100L)
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("Ni"))
-        advanceTimeBy(100L)
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("Nik"))
-        advanceTimeBy(350L)
-        advanceUntilIdle()
-
-        coVerify(exactly = 1) { searchProductsUseCase("Nik") }
-        coVerify(exactly = 0) { searchProductsUseCase("N") }
-        coVerify(exactly = 0) { searchProductsUseCase("Ni") }
-    }
-
-    @Test
-    fun `successful search with zero results sets isSearching false and searchResults empty`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
-        advanceUntilIdle()
-
-        coEvery { searchProductsUseCase("Unknown") } returns AppResult.Success(emptyList())
-
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("Unknown"))
-        advanceTimeBy(350L)
-        advanceUntilIdle()
-
-        val state = viewModel.uiState.value
-        assertEquals("Unknown", state.searchQuery)
-        assertFalse(state.isSearching)
-        assertTrue(state.searchResults.isEmpty())
-    }
-
-    @Test
-    fun `search error sets isSearching false and searchResults empty`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
-        advanceUntilIdle()
-
-        coEvery { searchProductsUseCase("ErrorQuery") } returns AppResult.Failure(AppError.Validation("Network error"))
-
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("ErrorQuery"))
-        advanceTimeBy(350L)
-        advanceUntilIdle()
-
-        val state = viewModel.uiState.value
-        assertEquals("ErrorQuery", state.searchQuery)
-        assertFalse(state.isSearching)
-        assertTrue(state.searchResults.isEmpty())
-    }
-
-    @Test
-    fun `clear search while debounce is pending cancels search and resets state`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
-        advanceUntilIdle()
-
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("Pending"))
-        advanceTimeBy(100L)
-
-        viewModel.onClearSearch()
-        advanceTimeBy(350L)
-        advanceUntilIdle()
-
-        val state = viewModel.uiState.value
-        assertEquals("", state.searchQuery)
-        assertFalse(state.isSearching)
-        assertTrue(state.searchResults.isEmpty())
-        coVerify(exactly = 0) { searchProductsUseCase("Pending") }
-    }
-
-    @Test
-    fun `clear search while request is in flight resets state and cancels in flight search`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
-        advanceUntilIdle()
-
-        coEvery { searchProductsUseCase("InFlight") } coAnswers {
-            delay(1000L)
-            AppResult.Success(listOf(Product("99", "InFlight Item", null, 10.0, null, null, null, 4)))
+    fun `retry while a load is running does not start a second load`() = runTest {
+        coEvery { getHomeContent() } coAnswers {
+            delay(1_000)
+            AppResult.Success(content())
         }
 
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("InFlight"))
-        advanceTimeBy(350L) // debounce passes, search invocation starts
-        advanceTimeBy(200L) // request in flight
-
-        viewModel.onClearSearch()
+        val viewModel = HomeViewModel(getHomeContent)
+        advanceTimeBy(100)
+        viewModel.onIntent(HomeUiIntent.RetryClicked)
         advanceUntilIdle()
 
-        val state = viewModel.uiState.value
-        assertEquals("", state.searchQuery)
-        assertFalse(state.isSearching)
-        assertTrue(state.searchResults.isEmpty())
+        coVerify(exactly = 1) { getHomeContent() }
     }
 
     @Test
-    fun `onClearSearch resets search query and search results immediately`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
+    fun `ProductClicked emits NavigateToProductDetails`() = runTest {
+        coEvery { getHomeContent() } returns AppResult.Success(content())
+        val viewModel = HomeViewModel(getHomeContent)
+        val effects = collectEffects(viewModel)
         advanceUntilIdle()
 
-        val searchProducts = listOf(Product("2", "Adidas Ultra", null, 90.0, null, null, null, 4))
-        coEvery { searchProductsUseCase("Adidas") } returns AppResult.Success(searchProducts)
-
-        viewModel.onEvent(HomeUiEvent.SearchQueryChanged("Adidas"))
-        advanceTimeBy(350L)
+        viewModel.onIntent(HomeUiIntent.ProductClicked("100"))
         advanceUntilIdle()
 
-        viewModel.onClearSearch()
-        advanceUntilIdle()
-
-        val state = viewModel.uiState.value
-        assertEquals("", state.searchQuery)
-        assertFalse(state.isSearching)
-        assertTrue(state.searchResults.isEmpty())
+        assertEquals(listOf<HomeUiEffect>(HomeUiEffect.NavigateToProductDetails("100")), effects)
     }
 
     @Test
-    fun `FavoriteClicked event toggles product isFavorite state locally`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
+    fun `BottomTabSelected emits NavigateToTab with the tab route`() = runTest {
+        coEvery { getHomeContent() } returns AppResult.Success(content())
+        val viewModel = HomeViewModel(getHomeContent)
+        val effects = collectEffects(viewModel)
         advanceUntilIdle()
 
-        viewModel.onEvent(HomeUiEvent.FavoriteClicked("1"))
-
-        val state = viewModel.uiState.value
-        assertTrue(state.flashSaleProducts.first().isFavorite)
-    }
-
-    @Test
-    fun `ProductClicked event emits NavigateToProductDetails effect`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
+        viewModel.onIntent(HomeUiIntent.BottomTabSelected(TabBarItem("Explore", Search, route = "explore")))
         advanceUntilIdle()
 
-        viewModel.onEvent(HomeUiEvent.ProductClicked("100"))
-
-        val effect = viewModel.effect.first()
-        assertTrue(effect is HomeUiEffect.NavigateToProductDetails)
-        assertEquals("100", (effect as HomeUiEffect.NavigateToProductDetails).productId)
-    }
-
-    @Test
-    fun `BottomTabSelected event emits NavigateToTab effect with tab route`() = runTest {
-        viewModel = HomeViewModel(getHomeContentUseCase, searchProductsUseCase)
-        advanceUntilIdle()
-
-        val tab = TabBarItem("Explore", Search, route = "explore")
-        viewModel.onEvent(HomeUiEvent.BottomTabSelected(tab))
-
-        val effect = viewModel.effect.first()
-        assertTrue(effect is HomeUiEffect.NavigateToTab)
-        assertEquals("explore", (effect as HomeUiEffect.NavigateToTab).tabRoute)
+        assertEquals(listOf<HomeUiEffect>(HomeUiEffect.NavigateToTab("explore")), effects)
     }
 }
