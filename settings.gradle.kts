@@ -24,4 +24,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "lafyuu"
 include(":app")
- 
+include(":core:network")
+include(":core:common")
+include(":core:design-system")
+include(":core:datastore")
+include(":core:database")
+include(":feature:auth")

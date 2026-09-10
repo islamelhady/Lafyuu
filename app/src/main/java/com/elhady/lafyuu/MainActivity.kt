@@ -4,44 +4,58 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.elhady.lafyuu.ui.theme.LafyuuTheme
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
+import com.elhady.lafyuu.feature.auth.presentation.navigation.AUTH_GRAPH_ROUTE
+import com.elhady.lafyuu.feature.auth.presentation.navigation.authGraph
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val isAuthenticated by viewModel.isAuthenticated.collectAsStateWithLifecycle()
+
             LafyuuTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                MainApp(
+                    isAuthenticated = isAuthenticated
+                )
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun MainApp(
+    isAuthenticated: Boolean
+) {
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    LafyuuTheme {
-        Greeting("Android")
+    NavHost(
+        navController = navController,
+        startDestination = if (isAuthenticated) "home" else AUTH_GRAPH_ROUTE
+    ) {
+        authGraph(
+            onNavigateToHome = {
+                navController.navigate("home") {
+                    popUpTo(AUTH_GRAPH_ROUTE) { inclusive = true }
+                }
+            },
+            navController = navController
+        )
+
+        composable("home") {
+            // Placeholder for Home Screen
+        }
     }
 }
