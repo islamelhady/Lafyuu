@@ -1,15 +1,16 @@
 package com.elhady.lafyuu.feature.auth.presentation.forgot_password
 
+import Left
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -25,9 +26,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.elhady.lafyuu.core.designsystem.component.button.LafyuuButton
-import com.elhady.lafyuu.core.designsystem.component.button.LafyuuIconButton
-import com.elhady.lafyuu.core.designsystem.component.input.LafyuuTextField
+import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.textfield.EmailTextField
+import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -42,7 +43,10 @@ fun ForgotPasswordRoute(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
-                is ForgotPasswordUiEffect.NavigateToResetPassword -> onNavigateToResetPassword(effect.email)
+                is ForgotPasswordUiEffect.NavigateToResetPassword -> onNavigateToResetPassword(
+                    effect.email
+                )
+
                 is ForgotPasswordUiEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
             }
         }
@@ -69,11 +73,14 @@ internal fun ForgotPasswordScreen(
             CenterAlignedTopAppBar(
                 title = { Text("Forgot Password") },
                 navigationIcon = {
-                    LafyuuIconButton(
-                        icon = Icons.Default.ArrowBack,
-                        onClick = onNavigateBack,
-                        contentDescription = "Back"
-                    )
+                    IconButton(
+                        onClick = onNavigateBack
+                    ) {
+                        Icon(
+                            imageVector = Left,
+                            contentDescription = "Back"
+                        )
+                    }
                 }
             )
         },
@@ -92,19 +99,18 @@ internal fun ForgotPasswordScreen(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            LafyuuTextField(
+            EmailTextField(
                 value = uiState.email,
                 onValueChange = { onEvent(ForgotPasswordUiEvent.EmailChanged(it)) },
-                label = "Email",
+                placeholder = "Email",
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            LafyuuButton(
-                text = "Send Code",
+            DefaultButton(
+                caption = "Send Cod",
                 onClick = { onEvent(ForgotPasswordUiEvent.SubmitClicked) },
-                loading = uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
         }

@@ -22,9 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.elhady.lafyuu.core.designsystem.component.button.LafyuuButton
-import com.elhady.lafyuu.core.designsystem.component.input.LafyuuPasswordField
-import com.elhady.lafyuu.core.designsystem.component.input.LafyuuTextField
+import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
+import com.elhady.lafyuu.core.designsystem.components.textfield.PhoneNumberTextField
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -79,33 +79,33 @@ internal fun ResetPasswordScreen(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            LafyuuTextField(
+            PhoneNumberTextField(
                 value = uiState.otp,
                 onValueChange = { onEvent(ResetPasswordUiEvent.OtpChanged(it)) },
-                label = "OTP Code",
+                placeholder = "OTP Code",
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
-            LafyuuPasswordField(
+            PasswordTextField(
                 value = uiState.newPassword,
                 onValueChange = { onEvent(ResetPasswordUiEvent.NewPasswordChanged(it)) },
-                label = "New Password",
+                placeholder = "New Password",
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
-            LafyuuPasswordField(
+            PasswordTextField(
                 value = uiState.confirmPassword,
                 onValueChange = { onEvent(ResetPasswordUiEvent.ConfirmPasswordChanged(it)) },
-                label = "Confirm Password",
+                placeholder = "Confirm Password",
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            LafyuuButton(
-                text = "Reset Password",
+            DefaultButton(
+                caption = "Reset Password",
                 onClick = { onEvent(ResetPasswordUiEvent.ResetClicked) },
-                loading = uiState.isLoading,
+                isLoading = uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
         }

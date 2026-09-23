@@ -20,12 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.elhady.lafyuu.core.designsystem.component.button.LafyuuButton
-import com.elhady.lafyuu.core.designsystem.component.button.LafyuuTextButton
-import com.elhady.lafyuu.core.designsystem.component.input.LafyuuOtpField
+import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
+import com.elhady.lafyuu.core.designsystem.components.textfield.PhoneNumberTextField
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -82,7 +83,7 @@ internal fun OtpScreen(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            LafyuuOtpField(
+            PhoneNumberTextField(
                 value = uiState.otp,
                 onValueChange = { otp -> 
                     onEvent(OtpUiEvent.OtpChanged(otp))
@@ -90,10 +91,10 @@ internal fun OtpScreen(
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            LafyuuButton(
-                text = "Verify",
+            DefaultButton(
+                caption = "Verify",
                 onClick = { onEvent(OtpUiEvent.VerifyClicked) },
-                loading = uiState.isLoading,
+                isLoading = uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -105,11 +106,21 @@ internal fun OtpScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Didn't receive code?")
-                LafyuuTextButton(
+                LafyuuText(
                     text = "Resend",
                     onClick = { onEvent(OtpUiEvent.ResendOtpClicked) }
                 )
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun OtpScreenPreview(){
+    OtpScreen(
+        uiState = OtpUiState(),
+        onEvent = {},
+        snackBarHostState = SnackbarHostState()
+    )
 }
