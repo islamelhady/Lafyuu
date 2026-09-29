@@ -4,7 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.feature.auth.domain.repository.AuthRepository
+import com.elhady.lafyuu.feature.auth.domain.model.ValidationResult
+import com.elhady.lafyuu.feature.auth.domain.usecase.ResetPasswordUseCase
+import com.elhady.lafyuu.feature.auth.domain.validator.ValidateConfirmPassword
+import com.elhady.lafyuu.feature.auth.domain.validator.ValidatePassword
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,13 +20,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ResetPasswordViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val resetPasswordUseCase: ResetPasswordUseCase,
+    private val validatePassword: ValidatePassword,
+    private val validateConfirmPassword: ValidateConfirmPassword,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val email: String = checkNotNull(savedStateHandle["email"])
+    private val otp: String = checkNotNull(savedStateHandle["otp"])
 
-    private val _uiState = MutableStateFlow(ResetPasswordUiState(email = email))
+    private val _uiState = MutableStateFlow(ResetPasswordUiState(email = email, otp = otp))
     val uiState: StateFlow<ResetPasswordUiState> = _uiState.asStateFlow()
 
     private val _uiEffect = Channel<ResetPasswordUiEffect>()
@@ -32,39 +38,57 @@ class ResetPasswordViewModel @Inject constructor(
     fun onEvent(event: ResetPasswordUiEvent) {
         when (event) {
             is ResetPasswordUiEvent.OtpChanged -> {
-                _uiState.update { it.copy(otp = event.otp, error = null) }
+                _uiState.update { it.copy(otp = event.otp, otpError = null, generalError = null) }
             }
             is ResetPasswordUiEvent.NewPasswordChanged -> {
-                _uiState.update { it.copy(newPassword = event.password, error = null) }
+                _uiState.update { it.copy(newPassword = event.password, newPasswordError = null, generalError = null) }
             }
             is ResetPasswordUiEvent.ConfirmPasswordChanged -> {
-                _uiState.update { it.copy(confirmPassword = event.password, error = null) }
+                _uiState.update { it.copy(confirmPassword = event.password, confirmPasswordError = null, generalError = null) }
             }
             ResetPasswordUiEvent.ResetClicked -> reset()
         }
     }
 
     private fun reset() {
+        if (_uiState.value.isLoading) return
+
         val state = _uiState.value
-        if (state.otp.isBlank() || state.newPassword.isBlank()) {
-            _uiState.update { it.copy(error = "Please fill in all fields") }
-            return
-        }
-        if (state.newPassword != state.confirmPassword) {
-            _uiState.update { it.copy(error = "Passwords do not match") }
+        val passwordResult = validatePassword(state.newPassword)
+        val confirmPasswordResult = validateConfirmPassword(state.newPassword, state.confirmPassword)
+
+        val hasError = listOf(passwordResult, confirmPasswordResult).any { it is ValidationResult.Error }
+
+        if (hasError) {
+            _uiState.update {
+                it.copy(
+                    newPasswordError = when (passwordResult) {
+                        ValidationResult.Error.PasswordRequired -> "New password is required"
+                        ValidationResult.Error.PasswordMissingDigit -> "Password must contain at least one digit"
+                        ValidationResult.Error.PasswordMissingUppercase -> "Password must contain at least one uppercase letter"
+                        ValidationResult.Error.PasswordMissingSpecialChar -> "Password must contain at least one special character"
+                        else -> null
+                    },
+                    confirmPasswordError = when (confirmPasswordResult) {
+                        ValidationResult.Error.ConfirmPasswordRequired -> "Confirm password is required"
+                        ValidationResult.Error.PasswordMismatch -> "Passwords do not match"
+                        else -> null
+                    }
+                )
+            }
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            when (val result = authRepository.resetPassword(email, state.otp, state.newPassword)) {
-                is AppResult.Success -> {
+            _uiState.update { it.copy(isLoading = true, generalError = null) }
+            when (val result = resetPasswordUseCase(email, otp, state.newPassword)) {
+                is AppResult.Success<*> -> {
                     _uiState.update { it.copy(isLoading = false) }
                     _uiEffect.send(ResetPasswordUiEffect.NavigateToLogin)
                 }
                 is AppResult.Error -> {
                     val errorMessage = result.message ?: "Reset failed"
-                    _uiState.update { it.copy(isLoading = false, error = errorMessage) }
+                    _uiState.update { it.copy(isLoading = false, generalError = errorMessage) }
                     _uiEffect.send(ResetPasswordUiEffect.ShowError(errorMessage))
                 }
                 AppResult.Loading -> {}

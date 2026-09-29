@@ -1,36 +1,42 @@
 package com.elhady.lafyuu.feature.auth.presentation.reset_password
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
+import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerExtraLarge
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerLarge
+import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerSmall
+import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
-import com.elhady.lafyuu.core.designsystem.components.textfield.PhoneNumberTextField
+import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
+import com.elhady.lafyuu.core.designsystem.theme.Theme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun ResetPasswordRoute(
+fun ResetPasswordScreen(
     onNavigateToLogin: () -> Unit,
-    viewModel: ResetPasswordViewModel = hiltViewModel()
+    viewModel: ResetPasswordViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -44,7 +50,7 @@ fun ResetPasswordRoute(
         }
     }
 
-    ResetPasswordScreen(
+    ResetPasswordContent(
         uiState = uiState,
         onEvent = viewModel::onEvent,
         snackbarHostState = snackbarHostState
@@ -52,55 +58,61 @@ fun ResetPasswordRoute(
 }
 
 @Composable
-internal fun ResetPasswordScreen(
+private fun ResetPasswordContent(
     uiState: ResetPasswordUiState,
     onEvent: (ResetPasswordUiEvent) -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { innerPadding ->
+    LafyuuScaffold(
+        snackbarHostState = snackbarHostState
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(24.dp),
+                .padding(horizontal = Theme.space.large)
+                .verticalScroll(rememberScrollState())
+                .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Reset Password",
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
+            Image(
+                painter = painterResource(R.drawable.logo),
+                contentDescription = "Logo",
             )
-            Text(
-                text = "Enter the code sent to your email and your new password",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 32.dp)
+            VerticalSpacerLarge()
+            LafyuuText(
+                text = "Reset Password?",
+                style = Theme.typography.heading4,
+                color = Theme.color.neutralDark,
+            )
+            VerticalSpacerSmall()
+            LafyuuText(
+                text = "Create a new password for your account",
+                style = Theme.typography.normalTextRegular,
+                color = Theme.color.neutralGrey,
+                modifier = Modifier.padding(horizontal = Theme.space.large),
+                textAlign = TextAlign.Center,
             )
 
-            PhoneNumberTextField(
-                value = uiState.otp,
-                onValueChange = { onEvent(ResetPasswordUiEvent.OtpChanged(it)) },
-                placeholder = "OTP Code",
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            VerticalSpacerExtraLarge()
+
             PasswordTextField(
                 value = uiState.newPassword,
                 onValueChange = { onEvent(ResetPasswordUiEvent.NewPasswordChanged(it)) },
                 placeholder = "New Password",
+                errorMessage = uiState.newPasswordError,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            VerticalSpacerSmall()
             PasswordTextField(
                 value = uiState.confirmPassword,
                 onValueChange = { onEvent(ResetPasswordUiEvent.ConfirmPasswordChanged(it)) },
                 placeholder = "Confirm Password",
+                errorMessage = uiState.confirmPasswordError,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            VerticalSpacerExtraLarge()
 
             DefaultButton(
                 caption = "Reset Password",
@@ -114,10 +126,11 @@ internal fun ResetPasswordScreen(
 
 @Preview
 @Composable
-fun ResetPasswordScreenPreview() {
-    ResetPasswordScreen(
-        uiState = ResetPasswordUiState(),
-        onEvent = {},
-        snackbarHostState = remember { SnackbarHostState() }
-    )
+private fun ResetPasswordContentPreview() {
+    LafyuuTheme {
+        ResetPasswordContent(
+            uiState = ResetPasswordUiState(),
+            onEvent = {}
+        )
+    }
 }

@@ -4,7 +4,8 @@ data class OtpUiState(
     val email: String = "",
     val otp: String = "",
     val isLoading: Boolean = false,
-    val error: String? = null
+    val otpError: String? = null,
+    val generalError: String? = null
 )
 
 sealed interface OtpUiEvent {
@@ -14,6 +15,7 @@ sealed interface OtpUiEvent {
 }
 
 sealed interface OtpUiEffect {
+    data class NavigateToResetPassword(val email: String, val otp: String) : OtpUiEffect
     data object NavigateToLogin : OtpUiEffect
     data class ShowError(val message: String) : OtpUiEffect
     data class ShowMessage(val message: String) : OtpUiEffect

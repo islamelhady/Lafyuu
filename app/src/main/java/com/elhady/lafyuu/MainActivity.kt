@@ -5,15 +5,23 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
+import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.feature.auth.presentation.navigation.AUTH_GRAPH_ROUTE
 import com.elhady.lafyuu.feature.auth.presentation.navigation.authGraph
+import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
+import com.elhady.lafyuu.feature.home.navigation.homeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,12 +32,31 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val isAuthenticated by viewModel.isAuthenticated.collectAsStateWithLifecycle()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             LafyuuTheme {
-                MainApp(
-                    isAuthenticated = isAuthenticated
-                )
+                when (uiState) {
+                    MainUiState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = Theme.color.blue
+                            )
+                        }
+                    }
+                    is MainUiState.Authenticated -> {
+                        key(true) {
+                            MainApp(isAuthenticated = true)
+                        }
+                    }
+                    is MainUiState.Unauthenticated -> {
+                        key(false) {
+                            MainApp(isAuthenticated = false)
+                        }
+                    }
+                }
             }
         }
     }
@@ -43,19 +70,17 @@ fun MainApp(
 
     NavHost(
         navController = navController,
-        startDestination = if (isAuthenticated) "home" else AUTH_GRAPH_ROUTE
+        startDestination = if (isAuthenticated) HOME_ROUTE else AUTH_GRAPH_ROUTE
     ) {
         authGraph(
             onNavigateToHome = {
-                navController.navigate("home") {
+                navController.navigate(HOME_ROUTE) {
                     popUpTo(AUTH_GRAPH_ROUTE) { inclusive = true }
                 }
             },
             navController = navController
         )
 
-        composable("home") {
-            // Placeholder for Home Screen
-        }
+        homeScreen()
     }
 }

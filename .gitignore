@@ -37,3 +37,4 @@ Thumbs.db
 
 # Project-specific AI and Architecture docs
 .agents/
+ARCHITECTURE.md

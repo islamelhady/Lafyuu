@@ -60,6 +60,13 @@ data class ResetPasswordRequest(
 )
 
 @Serializable
+data class ChangePasswordRequest(
+    val currentPassword: String,
+    val newPassword: String,
+    val confirmNewPassword: String
+)
+
+@Serializable
 data class ValidateOtpRequest(
     val email: String,
     val otp: String

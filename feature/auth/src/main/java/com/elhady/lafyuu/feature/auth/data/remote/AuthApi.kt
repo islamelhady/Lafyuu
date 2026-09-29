@@ -1,5 +1,6 @@
 package com.elhady.lafyuu.feature.auth.data.remote
 
+import com.elhady.lafyuu.feature.auth.data.remote.model.ChangePasswordRequest
 import com.elhady.lafyuu.feature.auth.data.remote.model.ForgotPasswordRequest
 import com.elhady.lafyuu.feature.auth.data.remote.model.LoginRequest
 import com.elhady.lafyuu.feature.auth.data.remote.model.LoginResponse
@@ -36,6 +37,9 @@ interface AuthApi {
 
     @POST("api/auth/reset-password")
     suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<Unit>
+
+    @POST("api/auth/change-password")
+    suspend fun changePassword(@Body request: ChangePasswordRequest): Response<Unit>
 
     @POST("api/auth/resend-otp")
     suspend fun resendOtp(@Body request: ResendOtpRequest): Response<Unit>

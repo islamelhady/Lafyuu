@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.elhady.lafyuu.core.designsystem.components.other.NotificationMarkCount
-import com.elhady.lafyuu.core.designsystem.components.text.HintText
+import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.icons.Cart
 import com.elhady.lafyuu.core.designsystem.icons.Offer
 import com.elhady.lafyuu.core.designsystem.icons.Search
@@ -59,7 +59,7 @@ fun NavigationBottomBar(
     onTabSelected: (TabBarItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    var selectedTabIndex by remember { mutableIntStateOf(2) }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -73,10 +73,6 @@ fun NavigationBottomBar(
                 )
             )
             .background(color = Theme.color.backgroundWhite)
-            .padding(
-                vertical = Theme.space.small,
-                horizontal = Theme.space.large
-            )
     ) {
         tabs.forEachIndexed { index, tab ->
             TabItem(
@@ -98,11 +94,12 @@ private fun RowScope.TabItem(
     onClick: () -> Unit,
 ) {
     val contentColor = if (isSelected) Theme.color.blue else Theme.color.neutralGrey
+    val contentStyle = if (isSelected) Theme.typography.normalTextBold else Theme.typography.normalTextRegular
     Column(
         modifier = Modifier
             .fillMaxHeight()
             .weight(1f)
-            .clip(Theme.corner.medium)
+            .clip(Theme.corner.small)
             .clickable(onClick = onClick),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -123,12 +120,11 @@ private fun RowScope.TabItem(
                 )
             }
         }
-        if (isSelected) {
-            HintText(
-                text = tab.label,
-                color = contentColor
-            )
-        }
+        LafyuuText(
+            text = tab.label,
+            color = contentColor,
+            style = contentStyle
+        )
     }
 }
 

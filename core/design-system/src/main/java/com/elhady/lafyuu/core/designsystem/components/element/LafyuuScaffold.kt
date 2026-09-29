@@ -10,23 +10,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.elhady.lafyuu.core.designsystem.components.appbar.ProductTopBar
+import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarHost
+import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.icons.More
 import com.elhady.lafyuu.core.designsystem.icons.Search
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import kotlinx.coroutines.launch
 
 @Composable
 fun LafyuuScaffold(
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
-    toast: @Composable () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     Box(
@@ -52,7 +58,9 @@ fun LafyuuScaffold(
                 .padding(horizontal = Theme.space.huge)
                 .padding(top = Theme.space.large)
         ) {
-            toast()
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                LafyuuSnackBarHost(data = data)
+            }
         }
     }
 
@@ -66,8 +74,11 @@ private fun LafyuuScaffoldPreview() {
             defaultTabBarItems
         )
     }
+    val snackBarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     LafyuuTheme() {
         LafyuuScaffold(
+            snackbarHostState = snackBarHostState,
             topBar = {
                 ProductTopBar(
                     title = "Nike Air Max 270 Rea",
@@ -83,19 +94,23 @@ private fun LafyuuScaffoldPreview() {
             bottomBar = {
                 NavigationBottomBar(
                     tabs = tabs,
-                    onTabSelected = {}
+                    onTabSelected = {
+                        scope.launch {
+                            snackBarHostState.showSnackbar(
+                                visuals = LafyuuSnackBarVisuals(
+                                    message = it.label,
+                                    type = when (it.label) {
+                                        "Cart" -> AlertType.Success
+                                        "Explore" -> AlertType.Error
+                                        else -> AlertType.Warning
+                                    }
+                                )
+                            )
+                        }
+                    }
                 )
             },
             content = {},
-            toast = {
-//                ToastMessage(
-//                    status = ToastStatus.SUCCESS,
-//                    isVisible = false,
-//                    title = "Success",
-//                    description = "Book Added to favourites",
-//                    onClickClose = {}
-//                )
-            }
         )
     }
 }
