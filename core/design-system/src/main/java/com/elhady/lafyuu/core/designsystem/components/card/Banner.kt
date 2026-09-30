@@ -1,6 +1,5 @@
 package com.elhady.lafyuu.core.designsystem.components.card
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
@@ -19,21 +19,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.elhady.lafyuu.core.designsystem.R
-import com.elhady.lafyuu.core.designsystem.components.other.CountdownTimer
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+
+import coil.compose.AsyncImage
 
 @Composable
 fun Banner(
     title: String = "Super Flash Sale",
-    subtitle: String = "50% Off",
-    hours: String = "08",
-    minutes: String = "34",
-    seconds: String = "52",
-    imageResId: Int,
+    subtitle: String? = null,
+    imageUrl: Any? = R.drawable.img_promo_shoes_red,
+    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Card(
+        onClick = { onClick?.invoke() },
+        enabled = onClick != null,
         modifier = modifier
             .fillMaxWidth()
             .height(208.dp),
@@ -43,10 +44,12 @@ fun Banner(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            Image(
-                painter = painterResource(id = imageResId),
+            AsyncImage(
+                model = imageUrl ?: R.drawable.img_promo_shoes_red,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.img_promo_shoes_red),
+                error = painterResource(id = R.drawable.img_promo_shoes_red),
                 modifier = Modifier.fillMaxSize()
             )
 
@@ -60,43 +63,37 @@ fun Banner(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = Theme.space.extraLarge, vertical = Theme.space.huge),
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.Center
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(Theme.space.small)
                 ) {
                     LafyuuText(
                         text = title,
-                        style = Theme.typography.heading4,
-                        color = Theme.color.backgroundWhite
+                        modifier = Modifier.width(209.dp),
+                        style = Theme.typography.heading2,
+                        color = Theme.color.backgroundWhite,
+                        maxLines = 2
                     )
-                    LafyuuText(
-                        text = subtitle,
-                        style = Theme.typography.heading5,
-                        color = Theme.color.backgroundWhite
-                    )
+                    subtitle?.let {
+                        LafyuuText(
+                            text = it,
+                            style = Theme.typography.normalTextRegular,
+                            color = Theme.color.backgroundWhite
+                        )
+                    }
                 }
-
-                CountdownTimer(
-                    hours = hours.toIntOrNull() ?: 0,
-                    minutes = minutes.toIntOrNull() ?: 0,
-                    seconds = seconds.toIntOrNull() ?: 0
-                )
             }
         }
     }
 }
 
-
 @Preview
 @Composable
 fun BannerPreview() {
     Banner(
-        title = "Super Flash Sale",
-        subtitle = "50% Off",
-        hours = "08",
-        minutes = "34",
-        seconds = "52",
-        imageResId = R.drawable.img_promo_shoes_red
+        title = "Super Flash Sale 50% Off",
+        subtitle = "We recommend the best for you",
+        imageUrl = R.drawable.img_promo_shoes_close_up
     )
 }

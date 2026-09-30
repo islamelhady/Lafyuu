@@ -16,10 +16,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,24 +38,25 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 data class TabBarItem(
     val label: String,
     val icon: ImageVector,
-    val badgeCount: Int? = null
+    val badgeCount: Int? = null,
+    val route: String = label.lowercase()
 )
 
 val defaultTabBarItems = listOf(
-    TabBarItem("Home", Home),
-    TabBarItem("Explore", Search),
-    TabBarItem("Cart", Cart, badgeCount = 2),
-    TabBarItem("Offer", Offer),
-    TabBarItem("Account", User)
+    TabBarItem("Home", Home, route = "home"),
+    TabBarItem("Explore", Search, route = "explore"),
+    TabBarItem("Cart", Cart, badgeCount = 2, route = "cart"),
+    TabBarItem("Offer", Offer, route = "offer"),
+    TabBarItem("Account", User, route = "account")
 )
 
 @Composable
 fun NavigationBottomBar(
     tabs: List<TabBarItem>,
     onTabSelected: (TabBarItem) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedTab: String = "Home"
 ) {
-    var selectedTabIndex by remember { mutableIntStateOf(2) }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -74,13 +71,14 @@ fun NavigationBottomBar(
             )
             .background(color = Theme.color.backgroundWhite)
     ) {
-        tabs.forEachIndexed { index, tab ->
+        tabs.forEach { tab ->
+            val isSelected = tab.label.equals(selectedTab, ignoreCase = true) ||
+                    tab.route.equals(selectedTab, ignoreCase = true)
             TabItem(
                 tab = tab,
-                isSelected = selectedTabIndex == index,
+                isSelected = isSelected,
                 onClick = {
-                    selectedTabIndex = index
-                    onTabSelected(tabs[index])
+                    onTabSelected(tab)
                 }
             )
         }

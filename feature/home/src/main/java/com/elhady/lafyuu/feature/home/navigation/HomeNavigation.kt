@@ -12,8 +12,26 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
     this.navigate(HOME_ROUTE, navOptions)
 }
 
-fun NavGraphBuilder.homeScreen() {
+fun NavGraphBuilder.homeScreen(
+    onNavigateToProductDetails: (String) -> Unit = {},
+    onNavigateToCategory: (String, String) -> Unit = { _, _ -> },
+    onNavigateToFlashSale: () -> Unit = {},
+    onNavigateToMegaSale: () -> Unit = {},
+    onNavigateToCategories: () -> Unit = {},
+    onNavigateToNotifications: () -> Unit = {},
+    onNavigateToWishlist: () -> Unit = {},
+    onNavigateToTab: (String) -> Unit = {}
+) {
     composable(route = HOME_ROUTE) {
-        HomeRoute()
+        HomeRoute(
+            onNavigateToProductDetails = onNavigateToProductDetails,
+            onNavigateToCategory = onNavigateToCategory,
+            onNavigateToFlashSale = onNavigateToFlashSale,
+            onNavigateToMegaSale = onNavigateToMegaSale,
+            onNavigateToCategories = onNavigateToCategories,
+            onNavigateToNotifications = onNavigateToNotifications,
+            onNavigateToWishlist = onNavigateToWishlist,
+            onNavigateToTab = onNavigateToTab
+        )
     }
 }

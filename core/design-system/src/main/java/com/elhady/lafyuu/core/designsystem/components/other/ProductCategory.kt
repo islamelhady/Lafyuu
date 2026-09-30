@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.core.designsystem.components.other
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,10 +27,12 @@ import com.elhady.lafyuu.core.designsystem.icons.WomanBag
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
+import coil.compose.AsyncImage
+
 @Composable
 fun ProductCategory(
     label: String,
-    icon: ImageVector,
+    icon: Any?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -44,15 +47,30 @@ fun ProductCategory(
             modifier = Modifier
                 .size(Theme.size.huge)
                 .clip(CircleShape)
+                .background(Theme.color.backgroundWhite)
+                .border(Theme.size.border, Theme.color.neutralLight, CircleShape)
                 .background(Theme.color.backgroundWhite),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                tint = Theme.color.blue,
-                modifier = Modifier.size(Theme.size.iconLarge)
-            )
+            when (icon) {
+                is ImageVector -> {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = label,
+                        tint = Theme.color.blue,
+                        modifier = Modifier.size(Theme.size.iconLarge)
+                    )
+                }
+                else -> {
+                    AsyncImage(
+                        model = icon,
+                        contentDescription = label,
+                        modifier = Modifier.size(Theme.size.iconLarge),
+                        error = null,
+                        placeholder = null
+                    )
+                }
+            }
         }
         LafyuuText(
             text = label,
@@ -64,7 +82,7 @@ fun ProductCategory(
     }
 }
 
-@Preview(showBackground = false)
+@Preview(showBackground = true)
 @Composable
 private fun ProductCategoryPreview() {
     LafyuuTheme {

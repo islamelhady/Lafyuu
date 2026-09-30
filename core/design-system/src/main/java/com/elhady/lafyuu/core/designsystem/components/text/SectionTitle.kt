@@ -36,7 +36,7 @@ fun SectionTitle(
         if (actionText != null && onActionClick != null) {
             LafyuuText(
                 text = actionText,
-                style = Theme.typography.largeLinkRegular,
+                style = Theme.typography.largeLinkBold,
                 color = Theme.color.blue,
                 onClick = onActionClick
             )
