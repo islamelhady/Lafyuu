@@ -22,6 +22,8 @@ import com.elhady.lafyuu.feature.auth.presentation.navigation.AUTH_GRAPH_ROUTE
 import com.elhady.lafyuu.feature.auth.presentation.navigation.authGraph
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
+import com.elhady.lafyuu.feature.product.navigation.navigateToProductDetails
+import com.elhady.lafyuu.feature.product.navigation.productDetailsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -83,7 +85,7 @@ fun MainApp(
 
         homeScreen(
             onNavigateToProductDetails = { productId ->
-                // Handle navigation to product details
+                navController.navigateToProductDetails(productId)
             },
             onNavigateToCategory = { categoryId, categoryName ->
                 // Handle navigation to category products
@@ -113,6 +115,18 @@ fun MainApp(
                         restoreState = true
                     }
                 }
+            }
+        )
+
+        productDetailsScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToSearch = {
+                // Handle navigation to search
+            },
+            onNavigateToProductDetails = { productId ->
+                navController.navigateToProductDetails(productId)
             }
         )
     }
