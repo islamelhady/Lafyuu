@@ -1,7 +1,6 @@
 package com.elhady.lafyuu.core.designsystem.components.card
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.appbar.IconClick
 import com.elhady.lafyuu.core.designsystem.components.button.QuantityButton
@@ -37,7 +37,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
 fun WideProductCard(
-    imageUrl: Int,
+    imageUrl: Any?,
     name: String,
     price: String,
     onClick: () -> Unit,
@@ -60,14 +60,16 @@ fun WideProductCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
         ) {
-            Image(
-                painter = painterResource(id = imageUrl),
+            AsyncImage(
+                model = imageUrl ?: R.drawable.img_product_shoes_blue,
                 contentDescription = "Product Image",
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(R.drawable.img_product_shoes_blue),
+                error = painterResource(R.drawable.img_product_shoes_blue),
                 modifier = Modifier
                     .size(Theme.size.huge)
                     .clip(Theme.corner.small)
-                    .background(Theme.color.neutralLight),
-                contentScale = ContentScale.Crop
+                    .background(Theme.color.neutralLight)
             )
             Column(
                 modifier = Modifier

@@ -44,7 +44,9 @@ dependencies {
     implementation(project(":feature:auth"))
     implementation(project(":feature:home"))
     implementation(project(":feature:product"))
+    implementation(project(":feature:cart"))
     implementation(project(":core:design-system"))
+    implementation(project(":core:common"))
 
     // Navigation & Lifecycle
     implementation(libs.androidx.navigation.compose)

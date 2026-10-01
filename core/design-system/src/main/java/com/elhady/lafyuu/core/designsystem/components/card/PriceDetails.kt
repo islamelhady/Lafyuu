@@ -18,12 +18,13 @@ import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
-fun PriceDetailsCard(
+fun PriceDetails(
     itemsCount: Int,
     itemsTotal: String,
     shipping: String,
+    discount: String,
     importCharges: String,
-    total: String,
+    totalPrice: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -50,10 +51,14 @@ fun PriceDetailsCard(
             label = "Import charges",
             value = importCharges
         )
+        InfoRow(
+            label = "Discount",
+            value = discount
+        )
         DashedDivider()
         InfoRow(
             label = "Total Price",
-            value = total,
+            value = totalPrice,
             isTotal = true
         )
     }
@@ -62,7 +67,7 @@ fun PriceDetailsCard(
 
 @Preview(showBackground = true, widthDp = 380, heightDp = 400)
 @Composable
-private fun AllCardAndListComponentsPreview() {
+private fun PriceDetailsPreview() {
     LafyuuTheme {
         Surface {
             Column(
@@ -74,12 +79,13 @@ private fun AllCardAndListComponentsPreview() {
 
 
                 SectionTitle("Price Details")
-                PriceDetailsCard(
+                PriceDetails(
                     itemsCount = 3,
                     itemsTotal = "$598.86",
                     shipping = "$40.00",
                     importCharges = "$128.00",
-                    total = "$766.86"
+                    discount = "$0.00",
+                    totalPrice = "$766.86"
                 )
             }
         }

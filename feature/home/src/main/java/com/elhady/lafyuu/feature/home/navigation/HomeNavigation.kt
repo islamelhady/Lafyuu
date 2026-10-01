@@ -20,7 +20,8 @@ fun NavGraphBuilder.homeScreen(
     onNavigateToCategories: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToWishlist: () -> Unit = {},
-    onNavigateToTab: (String) -> Unit = {}
+    onNavigateToTab: (String) -> Unit = {},
+    cartItemCount: Int = 0
 ) {
     composable(route = HOME_ROUTE) {
         HomeRoute(
@@ -31,7 +32,8 @@ fun NavGraphBuilder.homeScreen(
             onNavigateToCategories = onNavigateToCategories,
             onNavigateToNotifications = onNavigateToNotifications,
             onNavigateToWishlist = onNavigateToWishlist,
-            onNavigateToTab = onNavigateToTab
+            onNavigateToTab = onNavigateToTab,
+            cartItemCount = cartItemCount
         )
     }
 }
