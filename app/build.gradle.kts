@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:product"))
     implementation(project(":feature:cart"))
+    implementation(project(":feature:checkout"))
     implementation(project(":core:design-system"))
     implementation(project(":core:common"))
 

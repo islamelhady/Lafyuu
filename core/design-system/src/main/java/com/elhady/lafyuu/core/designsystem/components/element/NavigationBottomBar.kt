@@ -45,7 +45,7 @@ data class TabBarItem(
 val defaultTabBarItems = listOf(
     TabBarItem("Home", Home, route = "home"),
     TabBarItem("Explore", Search, route = "explore"),
-    TabBarItem("Cart", Cart, badgeCount = 2, route = "cart"),
+    TabBarItem("Cart", Cart, badgeCount = 20, route = "cart"),
     TabBarItem("Offer", Offer, route = "offer"),
     TabBarItem("Account", User, route = "account")
 )

@@ -1,6 +1,8 @@
 package com.elhady.lafyuu.core.designsystem.components.card
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,9 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.elhady.lafyuu.core.designsystem.components.appbar.IconClick
 import com.elhady.lafyuu.core.designsystem.components.button.SmallButton
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
-import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.icons.Trash
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
@@ -34,20 +35,23 @@ fun AddressCard(
     address: String,
     phone: String,
     onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isSelected: Boolean = false
+    isSelected: Boolean = false,
+    onSelected: () -> Unit
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .clip(Theme.corner.small)
             .border(
-                width = if (isSelected) Theme.size.border else Theme.size.border,
+                width = Theme.size.border,
                 color = if (isSelected) Theme.color.blue else Theme.color.neutralLight,
                 shape = Theme.corner.small
             )
-            .padding(Theme.space.large),
-        verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+            .clickable(onClick = onSelected)
+            .padding(Theme.space.extraLarge),
+        verticalArrangement = Arrangement.spacedBy(Theme.space.large)
     ) {
         LafyuuText(
             text = name,
@@ -75,19 +79,20 @@ fun AddressCard(
                 modifier = Modifier.width(Theme.size.huge),
 
                 )
-            Icon(
-                imageVector = Trash,
+            IconClick(
+                icon = Trash,
                 contentDescription = "Trash",
                 tint = Theme.color.neutralGrey,
+                onClick = onDeleteClick
             )
         }
     }
 }
 
 
-@Preview(showBackground = true, widthDp = 380, heightDp = 400)
+@Preview(showBackground = true)
 @Composable
-private fun AllCardAndListComponentsPreview() {
+private fun AddressCardPreview() {
     LafyuuTheme {
         Surface {
             Column(
@@ -99,15 +104,14 @@ private fun AllCardAndListComponentsPreview() {
 
                 var selected by remember { mutableStateOf(false) }
 
-                SectionTitle("Address Card")
                 AddressCard(
                     name = "Islam Elhady",
                     address = "3711 Spring Hill Rd undefined Tallahassee, Nevada 52874 United States",
                     phone = "+20 114 114 8538",
-                    onEditClick = {
-                        selected = !selected
-                    },
-                    isSelected = selected
+                    onEditClick = {},
+                    onDeleteClick = {},
+                    isSelected = selected,
+                    onSelected = { selected = !selected }
                 )
             }
         }

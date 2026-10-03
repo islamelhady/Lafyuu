@@ -15,7 +15,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
@@ -34,6 +33,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 fun SingleListItem(
     title: String,
     subtitle: String? = null,
+    isSelected: Boolean = false,
     onClick: () -> Unit,
     titleStyle: TextStyle = Theme.typography.heading6,
     modifier: Modifier = Modifier,
@@ -46,8 +46,9 @@ fun SingleListItem(
         modifier = modifier
             .fillMaxWidth()
             .height(Theme.size.buttonHeight)
-            .clip(Theme.corner.small)
-            .background(Theme.color.backgroundWhite)
+            .background(
+                color = if (isSelected) Theme.color.blue.copy(alpha = 0.1f) else Theme.color.backgroundWhite
+            )
             .clickable(onClick = onClick)
             .padding(all = Theme.space.large),
         verticalAlignment = Alignment.CenterVertically,
@@ -108,6 +109,7 @@ private fun AllSingleListShapesPreview() {
                     subtitle = "List",
                     showChevron = true,
                     onClick = {},
+                    isSelected = true,
                     leadingIcon = Offer,
                     leadingIconTint = Theme.color.blue
                 )
@@ -126,6 +128,7 @@ private fun AllSingleListShapesPreview() {
                     badgeCount = {
                         NotificationMarkCount(badgeCount = 2)
                     },
+                    isSelected = true,
                     onClick = {}
                 )
 
