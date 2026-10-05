@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarHostState
@@ -148,7 +151,6 @@ fun ProfileScreen(
                             subtitle = "***********",
                             showChevron = true,
                             onClick = { onEvent(ProfileUiEvent.ChangePasswordClicked) },
-                            isSelected = true,
                             leadingIcon = Password,
                             leadingIconTint = Theme.color.blue
                         )
@@ -157,8 +159,7 @@ fun ProfileScreen(
                             subtitle = "Logout",
                             showChevron = true,
                             onClick = { onEvent(ProfileUiEvent.LogoutClicked) },
-                            isSelected = true,
-                            leadingIcon = Trash,
+                            leadingIcon = Icons.AutoMirrored.Filled.Logout,
                             leadingIconTint = Theme.color.error
                         )
                     }
