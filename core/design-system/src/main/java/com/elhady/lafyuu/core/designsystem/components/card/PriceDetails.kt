@@ -19,7 +19,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
 fun PriceDetails(
-    itemsCount: Int,
+    itemsCount: Int? = null,
     itemsTotal: String,
     shipping: String,
     discount: String,
@@ -39,10 +39,12 @@ fun PriceDetails(
             .padding(Theme.space.large),
         verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
     ) {
-        InfoRow(
-            label = "Items (${itemsCount})",
-            value = itemsTotal
-        )
+        itemsCount?.let {
+            InfoRow(
+                label = "Items (${itemsCount})",
+                value = itemsTotal
+            )
+        }
         InfoRow(
             label = "Shipping",
             value = shipping
