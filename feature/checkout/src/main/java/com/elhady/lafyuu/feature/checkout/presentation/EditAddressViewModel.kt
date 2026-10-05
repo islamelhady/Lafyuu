@@ -70,7 +70,7 @@ class EditAddressViewModel @Inject constructor(
                 is AppResult.Error -> {
                     val msg = result.message ?: "Failed to load address"
                     _uiState.update { it.copy(isFetching = false, error = msg) }
-                    sendEffect(EditAddressUiEffect.ShowSnackbar(msg, AlertType.Error))
+                    sendEffect(EditAddressUiEffect.ShowSnackBar(msg, AlertType.Error))
                 }
                 is AppResult.Loading -> {}
             }
@@ -128,7 +128,7 @@ class EditAddressViewModel @Inject constructor(
                 is AppResult.Error -> {
                     val msg = result.message ?: "Failed to update address"
                     _uiState.update { it.copy(isLoading = false, error = msg) }
-                    sendEffect(EditAddressUiEffect.ShowSnackbar(msg, AlertType.Error))
+                    sendEffect(EditAddressUiEffect.ShowSnackBar(msg, AlertType.Error))
                 }
                 is AppResult.Loading -> {}
             }
