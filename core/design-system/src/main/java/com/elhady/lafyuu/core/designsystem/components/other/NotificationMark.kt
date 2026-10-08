@@ -22,8 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.elhady.lafyuu.core.designsystem.components.appbar.IconClick
 import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.icons.Notification
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
@@ -34,14 +36,13 @@ fun NotificationMark(
     hasNotification: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    icon: ImageVector
 ) {
     Box(modifier = modifier) {
-        IconButton(
-            onClick = onClick,
-        ) {
-            content()
-        }
+        IconClick(
+            icon = icon,
+            onClick = onClick
+        )
         if (hasNotification) {
             Box(
                 modifier = Modifier
@@ -72,14 +73,9 @@ private fun AllOtherComponentsPreview() {
                 Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                     NotificationMark(
                         hasNotification = hasNotification,
-                        onClick = { hasNotification = !hasNotification }
-                    ) {
-                        Icon(
-                            Notification,
-                            contentDescription = null,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
+                        onClick = { hasNotification = !hasNotification },
+                        icon = Notification
+                    )
                 }
             }
         }

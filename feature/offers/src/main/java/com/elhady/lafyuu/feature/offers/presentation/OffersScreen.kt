@@ -1,8 +1,9 @@
-package com.elhady.lafyuu.feature.orders.presentation
+package com.elhady.lafyuu.feature.offers.presentation
 
-import Left
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -16,19 +17,21 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
-import com.elhady.lafyuu.core.designsystem.components.card.OrderCard
+import com.elhady.lafyuu.core.designsystem.components.card.Banner
+import com.elhady.lafyuu.core.designsystem.components.card.InformationCard
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
+import com.elhady.lafyuu.core.designsystem.components.element.NavigationBottomBar
+import com.elhady.lafyuu.core.designsystem.components.element.defaultTabBarItems
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
-fun OrdersRoute(
-    onNavigateBack: () -> Unit,
-    onNavigateToOrderDetails: (String) -> Unit,
+fun OffersRoute(
+    onNavigateToTab: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: OrdersViewModel = hiltViewModel()
+    viewModel: OffersViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -36,9 +39,8 @@ fun OrdersRoute(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                OrdersUiEffect.NavigateBack -> onNavigateBack()
-                is OrdersUiEffect.NavigateToOrderDetails -> onNavigateToOrderDetails(effect.orderId)
-                is OrdersUiEffect.ShowSnackbar -> {
+                is OffersUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
+                is OffersUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
                             message = effect.message,
@@ -50,7 +52,7 @@ fun OrdersRoute(
         }
     }
 
-    OrdersScreen(
+    OffersScreen(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
@@ -59,52 +61,63 @@ fun OrdersRoute(
 }
 
 @Composable
-fun OrdersScreen(
-    uiState: OrdersUiState,
+fun OffersScreen(
+    uiState: OffersUiState,
     snackbarHostState: SnackbarHostState,
-    onEvent: (OrdersUiEvent) -> Unit,
+    onEvent: (OffersUiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
         topBar = {
             SingleTopAppBar(
-                title = "Orders",
-                leadingIcon = Left,
-                onLeadingClick = { onEvent(OrdersUiEvent.BackClicked) }
+                title = "Offer",
+                onLeadingClick = {}
+            )
+        },
+        bottomBar = {
+            NavigationBottomBar(
+                tabs = defaultTabBarItems,
+                selectedTab = "offer",
+                onTabSelected = { onEvent(OffersUiEvent.BottomTabSelected(it)) }
             )
         }
     ) {
         when {
-            uiState.isLoading && uiState.orders.isEmpty() -> {
+            uiState.isLoading && uiState.offers.isEmpty() -> {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
                     color = Theme.color.blue
                 )
             }
 
-            uiState.orders.isEmpty() -> {
+            uiState.offers.isEmpty() -> {
                 InfoStateContent(
-                    errorMessage = "No orders found",
+                    errorMessage = "No offers available",
+                    onRetryClick = { onEvent(OffersUiEvent.RetryClicked) },
                     errorType = AlertType.Warning,
-                    modifier = Modifier.align(Alignment.Center),
-                    onRetryClick = { onEvent(OrdersUiEvent.RetryClicked) }
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
 
             else -> {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = Theme.space.large),
+                    verticalArrangement = Arrangement.spacedBy(Theme.space.large)
                 ) {
-                    items(uiState.orders) { order ->
-                        OrderCard(
-                            orderCode = order.orderCode,
-                            updatedAt = order.updatedAt,
-                            status = order.status,
-                            totalPrice = order.totalPrice,
-                            paymentMethod = order.paymentMethod,
-                            onClick = { onEvent(OrdersUiEvent.SelectOrder(order.orderId)) }
+                    item {
+                        InformationCard(
+                            information = "Use \"MEGSL\" Coupon For \nGet 90% off"
+                        )
+                    }
+                    items(uiState.offers, key = { it.id }) { offer ->
+                        Banner(
+                            title = offer.name,
+                            subtitle = offer.description ?: "50% Off",
+                            imageUrl = offer.coverUrl,
+                            onClick = { onEvent(OffersUiEvent.OfferClicked(offer)) }
                         )
                     }
                 }

@@ -51,14 +51,9 @@ fun SearchTopBarWithNotification(
                 }
                 NotificationMark(
                     hasNotification = hasNotification,
-                    onClick = onNotificationClick
+                    onClick = onNotificationClick,
+                    icon = Notification
                 )
-                {
-                    IconClick(
-                        icon = Notification,
-                        onClick = onTrailingClick
-                    )
-                }
             }
         )
     ) {

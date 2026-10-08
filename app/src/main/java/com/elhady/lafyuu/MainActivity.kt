@@ -34,6 +34,10 @@ import com.elhady.lafyuu.feature.checkout.presentation.navigateToPayment
 import com.elhady.lafyuu.feature.checkout.presentation.paymentScreen
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
+import com.elhady.lafyuu.feature.notifications.presentation.navigateToNotifications
+import com.elhady.lafyuu.feature.notifications.presentation.notificationsScreen
+import com.elhady.lafyuu.feature.offers.presentation.navigateToOffers
+import com.elhady.lafyuu.feature.offers.presentation.offersScreen
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrderDetails
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrders
 import com.elhady.lafyuu.feature.orders.presentation.orderDetailsScreen
@@ -127,21 +131,23 @@ fun MainApp(
                 // Handle navigation to categories
             },
             onNavigateToNotifications = {
-                // Handle navigation to notifications
+                navController.navigateToNotifications()
             },
             onNavigateToWishlist = {
                 // Handle navigation to wishlist
             },
             onNavigateToTab = { tabId ->
-                if (tabId == "account" || tabId == "Account") {
-                    navController.navigateToAccount()
-                } else if (navController.graph.findNode(tabId) != null) {
-                    navController.navigate(tabId) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                when {
+                    tabId.equals("account", ignoreCase = true) -> navController.navigateToAccount()
+                    tabId.equals("offer", ignoreCase = true) -> navController.navigateToOffers()
+                    navController.graph.findNode(tabId) != null -> {
+                        navController.navigate(tabId) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
                 }
             },
@@ -168,15 +174,35 @@ fun MainApp(
                 navController.navigateToProductDetails(productId)
             },
             onNavigateToTab = { tabId ->
-                if (tabId == "account" || tabId == "Account") {
-                    navController.navigateToAccount()
-                } else if (navController.graph.findNode(tabId) != null) {
-                    navController.navigate(tabId) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                when {
+                    tabId.equals("account", ignoreCase = true) -> navController.navigateToAccount()
+                    tabId.equals("offer", ignoreCase = true) -> navController.navigateToOffers()
+                    navController.graph.findNode(tabId) != null -> {
+                        navController.navigate(tabId) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
+                    }
+                }
+            }
+        )
+
+        offersScreen(
+            onNavigateToTab = { tabId ->
+                when {
+                    tabId.equals("account", ignoreCase = true) -> navController.navigateToAccount()
+                    tabId.equals("offer", ignoreCase = true) -> navController.navigateToOffers()
+                    navController.graph.findNode(tabId) != null -> {
+                        navController.navigate(tabId) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 }
             }
@@ -231,6 +257,12 @@ fun MainApp(
             },
             onNavigateToOrderDetails = { orderId ->
                 navController.navigateToOrderDetails(orderId)
+            }
+        )
+
+        notificationsScreen(
+            onNavigateBack = {
+                navController.popBackStack()
             }
         )
 

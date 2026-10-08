@@ -48,6 +48,8 @@ dependencies {
     implementation(project(":feature:checkout"))
     implementation(project(":feature:orders"))
     implementation(project(":feature:profile"))
+    implementation(project(":feature:offers"))
+    implementation(project(":feature:notifications"))
     implementation(project(":core:design-system"))
     implementation(project(":core:common"))
 
