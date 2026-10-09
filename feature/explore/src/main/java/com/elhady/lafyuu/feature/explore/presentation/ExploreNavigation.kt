@@ -13,6 +13,7 @@ fun NavController.navigateToExplore(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.exploreScreen(
     onNavigateToCategoryProducts: (String, String) -> Unit,
+    onNavigateToSearch: () -> Unit,
     onNavigateToNotifications: () -> Unit,
     onNavigateToWishlist: () -> Unit,
     onNavigateToTab: (String) -> Unit
@@ -20,6 +21,7 @@ fun NavGraphBuilder.exploreScreen(
     composable(route = EXPLORE_ROUTE) {
         ExploreRoute(
             onNavigateToCategoryProducts = onNavigateToCategoryProducts,
+            onNavigateToSearch = onNavigateToSearch,
             onNavigateToNotifications = onNavigateToNotifications,
             onNavigateToWishlist = onNavigateToWishlist,
             onNavigateToTab = onNavigateToTab

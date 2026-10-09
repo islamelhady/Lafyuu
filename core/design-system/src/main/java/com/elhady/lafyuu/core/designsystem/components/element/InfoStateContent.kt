@@ -20,7 +20,7 @@ fun InfoStateContent(
     errorMessage: String,
     errorType: AlertType = AlertType.Error,
     caption: String = "Try Again",
-    onRetryClick: () -> Unit,
+    onRetryClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -46,11 +46,13 @@ fun InfoStateContent(
             color = Theme.color.neutralGrey,
             textAlign = TextAlign.Center
         )
-        DefaultButton(
-            caption = caption,
-            onClick = onRetryClick,
-            modifier = Modifier.fillMaxWidth()
-        )
+        onRetryClick?.let {
+            DefaultButton(
+                caption = caption,
+                onClick = onRetryClick,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 

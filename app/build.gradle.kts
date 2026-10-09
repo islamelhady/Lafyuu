@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":feature:offers"))
     implementation(project(":feature:notifications"))
     implementation(project(":feature:explore"))
+    implementation(project(":feature:search"))
     implementation(project(":core:design-system"))
     implementation(project(":core:common"))
 

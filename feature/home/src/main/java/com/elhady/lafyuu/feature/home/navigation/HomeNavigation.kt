@@ -13,6 +13,7 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.homeScreen(
+    onNavigateToSearch: () -> Unit = {},
     onNavigateToProductDetails: (String) -> Unit = {},
     onNavigateToCategory: (String, String) -> Unit = { _, _ -> },
     onNavigateToFlashSale: () -> Unit = {},
@@ -25,6 +26,7 @@ fun NavGraphBuilder.homeScreen(
 ) {
     composable(route = HOME_ROUTE) {
         HomeRoute(
+            onNavigateToSearch = onNavigateToSearch,
             onNavigateToProductDetails = onNavigateToProductDetails,
             onNavigateToCategory = onNavigateToCategory,
             onNavigateToFlashSale = onNavigateToFlashSale,

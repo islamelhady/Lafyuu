@@ -36,6 +36,7 @@ import com.elhady.lafyuu.feature.explore.presentation.exploreScreen
 import com.elhady.lafyuu.feature.explore.presentation.navigateToExplore
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
+import com.elhady.lafyuu.feature.home.navigation.navigateToHome
 import com.elhady.lafyuu.feature.notifications.presentation.navigateToNotifications
 import com.elhady.lafyuu.feature.notifications.presentation.notificationsScreen
 import com.elhady.lafyuu.feature.offers.presentation.navigateToOffers
@@ -52,6 +53,8 @@ import com.elhady.lafyuu.feature.profile.presentation.navigateToAccount
 import com.elhady.lafyuu.feature.profile.presentation.navigateToChangePassword
 import com.elhady.lafyuu.feature.profile.presentation.navigateToProfile
 import com.elhady.lafyuu.feature.profile.presentation.profileScreen
+import com.elhady.lafyuu.feature.search.presentation.navigateToSearch
+import com.elhady.lafyuu.feature.search.presentation.searchScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -117,6 +120,9 @@ fun MainApp(
         )
 
         homeScreen(
+            onNavigateToSearch = {
+                navController.navigateToSearch()
+            },
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
             },
@@ -270,7 +276,10 @@ fun MainApp(
 
         exploreScreen(
             onNavigateToCategoryProducts = { categoryId, categoryName ->
-                // Handle navigation to category products
+                navController.navigateToSearch()
+            },
+            onNavigateToSearch = {
+                navController.navigateToSearch()
             },
             onNavigateToNotifications = {
                 navController.navigateToNotifications()
@@ -293,6 +302,15 @@ fun MainApp(
                         }
                     }
                 }
+            }
+        )
+
+        searchScreen(
+            onNavigateToHome = {
+                navController.navigateToHome()
+            },
+            onNavigateToProductDetails = { productId ->
+                navController.navigateToProductDetails(productId)
             }
         )
 

@@ -44,7 +44,7 @@ class HomeViewModel @Inject constructor(
     fun onEvent(event: HomeUiEvent) {
         when (event) {
             is HomeUiEvent.SearchQueryChanged -> onSearchQueryChange(event.query)
-            is HomeUiEvent.ClearSearchClicked -> onClearSearch()
+            is HomeUiEvent.SearchClicked -> sendEffect(HomeUiEffect.NavigateToSearch)
             is HomeUiEvent.CategoryClicked -> sendEffect(HomeUiEffect.NavigateToCategoryProducts(event.categoryId, event.categoryName))
             is HomeUiEvent.ProductClicked -> sendEffect(HomeUiEffect.NavigateToProductDetails(event.productId))
             is HomeUiEvent.FavoriteClicked -> onFavoriteClicked(event.productId)

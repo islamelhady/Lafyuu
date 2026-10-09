@@ -1,0 +1,213 @@
+package com.elhady.lafyuu.feature.search.presentation
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.feature.search.domain.usecase.GetCategoriesUseCase
+import com.elhady.lafyuu.feature.search.domain.usecase.SearchProductsUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private val searchProductsUseCase: SearchProductsUseCase,
+    private val getCategoriesUseCase: GetCategoriesUseCase,
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    private val initialQuery: String = savedStateHandle["query"] ?: ""
+
+    private val _uiState = MutableStateFlow(SearchUiState(query = initialQuery))
+    val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
+
+    private val _searchQuery = MutableStateFlow(initialQuery)
+    private var searchJob: Job? = null
+
+    private val _uiEffect = Channel<SearchUiEffect>()
+    val uiEffect = _uiEffect.receiveAsFlow()
+
+    init {
+        observeSearchQuery()
+        loadCategories()
+        if (initialQuery.isNotBlank()) {
+            searchProducts()
+        }
+    }
+
+    fun onEvent(event: SearchUiEvent) {
+        when (event) {
+            is SearchUiEvent.QueryChanged -> {
+                _uiState.update { it.copy(query = event.query) }
+                _searchQuery.value = event.query
+            }
+            is SearchUiEvent.SearchSubmitted -> {
+                _uiState.update { it.copy(query = event.query, page = 1) }
+                searchProducts()
+            }
+            is SearchUiEvent.CategoryFilterChanged -> {
+                _uiState.update { it.copy(tempCategory = event.category) }
+            }
+            is SearchUiEvent.PriceRangeChanged -> {
+                _uiState.update {
+                    it.copy(
+                        tempIsPriceFilterEnabled = true,
+                        tempMinPrice = event.min,
+                        tempMaxPrice = event.max
+                    )
+                }
+            }
+            is SearchUiEvent.PriceFilterToggled -> {
+                _uiState.update { it.copy(tempIsPriceFilterEnabled = event.enabled) }
+            }
+            is SearchUiEvent.InStockChanged -> {
+                _uiState.update { it.copy(tempIsInStock = event.isInStock) }
+            }
+            SearchUiEvent.FilterClicked -> {
+                _uiState.update {
+                    it.copy(
+                        isFilterSheetOpen = true,
+                        tempCategory = it.category,
+                        tempIsPriceFilterEnabled = it.isPriceFilterEnabled,
+                        tempMinPrice = it.minPrice ?: 0.0,
+                        tempMaxPrice = it.maxPrice ?: 2000.0,
+                        tempIsInStock = it.isInStock
+                    )
+                }
+            }
+            SearchUiEvent.FilterDismissed -> {
+                _uiState.update { it.copy(isFilterSheetOpen = false) }
+            }
+            SearchUiEvent.ApplyFilters -> {
+                val minPrice = if (uiState.value.tempIsPriceFilterEnabled) uiState.value.tempMinPrice else null
+                val maxPrice = if (uiState.value.tempIsPriceFilterEnabled) uiState.value.tempMaxPrice else null
+                _uiState.update {
+                    it.copy(
+                        category = it.tempCategory,
+                        isPriceFilterEnabled = it.tempIsPriceFilterEnabled,
+                        minPrice = minPrice,
+                        maxPrice = maxPrice,
+                        isInStock = it.tempIsInStock,
+                        isFilterSheetOpen = false,
+                        page = 1
+                    )
+                }
+                searchProducts()
+            }
+            SearchUiEvent.SortClicked -> {
+                toggleSort()
+            }
+            is SearchUiEvent.ProductClicked -> {
+                sendEffect(SearchUiEffect.NavigateToProductDetails(event.productId))
+            }
+            SearchUiEvent.BackToHomeClick -> {
+                sendEffect(SearchUiEffect.NavigateToHome)
+            }
+        }
+    }
+
+    private fun loadCategories() {
+        viewModelScope.launch {
+            when (val result = getCategoriesUseCase()) {
+                is AppResult.Success -> {
+                    _uiState.update { it.copy(categories = result.data) }
+                }
+                else -> {}
+            }
+        }
+    }
+
+    private fun toggleSort() {
+        val currentSortBy = _uiState.value.sortBy
+        val currentSortOrder = _uiState.value.sortOrder
+
+        val (nextSortBy, nextSortOrder) = when {
+            currentSortBy == null -> Pair("price", "asc")
+            currentSortBy == "price" && currentSortOrder == "asc" -> Pair("price", "desc")
+            else -> Pair(null, null)
+        }
+
+        _uiState.update { it.copy(sortBy = nextSortBy, sortOrder = nextSortOrder, page = 1) }
+        searchProducts()
+    }
+
+    private fun observeSearchQuery() {
+        viewModelScope.launch {
+            _searchQuery
+                .debounce(400L)
+                .distinctUntilChanged()
+                .collectLatest {
+                    _uiState.update { state -> state.copy(page = 1) }
+                    searchProducts()
+                }
+        }
+    }
+
+    fun searchProducts() {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            val state = _uiState.value
+            if (state.query.isBlank()) {
+                _uiState.update { it.copy(isLoading = false, products = emptyList(), error = null) }
+                return@launch
+            }
+
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            when (val result = searchProductsUseCase(
+                searchTerm = state.query,
+                category = state.category,
+                minPrice = state.minPrice,
+                maxPrice = state.maxPrice,
+                isInStock = state.isInStock,
+                sortBy = state.sortBy,
+                sortOrder = state.sortOrder,
+                page = state.page,
+                pageSize = state.pageSize
+            )) {
+                is AppResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            products = result.data,
+                            error = null
+                        )
+                    }
+                }
+                is AppResult.Error -> {
+                    val message = result.message ?: "Failed to search products"
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = message
+                        )
+                    }
+                    sendEffect(SearchUiEffect.ShowSnackbar(message, AlertType.Error))
+                }
+                is AppResult.Loading -> {
+                    _uiState.update { it.copy(isLoading = true) }
+                }
+            }
+        }
+    }
+
+    private fun sendEffect(effect: SearchUiEffect) {
+        viewModelScope.launch {
+            _uiEffect.send(effect)
+        }
+    }
+}
