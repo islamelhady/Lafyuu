@@ -32,6 +32,8 @@ import com.elhady.lafyuu.feature.checkout.presentation.navigateToCheckout
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToEditAddress
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToPayment
 import com.elhady.lafyuu.feature.checkout.presentation.paymentScreen
+import com.elhady.lafyuu.feature.explore.presentation.exploreScreen
+import com.elhady.lafyuu.feature.explore.presentation.navigateToExplore
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
 import com.elhady.lafyuu.feature.notifications.presentation.navigateToNotifications
@@ -263,6 +265,34 @@ fun MainApp(
         notificationsScreen(
             onNavigateBack = {
                 navController.popBackStack()
+            }
+        )
+
+        exploreScreen(
+            onNavigateToCategoryProducts = { categoryId, categoryName ->
+                // Handle navigation to category products
+            },
+            onNavigateToNotifications = {
+                navController.navigateToNotifications()
+            },
+            onNavigateToWishlist = {
+                // Handle navigation to wishlist
+            },
+            onNavigateToTab = { tabId ->
+                when {
+                    tabId.equals("account", ignoreCase = true) -> navController.navigateToAccount()
+                    tabId.equals("offer", ignoreCase = true) -> navController.navigateToOffers()
+                    tabId.equals("explore", ignoreCase = true) -> navController.navigateToExplore()
+                    navController.graph.findNode(tabId) != null -> {
+                        navController.navigate(tabId) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                }
             }
         )
 
