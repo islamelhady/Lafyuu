@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import com.elhady.lafyuu.core.designsystem.R
+import com.elhady.lafyuu.core.designsystem.components.button.LabelButton
 import com.elhady.lafyuu.core.designsystem.components.card.ProductCard
 import com.elhady.lafyuu.core.designsystem.components.element.ColorSelectRow
 import com.elhady.lafyuu.core.designsystem.components.element.ReviewCard
@@ -265,7 +266,18 @@ fun ProductDetailsContent(
             // Reviews
             if (uiState.reviews.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(Theme.space.medium)) {
-                    SectionTitle("Review Product")
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        SectionTitle("Review Product")
+                        LabelButton(
+                            caption = "See More",
+                            onClick = { onEvent(ProductDetailsUiEvent.SeeMoreReviewsClicked) },
+                            contentColor = Theme.color.blue
+                        )
+                    }
                     uiState.reviews.take(2).forEach { review ->
                         ReviewCard(
                             review = ReviewData(

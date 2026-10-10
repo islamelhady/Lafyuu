@@ -43,7 +43,7 @@ fun ProductCategory(
         colors = CardDefaults.cardColors(containerColor = Theme.color.backgroundWhite),
     ) {
         Column(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Theme.space.small)
         ) {
@@ -65,14 +65,14 @@ fun ProductCategory(
                     )
                 }
             }
+            LafyuuText(
+                text = label,
+                style = Theme.typography.normalTextRegular,
+                color = Theme.color.neutralGrey,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+            )
         }
-        LafyuuText(
-            text = label,
-            style = Theme.typography.normalTextRegular,
-            color = Theme.color.neutralGrey,
-            textAlign = TextAlign.Center,
-            maxLines = 2
-        )
     }
 }
 

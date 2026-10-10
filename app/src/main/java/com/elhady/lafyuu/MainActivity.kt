@@ -27,34 +27,34 @@ import com.elhady.lafyuu.feature.cart.navigation.cartScreen
 import com.elhady.lafyuu.feature.checkout.presentation.addAddressScreen
 import com.elhady.lafyuu.feature.checkout.presentation.checkoutScreen
 import com.elhady.lafyuu.feature.checkout.presentation.editAddressScreen
-import com.elhady.lafyuu.feature.checkout.presentation.navigateToAddAddress
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToCheckout
+import com.elhady.lafyuu.feature.checkout.presentation.navigateToAddAddress
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToEditAddress
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToPayment
 import com.elhady.lafyuu.feature.checkout.presentation.paymentScreen
 import com.elhady.lafyuu.feature.explore.presentation.exploreScreen
-import com.elhady.lafyuu.feature.explore.presentation.navigateToExplore
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
+import com.elhady.lafyuu.feature.home.navigation.categoriesScreen
+import com.elhady.lafyuu.feature.home.navigation.categoryProductsScreen
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
-import com.elhady.lafyuu.feature.home.navigation.navigateToHome
+import com.elhady.lafyuu.feature.home.navigation.navigateToCategories
+import com.elhady.lafyuu.feature.home.navigation.navigateToCategoryProducts
 import com.elhady.lafyuu.feature.notifications.presentation.navigateToNotifications
-import com.elhady.lafyuu.feature.notifications.presentation.notificationsScreen
-import com.elhady.lafyuu.feature.offers.presentation.navigateToOffers
-import com.elhady.lafyuu.feature.offers.presentation.offersScreen
-import com.elhady.lafyuu.feature.orders.presentation.navigateToOrderDetails
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrders
-import com.elhady.lafyuu.feature.orders.presentation.orderDetailsScreen
+import com.elhady.lafyuu.feature.orders.presentation.navigateToOrderDetails
 import com.elhady.lafyuu.feature.orders.presentation.ordersScreen
-import com.elhady.lafyuu.feature.product.navigation.navigateToProductDetails
-import com.elhady.lafyuu.feature.product.navigation.productDetailsScreen
-import com.elhady.lafyuu.feature.profile.presentation.accountScreen
-import com.elhady.lafyuu.feature.profile.presentation.changePasswordScreen
+import com.elhady.lafyuu.feature.orders.presentation.orderDetailsScreen
 import com.elhady.lafyuu.feature.profile.presentation.navigateToAccount
-import com.elhady.lafyuu.feature.profile.presentation.navigateToChangePassword
 import com.elhady.lafyuu.feature.profile.presentation.navigateToProfile
+import com.elhady.lafyuu.feature.profile.presentation.navigateToChangePassword
+import com.elhady.lafyuu.feature.profile.presentation.accountScreen
 import com.elhady.lafyuu.feature.profile.presentation.profileScreen
+import com.elhady.lafyuu.feature.profile.presentation.changePasswordScreen
+import com.elhady.lafyuu.feature.product.navigation.navigateToProductDetails
+import com.elhady.lafyuu.feature.product.navigation.navigateToReviews
+import com.elhady.lafyuu.feature.product.navigation.productDetailsScreen
+import com.elhady.lafyuu.feature.product.navigation.reviewsScreen
 import com.elhady.lafyuu.feature.search.presentation.navigateToSearch
-import com.elhady.lafyuu.feature.search.presentation.searchScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -80,13 +80,11 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-
                     is MainUiState.Authenticated -> {
                         key(true) {
                             MainApp(isAuthenticated = true, cartItemCount = cartItemCount)
                         }
                     }
-
                     is MainUiState.Unauthenticated -> {
                         key(false) {
                             MainApp(isAuthenticated = false, cartItemCount = 0)
@@ -120,14 +118,8 @@ fun MainApp(
         )
 
         homeScreen(
-            onNavigateToSearch = {
-                navController.navigateToSearch()
-            },
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
-            },
-            onNavigateToCategory = { categoryId, categoryName ->
-                // Handle navigation to category products
             },
             onNavigateToFlashSale = {
                 // Handle navigation to flash sale
@@ -135,8 +127,14 @@ fun MainApp(
             onNavigateToMegaSale = {
                 // Handle navigation to mega sale
             },
-            onNavigateToCategories = {
-                // Handle navigation to categories
+            onNavigateToMoreCategories = {
+                navController.navigateToCategories()
+            },
+            onNavigateToCategoryProducts = { categoryId, categoryName ->
+                navController.navigateToCategoryProducts(categoryName)
+            },
+            onNavigateToSearch = {
+                navController.navigateToSearch()
             },
             onNavigateToNotifications = {
                 navController.navigateToNotifications()
@@ -145,21 +143,61 @@ fun MainApp(
                 // Handle navigation to wishlist
             },
             onNavigateToTab = { tabId ->
-                when {
-                    tabId.equals("account", ignoreCase = true) -> navController.navigateToAccount()
-                    tabId.equals("offer", ignoreCase = true) -> navController.navigateToOffers()
-                    navController.graph.findNode(tabId) != null -> {
-                        navController.navigate(tabId) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
+                if (tabId == "account" || tabId == "Account") {
+                    navController.navigateToAccount()
+                } else if (navController.graph.findNode(tabId) != null) {
+                    navController.navigate(tabId) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
                         }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 }
             },
             cartItemCount = cartItemCount
+        )
+
+        categoriesScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToCategoryProducts = { categoryId, categoryName ->
+                navController.navigateToCategoryProducts(categoryName)
+            }
+        )
+
+        categoryProductsScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToProductDetails = { productId ->
+                navController.navigateToProductDetails(productId)
+            }
+        )
+
+        exploreScreen(
+            onNavigateToCategoryProducts = { categoryId, categoryName ->
+                navController.navigateToCategoryProducts(categoryName)
+            },
+            onNavigateToSearch = {
+                // Handle navigation to search
+            },
+            onNavigateToNotifications = {},
+            onNavigateToWishlist = {},
+            onNavigateToTab = { tabId ->
+                if (tabId == "account" || tabId == "Account") {
+                    navController.navigateToAccount()
+                } else if (navController.graph.findNode(tabId) != null) {
+                    navController.navigate(tabId) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            }
         )
 
         productDetailsScreen(
@@ -171,6 +209,15 @@ fun MainApp(
             },
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
+            },
+            onNavigateToReviews = { productId ->
+                navController.navigateToReviews(productId)
+            }
+        )
+
+        reviewsScreen(
+            onNavigateBack = {
+                navController.popBackStack()
             }
         )
 
@@ -182,35 +229,15 @@ fun MainApp(
                 navController.navigateToProductDetails(productId)
             },
             onNavigateToTab = { tabId ->
-                when {
-                    tabId.equals("account", ignoreCase = true) -> navController.navigateToAccount()
-                    tabId.equals("offer", ignoreCase = true) -> navController.navigateToOffers()
-                    navController.graph.findNode(tabId) != null -> {
-                        navController.navigate(tabId) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
+                if (tabId == "account" || tabId == "Account") {
+                    navController.navigateToAccount()
+                } else if (navController.graph.findNode(tabId) != null) {
+                    navController.navigate(tabId) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
                         }
-                    }
-                }
-            }
-        )
-
-        offersScreen(
-            onNavigateToTab = { tabId ->
-                when {
-                    tabId.equals("account", ignoreCase = true) -> navController.navigateToAccount()
-                    tabId.equals("offer", ignoreCase = true) -> navController.navigateToOffers()
-                    navController.graph.findNode(tabId) != null -> {
-                        navController.navigate(tabId) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 }
             }
@@ -254,8 +281,7 @@ fun MainApp(
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 try {
                     context.startActivity(intent)
-                } catch (_: Exception) {
-                }
+                } catch (_: Exception) {}
             }
         )
 
@@ -265,52 +291,6 @@ fun MainApp(
             },
             onNavigateToOrderDetails = { orderId ->
                 navController.navigateToOrderDetails(orderId)
-            }
-        )
-
-        notificationsScreen(
-            onNavigateBack = {
-                navController.popBackStack()
-            }
-        )
-
-        exploreScreen(
-            onNavigateToCategoryProducts = { categoryId, categoryName ->
-                navController.navigateToSearch()
-            },
-            onNavigateToSearch = {
-                navController.navigateToSearch()
-            },
-            onNavigateToNotifications = {
-                navController.navigateToNotifications()
-            },
-            onNavigateToWishlist = {
-                // Handle navigation to wishlist
-            },
-            onNavigateToTab = { tabId ->
-                when {
-                    tabId.equals("account", ignoreCase = true) -> navController.navigateToAccount()
-                    tabId.equals("offer", ignoreCase = true) -> navController.navigateToOffers()
-                    tabId.equals("explore", ignoreCase = true) -> navController.navigateToExplore()
-                    navController.graph.findNode(tabId) != null -> {
-                        navController.navigate(tabId) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                }
-            }
-        )
-
-        searchScreen(
-            onNavigateToHome = {
-                navController.navigateToHome()
-            },
-            onNavigateToProductDetails = { productId ->
-                navController.navigateToProductDetails(productId)
             }
         )
 
@@ -328,22 +308,22 @@ fun MainApp(
                 navController.navigateToOrders()
             },
             onNavigateToAddress = {
-                navController.navigateToAddAddress()
+                navController.navigateToCheckout()
             },
-            onNavigateToPayment = {
-                TODO()
-            }
+            onNavigateToPayment = {}
         )
 
         profileScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
             onNavigateToChangePassword = {
                 navController.navigateToChangePassword()
             },
             onNavigateToLogin = {
-                navController.popBackStack(AUTH_GRAPH_ROUTE, false)
-            },
-            onNavigateBack = {
-                navController.popBackStack()
+                navController.navigate(AUTH_GRAPH_ROUTE) {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
             }
         )
 

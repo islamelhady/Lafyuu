@@ -11,6 +11,7 @@ import com.elhady.lafyuu.feature.product.data.remote.model.AddItemToCartRequestD
 import com.elhady.lafyuu.feature.product.domain.model.Product
 import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
 import com.elhady.lafyuu.feature.product.domain.model.ProductReview
+import com.elhady.lafyuu.feature.product.domain.model.ProductReviewsInfo
 import com.elhady.lafyuu.feature.product.domain.repository.ProductRepository
 import javax.inject.Inject
 
@@ -59,6 +60,32 @@ class ProductRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             android.util.Log.e("ProductRepository", "getProductReviews failure: ${e.message}", e)
             mapError(apiErrorParser.parseException(e))
+        }
+    }
+
+    override suspend fun getProductReviewsInfo(
+        productId: String,
+        page: Int,
+        pageSize: Int
+    ): AppResult<ProductReviewsInfo> {
+        return try {
+            val response = productApi.getProductReviews(
+                productId = productId,
+                page = page,
+                pageSize = pageSize
+            )
+            if (response.isSuccessful) {
+                val body = response.body()
+                val avg = body?.averageRating ?: 0.0
+                val count = body?.reviewsCount ?: 0
+                val reviews = body?.reviews?.items.orEmpty().map { it.toDomain() }
+                AppResult.Success(ProductReviewsInfo(avg, count, reviews))
+            } else {
+                mapError(apiErrorParser.parseError(response))
+            }
+        } catch (ex: Exception) {
+            android.util.Log.e("ProductRepository", "getProductReviewsInfo failure: ${ex.message}", ex)
+            mapError(apiErrorParser.parseException(ex))
         }
     }
 
