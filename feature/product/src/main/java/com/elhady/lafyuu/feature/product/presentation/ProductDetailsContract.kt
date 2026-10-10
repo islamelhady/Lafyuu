@@ -29,12 +29,14 @@ sealed interface ProductDetailsUiEvent {
     data object RetryClicked : ProductDetailsUiEvent
     data class RecommendedProductClicked(val productId: String) : ProductDetailsUiEvent
     data object SeeMoreReviewsClicked : ProductDetailsUiEvent
+    data object WriteReviewClicked : ProductDetailsUiEvent
 }
 
 sealed interface ProductDetailsUiEffect {
     data object NavigateBack : ProductDetailsUiEffect
     data class NavigateToProductDetails(val productId: String) : ProductDetailsUiEffect
     data class NavigateToReviews(val productId: String) : ProductDetailsUiEffect
+    data class NavigateToWriteReview(val productId: String) : ProductDetailsUiEffect
     data class ShowSnackbar(val message: String) : ProductDetailsUiEffect
     data object NavigateToSearch : ProductDetailsUiEffect
 }

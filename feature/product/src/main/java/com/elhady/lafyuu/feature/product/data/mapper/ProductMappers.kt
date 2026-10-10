@@ -38,7 +38,7 @@ fun ProductDto.toProductDetailsDomain(): ProductDetails {
         color = color.orEmpty(),
         availableColorsHex = defaultColors,
         availableSizes = defaultSizes,
-        rating = rating?.toFloat() ?: 0f,
+        rating = rating?.toInt() ?: 0,
         reviewsCount = reviewsCount ?: 0,
         sellerId = sellerId.orEmpty()
     )
@@ -58,7 +58,7 @@ fun ProductDto.toProductSummaryDomain(): Product {
         price = currentPrice,
         originalPrice = origPrice,
         discountPercentage = discount,
-        rating = rating?.toFloat() ?: 0f,
+        rating = rating?.toInt() ?: 0,
         imageUrl = cover
     )
 }
@@ -66,7 +66,7 @@ fun ProductDto.toProductSummaryDomain(): Product {
 fun UserReviewDto.toDomain(): ProductReview {
     return ProductReview(
         comment = comment.orEmpty(),
-        rating = rating?.toFloat() ?: 0f,
+        rating = rating?.toInt() ?: 0,
         createdAt = createdAt.orEmpty(),
         userName = userName.orEmpty(),
         userPicture = userPicture

@@ -1,11 +1,11 @@
-package com.elhady.lafyuu.feature.product.presentation.reviews
+package com.elhady.lafyuu.feature.review.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
-import com.elhady.lafyuu.feature.product.domain.usecase.GetProductReviewsInfoUseCase
+import com.elhady.lafyuu.feature.review.domain.usecase.GetProductReviewsInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +41,11 @@ class ReviewsViewModel @Inject constructor(
             is ReviewsUiEvent.LoadReviews -> loadReviews(event.productId)
             is ReviewsUiEvent.FilterRating -> {
                 _uiState.update { it.copy(selectedRatingFilter = event.rating) }
+            }
+            ReviewsUiEvent.WriteReviewClicked -> {
+                if (productIdArg.isNotBlank()) {
+                    sendEffect(ReviewsUiEffect.NavigateToWriteReview(productIdArg))
+                }
             }
             ReviewsUiEvent.BackClicked -> sendEffect(ReviewsUiEffect.NavigateBack)
             ReviewsUiEvent.RetryClicked -> loadReviews(productIdArg)

@@ -14,7 +14,7 @@ data class ProductDetails(
     val color: String = "",
     val availableColorsHex: List<String> = emptyList(),
     val availableSizes: List<String> = emptyList(),
-    val rating: Float = 0f,
+    val rating: Int = 0,
     val reviewsCount: Int = 0,
     val sellerId: String = ""
 )

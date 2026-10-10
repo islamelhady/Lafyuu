@@ -24,12 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.button.LabelButton
+import com.elhady.lafyuu.core.designsystem.components.card.InformationCard
 import com.elhady.lafyuu.core.designsystem.components.card.ProductCard
 import com.elhady.lafyuu.core.designsystem.components.element.ColorSelectRow
 import com.elhady.lafyuu.core.designsystem.components.element.ReviewCard
@@ -44,8 +44,6 @@ import com.elhady.lafyuu.core.designsystem.icons.LoveFilled
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.feature.product.presentation.ProductDetailsUiEvent
 import com.elhady.lafyuu.feature.product.presentation.ProductDetailsUiState
-import kotlin.collections.ifEmpty
-import kotlin.collections.isNotEmpty
 
 @Composable
 fun ProductDetailsContent(
@@ -128,59 +126,27 @@ fun ProductDetailsContent(
             }
 
             // Rating
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
-            ) {
-                RatingBar(
-                    rating = product.rating,
-                    iconSize = Theme.size.iconSmall
-                )
-                LafyuuText(
-                    text = product.rating.toString(),
-                    style = Theme.typography.heading5,
-                    color = Theme.color.neutralGrey
-                )
-            }
+
+            RatingBar(
+                rating = product.rating,
+                iconSize = Theme.size.iconSmall
+            )
 
             // Price
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
-            ) {
-                LafyuuText(
-                    text = "$${"%.2f".format(product.price)}",
-                    style = Theme.typography.heading3,
-                    color = Theme.color.blue
-                )
-                product.originalPrice?.let { orig ->
-                    LafyuuText(
-                        text = "$${"%.2f".format(orig)}",
-                        style = Theme.typography.normalTextRegular.copy(
-                            textDecoration = TextDecoration.LineThrough
-                        ),
-                        color = Theme.color.neutralGrey
-                    )
-                }
-                if (product.discountPercentage > 0) {
-                    LafyuuText(
-                        text = "${product.discountPercentage}% Off",
-                        style = Theme.typography.normalTextBold,
-                        color = Theme.color.red
-                    )
-                }
-            }
+            LafyuuText(
+                text = "$${"%.2f".format(product.price)}",
+                style = Theme.typography.heading3,
+                color = Theme.color.blue
+            )
 
             // Select Size
             if (product.availableSizes.isNotEmpty()) {
-                Column(verticalArrangement = Arrangement.spacedBy(Theme.space.medium)) {
-                    SectionTitle("Select Size")
-                    SelectingGroup(
-                        options = product.availableSizes,
-                        selectedOption = uiState.selectedSize,
-                        onOptionSelected = { onEvent(ProductDetailsUiEvent.SizeSelected(it)) }
-                    )
-                }
+                SectionTitle("Select Size")
+                SelectingGroup(
+                    options = product.availableSizes,
+                    selectedOption = uiState.selectedSize,
+                    onOptionSelected = { onEvent(ProductDetailsUiEvent.SizeSelected(it)) }
+                )
             }
 
             // Select Color
@@ -264,20 +230,22 @@ fun ProductDetailsContent(
             }
 
             // Reviews
-            if (uiState.reviews.isNotEmpty()) {
-                Column(verticalArrangement = Arrangement.spacedBy(Theme.space.medium)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        SectionTitle("Review Product")
-                        LabelButton(
-                            caption = "See More",
-                            onClick = { onEvent(ProductDetailsUiEvent.SeeMoreReviewsClicked) },
-                            contentColor = Theme.color.blue
-                        )
-                    }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+            ) {
+                if (uiState.reviews.isNotEmpty()) {
+                    SectionTitle(
+                        title = "Review Product",
+                        actionText = "See More",
+                        onActionClick = { onEvent(ProductDetailsUiEvent.SeeMoreReviewsClicked) }
+                    )
+                    RatingBar(
+                        rating = uiState.reviews.map { it.rating }.average().toInt(),
+                        iconSize = Theme.size.iconMedium,
+                        showRatingText = true,
+                        showReviewNumber = "${uiState.reviews.size}"
+                    )
+
                     uiState.reviews.take(2).forEach { review ->
                         ReviewCard(
                             review = ReviewData(
@@ -287,6 +255,39 @@ fun ProductDetailsContent(
                                 comment = review.comment,
                                 date = review.createdAt
                             )
+                        )
+                    }
+                    LabelButton(
+                        caption = "Write Review",
+                        onClick = { onEvent(ProductDetailsUiEvent.WriteReviewClicked) },
+                        contentColor = Theme.color.blue,
+                        hasBorder = true,
+                        borderColor = Theme.color.blue,
+                        style = Theme.typography.largeCaptionBold,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = Theme.space.small)
+                            .padding(horizontal = Theme.space.large)
+                    )
+                } else if (!uiState.isLoading) {
+                    SectionTitle(title = "Review Product")
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = Theme.space.large),
+                        verticalArrangement = Arrangement.spacedBy(Theme.space.small)
+                    ) {
+                        InformationCard(information = "No reviews yet\nBe the first to review this product.")
+                        LabelButton(
+                            caption = "Write the First Review",
+                            onClick = { onEvent(ProductDetailsUiEvent.WriteReviewClicked) },
+                            contentColor = Theme.color.blue,
+                            hasBorder = true,
+                            borderColor = Theme.color.blue,
+                            style = Theme.typography.largeCaptionBold,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = Theme.space.small)
                         )
                     }
                 }

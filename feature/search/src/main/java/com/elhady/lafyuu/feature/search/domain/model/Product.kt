@@ -8,5 +8,5 @@ data class Product(
     val originalPrice: Double?,
     val discountPercentage: Double?,
     val discountLabel: String?,
-    val rating: Float?
+    val rating: Int?
 )

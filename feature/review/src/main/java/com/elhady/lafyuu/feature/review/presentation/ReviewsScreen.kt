@@ -1,4 +1,4 @@
-package com.elhady.lafyuu.feature.product.presentation.reviews
+package com.elhady.lafyuu.feature.review.presentation
 
 import Left
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +23,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.R
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
+import com.elhady.lafyuu.core.designsystem.components.button.DefaultButton
 import com.elhady.lafyuu.core.designsystem.components.element.FilterReviewBar
 import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
@@ -36,6 +37,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 @Composable
 fun ReviewsRoute(
     onNavigateBack: () -> Unit,
+    onNavigateToWriteReview: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReviewsViewModel = hiltViewModel()
 ) {
@@ -46,6 +48,7 @@ fun ReviewsRoute(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 ReviewsUiEffect.NavigateBack -> onNavigateBack()
+                is ReviewsUiEffect.NavigateToWriteReview -> onNavigateToWriteReview(effect.productId)
                 is ReviewsUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
@@ -87,6 +90,19 @@ fun ReviewsScreen(
                 leadingIcon = Left,
                 onLeadingClick = { onEvent(ReviewsUiEvent.BackClicked) }
             )
+        },
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Theme.space.large)
+            ) {
+                DefaultButton(
+                    caption = "Write Review",
+                    onClick = { onEvent(ReviewsUiEvent.WriteReviewClicked) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     ) {
         Box(
@@ -113,7 +129,7 @@ fun ReviewsScreen(
                             horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
                         ) {
                             RatingBar(
-                                rating = uiState.averageRating.toFloat(),
+                                rating = uiState.averageRating.toInt(),
                                 iconSize = Theme.size.iconMedium
                             )
                             LafyuuText(

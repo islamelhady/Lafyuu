@@ -51,9 +51,11 @@ import com.elhady.lafyuu.feature.profile.presentation.accountScreen
 import com.elhady.lafyuu.feature.profile.presentation.profileScreen
 import com.elhady.lafyuu.feature.profile.presentation.changePasswordScreen
 import com.elhady.lafyuu.feature.product.navigation.navigateToProductDetails
-import com.elhady.lafyuu.feature.product.navigation.navigateToReviews
 import com.elhady.lafyuu.feature.product.navigation.productDetailsScreen
-import com.elhady.lafyuu.feature.product.navigation.reviewsScreen
+import com.elhady.lafyuu.feature.review.navigation.navigateToReviews
+import com.elhady.lafyuu.feature.review.navigation.navigateToWriteReview
+import com.elhady.lafyuu.feature.review.navigation.reviewsScreen
+import com.elhady.lafyuu.feature.review.navigation.writeReviewScreen
 import com.elhady.lafyuu.feature.search.presentation.navigateToSearch
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -212,10 +214,22 @@ fun MainApp(
             },
             onNavigateToReviews = { productId ->
                 navController.navigateToReviews(productId)
+            },
+            onNavigateToWriteReview = { productId ->
+                navController.navigateToWriteReview(productId)
             }
         )
 
         reviewsScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToWriteReview = { productId ->
+                navController.navigateToWriteReview(productId)
+            }
+        )
+
+        writeReviewScreen(
             onNavigateBack = {
                 navController.popBackStack()
             }

@@ -1,6 +1,7 @@
 package com.elhady.lafyuu.core.designsystem.components.other
 
 import Star
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,35 +19,57 @@ import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
-import kotlin.math.roundToInt
 
 
 @Composable
 fun RatingBar(
-    rating: Float,
+    rating: Int,
     modifier: Modifier = Modifier,
     iconSize: Dp = Theme.size.iconSmall,
     maxStar: Int = 5,
-    showRatingText: Boolean = false
+    showRatingText: Boolean = false,
+    onRatingChanged: ((Float) -> Unit)? = null,
+    showReviewNumber: String? = null
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
         repeat(maxStar) { index ->
+            val starNumber = index + 1
+            val isSelected = index < rating
             Icon(
                 imageVector = Star,
-                contentDescription = null,
-                modifier = Modifier.size(iconSize),
-                tint = if (index < rating.roundToInt()) Theme.color.yellow else Theme.color.neutralLight
+                contentDescription = "$starNumber stars",
+                modifier = Modifier
+                    .size(iconSize)
+                    .then(
+                        if (onRatingChanged != null) {
+                            Modifier
+                                .padding(4.dp)
+                                .clickable { onRatingChanged(starNumber.toFloat()) }
+                        } else {
+                            Modifier
+                        }
+                    ),
+                tint = if (isSelected) Theme.color.yellow else Theme.color.neutralLight
             )
         }
         if (showRatingText) {
             LafyuuText(
-                text = "${rating.roundToInt()}/$maxStar",
+                text = "${rating}/$maxStar",
                 style = Theme.typography.heading5,
                 color = Theme.color.neutralGrey,
                 modifier = Modifier.padding(start = Theme.space.large)
+            )
+        }
+        showReviewNumber?.let {
+            LafyuuText(
+                text = "($showReviewNumber Review)",
+                style = Theme.typography.normalTextRegular,
+                color = Theme.color.neutralGrey,
+                modifier = Modifier.padding(start = Theme.space.small)
             )
         }
     }
@@ -63,9 +86,9 @@ private fun RatingBarPreview() {
             ) {
                 SectionTitle("Rating")
 
-                RatingBar(rating = 4.0f, iconSize = Theme.size.iconSmall)
-                RatingBar(rating = 4.0f, iconSize = Theme.size.iconMedium)
-                RatingBar(rating = 4.0f, iconSize = Theme.size.iconLarge, showRatingText = true)
+                RatingBar(rating = 4, iconSize = Theme.size.iconSmall)
+                RatingBar(rating = 4, iconSize = Theme.size.iconMedium)
+                RatingBar(rating = 4, iconSize = Theme.size.iconLarge, showRatingText = true, showReviewNumber = "4")
             }
         }
     }

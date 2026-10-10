@@ -1,4 +1,4 @@
-package com.elhady.lafyuu.feature.product.domain.model
+package com.elhady.lafyuu.feature.review.domain.model
 
 data class ProductReviewsInfo(
     val averageRating: Double,

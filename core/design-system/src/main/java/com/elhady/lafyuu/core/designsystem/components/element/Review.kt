@@ -30,7 +30,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 data class ReviewData(
     val userName: String,
     @DrawableRes val avatarUrl: Int,
-    val rating: Float,
+    val rating: Int,
     val comment: String,
     val date: String,
     @DrawableRes val imageUrls: List<Int> = emptyList()
@@ -105,7 +105,7 @@ private fun AllElementComponentsPreview() {
                     review = ReviewData(
                         userName = "James Lawson",
                         avatarUrl = R.drawable.img_profile_man_bearded,
-                        rating = 3.0f,
+                        rating = 3,
                         comment = "air max are always very comfortable fit, clean and just perfect in every way. just the box was too small and scrunched the sneakers up a little bit, not sure if the box was always this small but the 90s are and will always be one of my favorites.",
                         date = "December 10, 2016",
                         imageUrls = listOf(
