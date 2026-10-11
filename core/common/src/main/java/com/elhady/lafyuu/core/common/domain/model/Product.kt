@@ -1,4 +1,4 @@
-package com.elhady.lafyuu.feature.product.domain.model
+package com.elhady.lafyuu.core.common.domain.model
 
 data class Product(
     val id: String,

@@ -1,7 +1,7 @@
 package com.elhady.lafyuu.feature.product.domain.usecase
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.feature.product.domain.repository.ProductRepository
+import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

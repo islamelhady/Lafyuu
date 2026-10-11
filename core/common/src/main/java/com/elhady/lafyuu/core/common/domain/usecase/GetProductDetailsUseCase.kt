@@ -1,19 +1,11 @@
-package com.elhady.lafyuu.feature.product.domain.usecase
+package com.elhady.lafyuu.core.common.domain.usecase
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.feature.product.domain.model.Product
-import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
-import com.elhady.lafyuu.feature.product.domain.model.ProductReview
-import com.elhady.lafyuu.feature.product.domain.repository.ProductRepository
+import com.elhady.lafyuu.core.common.domain.model.ProductContent
+import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
-
-data class ProductContent(
-    val details: ProductDetails,
-    val reviews: List<ProductReview> = emptyList(),
-    val recommendedProducts: List<Product> = emptyList()
-)
 
 class GetProductDetailsUseCase @Inject constructor(
     private val repository: ProductRepository

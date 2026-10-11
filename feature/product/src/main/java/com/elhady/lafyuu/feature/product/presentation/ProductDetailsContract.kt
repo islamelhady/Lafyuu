@@ -1,8 +1,8 @@
 package com.elhady.lafyuu.feature.product.presentation
 
-import com.elhady.lafyuu.feature.product.domain.model.Product
-import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
-import com.elhady.lafyuu.feature.product.domain.model.ProductReview
+import com.elhady.lafyuu.core.common.domain.model.Product
+import com.elhady.lafyuu.core.common.domain.model.ProductDetails
+import com.elhady.lafyuu.core.common.domain.model.ProductReview
 
 data class ProductDetailsUiState(
     val isLoading: Boolean = false,

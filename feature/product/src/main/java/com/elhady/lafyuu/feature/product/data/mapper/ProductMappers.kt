@@ -1,10 +1,10 @@
 package com.elhady.lafyuu.feature.product.data.mapper
 
+import com.elhady.lafyuu.core.common.domain.model.Product
+import com.elhady.lafyuu.core.common.domain.model.ProductDetails
+import com.elhady.lafyuu.core.common.domain.model.ProductReview
 import com.elhady.lafyuu.feature.product.data.remote.model.ProductDto
 import com.elhady.lafyuu.feature.product.data.remote.model.UserReviewDto
-import com.elhady.lafyuu.feature.product.domain.model.Product
-import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
-import com.elhady.lafyuu.feature.product.domain.model.ProductReview
 
 fun ProductDto.toProductDetailsDomain(): ProductDetails {
     val cover = coverPictureUrl ?: coverUrl ?: imageUrl ?: image ?: productPictures?.firstOrNull() ?: ""

@@ -40,7 +40,7 @@ class ProductMappersTest {
         assertEquals(33, domain.discountPercentage)
         assertEquals(10, domain.stock)
         assertEquals("Red", domain.color)
-        assertEquals(4.5f, domain.rating)
+        assertEquals(4, domain.rating)
         assertEquals(12, domain.reviewsCount)
         assertEquals("seller-1", domain.sellerId)
     }
@@ -63,7 +63,7 @@ class ProductMappersTest {
         assertEquals("https://example.com/summary.jpg", domain.imageUrl)
         assertEquals(50.0, domain.price, 0.01)
         assertEquals(20, domain.discountPercentage)
-        assertEquals(4.0f, domain.rating)
+        assertEquals(4, domain.rating)
         assertNotNull(domain.originalPrice)
     }
 
@@ -80,7 +80,7 @@ class ProductMappersTest {
         val domain = dto.toDomain()
 
         assertEquals("Great product!", domain.comment)
-        assertEquals(5f, domain.rating)
+        assertEquals(5, domain.rating)
         assertEquals("2024-04-28", domain.createdAt)
         assertEquals("John Doe", domain.userName)
         assertEquals("https://example.com/avatar.jpg", domain.userPicture)

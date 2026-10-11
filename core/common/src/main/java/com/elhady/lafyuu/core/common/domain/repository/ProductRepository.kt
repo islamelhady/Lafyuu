@@ -1,9 +1,10 @@
-package com.elhady.lafyuu.feature.product.domain.repository
+package com.elhady.lafyuu.core.common.domain.repository
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.feature.product.domain.model.Product
-import com.elhady.lafyuu.feature.product.domain.model.ProductDetails
-import com.elhady.lafyuu.feature.product.domain.model.ProductReview
+import com.elhady.lafyuu.core.common.domain.model.Product
+import com.elhady.lafyuu.core.common.domain.model.ProductContent
+import com.elhady.lafyuu.core.common.domain.model.ProductDetails
+import com.elhady.lafyuu.core.common.domain.model.ProductReview
 
 interface ProductRepository {
     suspend fun getProductDetails(id: String): AppResult<ProductDetails>
