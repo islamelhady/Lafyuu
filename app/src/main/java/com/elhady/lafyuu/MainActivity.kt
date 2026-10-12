@@ -24,14 +24,16 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.feature.auth.presentation.navigation.AUTH_GRAPH_ROUTE
 import com.elhady.lafyuu.feature.auth.presentation.navigation.authGraph
 import com.elhady.lafyuu.feature.cart.navigation.cartScreen
-import com.elhady.lafyuu.feature.checkout.presentation.addAddressScreen
 import com.elhady.lafyuu.feature.checkout.presentation.checkoutScreen
-import com.elhady.lafyuu.feature.checkout.presentation.editAddressScreen
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToCheckout
-import com.elhady.lafyuu.feature.checkout.presentation.navigateToAddAddress
-import com.elhady.lafyuu.feature.checkout.presentation.navigateToEditAddress
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToPayment
 import com.elhady.lafyuu.feature.checkout.presentation.paymentScreen
+import com.elhady.lafyuu.feature.address.presentation.navigateToAddress
+import com.elhady.lafyuu.feature.address.presentation.navigateToAddAddress
+import com.elhady.lafyuu.feature.address.presentation.navigateToEditAddress
+import com.elhady.lafyuu.feature.address.presentation.addressScreen
+import com.elhady.lafyuu.feature.address.presentation.addAddressScreen
+import com.elhady.lafyuu.feature.address.presentation.editAddressScreen
 import com.elhady.lafyuu.feature.explore.presentation.exploreScreen
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.categoriesScreen
@@ -335,9 +337,33 @@ fun MainApp(
                 navController.navigateToOrders()
             },
             onNavigateToAddress = {
-                navController.navigateToCheckout()
+                navController.navigateToAddress()
             },
             onNavigateToPayment = {}
+        )
+
+        addressScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToAddAddress = {
+                navController.navigateToAddAddress()
+            },
+            onNavigateToEditAddress = { addressId ->
+                navController.navigateToEditAddress(addressId)
+            }
+        )
+
+        addAddressScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            }
+        )
+
+        editAddressScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            }
         )
 
         profileScreen(

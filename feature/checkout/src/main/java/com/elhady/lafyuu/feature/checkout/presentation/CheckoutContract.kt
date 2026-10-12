@@ -1,7 +1,7 @@
 package com.elhady.lafyuu.feature.checkout.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
-import com.elhady.lafyuu.feature.checkout.domain.model.Address
+import com.elhady.lafyuu.feature.address.domain.model.Address
 
 enum class AddressField {
     STATE, CITY, STREET, APARTMENT, PHONE, NOTES

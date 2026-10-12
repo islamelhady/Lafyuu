@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":feature:search"))
     implementation(project(":feature:review"))
     implementation(project(":feature:favorites"))
+    implementation(project(":feature:address"))
     implementation(project(":core:design-system"))
     implementation(project(":core:common"))
     implementation(project(":core:database"))
