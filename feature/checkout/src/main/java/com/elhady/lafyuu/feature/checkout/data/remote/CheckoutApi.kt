@@ -37,7 +37,7 @@ interface CheckoutApi {
     @DELETE("api/addresses/{Id}")
     suspend fun deleteAddress(
         @Path("Id") id: String
-    ): Response<Any>
+    ): Response<Unit>
 
     @POST("api/orders/checkout")
     suspend fun checkout(

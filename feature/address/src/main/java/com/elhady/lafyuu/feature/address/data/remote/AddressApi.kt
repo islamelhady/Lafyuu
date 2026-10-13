@@ -35,5 +35,5 @@ interface AddressApi {
     @DELETE("api/addresses/{Id}")
     suspend fun deleteAddress(
         @Path("Id") id: String
-    ): Response<Any>
+    ): Response<Unit>
 }
