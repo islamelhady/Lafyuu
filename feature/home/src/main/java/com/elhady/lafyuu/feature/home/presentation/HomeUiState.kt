@@ -14,7 +14,6 @@ data class HomeUiState(
     val megaSaleProducts: List<Product> = emptyList(),
     val recommendedProducts: List<Product> = emptyList(),
     val searchResults: List<Product> = emptyList(),
-    val selectedTab: String = "Home",
     val errorMessage: String? = null
 ) {
     val isContentEmpty: Boolean

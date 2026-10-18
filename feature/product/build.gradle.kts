@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":core:design-system"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
+    implementation(project(":feature:cart"))
 
     implementation(libs.retrofit.core)
     implementation(libs.kotlinx.serialization.json)
@@ -66,6 +67,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
+    testImplementation(project(":feature:cart"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

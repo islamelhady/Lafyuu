@@ -9,11 +9,14 @@ import androidx.navigation.navArgument
 import com.elhady.lafyuu.feature.home.presentation.CategoriesRoute
 import com.elhady.lafyuu.feature.home.presentation.CategoryProductsRoute
 import com.elhady.lafyuu.feature.home.presentation.HomeRoute
+import com.elhady.lafyuu.feature.home.presentation.ProductListRoute
 
 const val HOME_ROUTE = "home"
 const val CATEGORIES_ROUTE = "categories"
 const val CATEGORY_PRODUCTS_ROUTE_BASE = "category_products"
 const val CATEGORY_PRODUCTS_ROUTE = "$CATEGORY_PRODUCTS_ROUTE_BASE/{categoryName}"
+const val PRODUCT_LIST_ROUTE_BASE = "product_list"
+const val PRODUCT_LIST_ROUTE = "$PRODUCT_LIST_ROUTE_BASE/{title}"
 
 fun NavController.navigateToHome(navOptions: NavOptions? = null) {
     this.navigate(HOME_ROUTE, navOptions)
@@ -27,6 +30,10 @@ fun NavController.navigateToCategoryProducts(categoryName: String, navOptions: N
     this.navigate("$CATEGORY_PRODUCTS_ROUTE_BASE/$categoryName", navOptions)
 }
 
+fun NavController.navigateToProductList(title: String, navOptions: NavOptions? = null) {
+    this.navigate("$PRODUCT_LIST_ROUTE_BASE/$title", navOptions)
+}
+
 fun NavGraphBuilder.homeScreen(
     onNavigateToSearch: () -> Unit = {},
     onNavigateToProductDetails: (String) -> Unit = {},
@@ -37,7 +44,8 @@ fun NavGraphBuilder.homeScreen(
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToWishlist: () -> Unit = {},
     onNavigateToTab: (String) -> Unit = {},
-    cartItemCount: Int = 0
+    cartItemCount: Int = 0,
+    selectedTab: String = "home"
 ) {
     composable(route = HOME_ROUTE) {
         HomeRoute(
@@ -50,7 +58,8 @@ fun NavGraphBuilder.homeScreen(
             onNavigateToNotifications = onNavigateToNotifications,
             onNavigateToWishlist = onNavigateToWishlist,
             onNavigateToTab = onNavigateToTab,
-            cartItemCount = cartItemCount
+            cartItemCount = cartItemCount,
+            selectedTab = selectedTab
         )
     }
 }
@@ -78,6 +87,23 @@ fun NavGraphBuilder.categoryProductsScreen(
         )
     ) {
         CategoryProductsRoute(
+            onNavigateBack = onNavigateBack,
+            onNavigateToProductDetails = onNavigateToProductDetails
+        )
+    }
+}
+
+fun NavGraphBuilder.productListScreen(
+    onNavigateBack: () -> Unit,
+    onNavigateToProductDetails: (String) -> Unit
+) {
+    composable(
+        route = PRODUCT_LIST_ROUTE,
+        arguments = listOf(
+            navArgument("title") { type = NavType.StringType }
+        )
+    ) {
+        ProductListRoute(
             onNavigateBack = onNavigateBack,
             onNavigateToProductDetails = onNavigateToProductDetails
         )

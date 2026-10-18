@@ -42,7 +42,7 @@ internal fun LafyuuButton(
     style: TextStyle = Theme.typography.mediumTextBold,
     borderColor: Color = Theme.color.neutralLight,
     containerColor: Color = Theme.color.blue,
-    disableContainerColor: Color = Theme.color.backgroundWhite,
+    disableContainerColor: Color = Theme.color.neutralLight,
     contentColor: Color = Theme.color.backgroundWhite,
     disableContentColor: Color = Theme.color.neutralGrey,
     iconTint: Color? = contentColor,

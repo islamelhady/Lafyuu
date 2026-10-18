@@ -78,8 +78,8 @@ class AddressViewModel @Inject constructor(
                     loadAddresses()
                 }
                 is AppResult.Error -> {
-                    val msg = result.message ?: "Failed to delete address"
-                    sendEffect(AddressUiEffect.ShowSnackbar(msg, AlertType.Error))
+                    val errorMessage = result.message ?: "Failed to delete address"
+                    sendEffect(AddressUiEffect.ShowSnackbar(errorMessage, type = AlertType.Error))
                 }
                 is AppResult.Loading -> {}
             }

@@ -21,6 +21,7 @@ data class SearchUiState(
     val pageSize: Int = 20,
     val hasMorePages: Boolean = false,
     val isFilterSheetOpen: Boolean = false,
+    val isSortSheetOpen: Boolean = false,
     val tempCategory: String? = null,
     val tempIsPriceFilterEnabled: Boolean = false,
     val tempMinPrice: Double? = null,
@@ -40,12 +41,16 @@ sealed interface SearchUiEvent {
     data object FilterDismissed : SearchUiEvent
     data object ApplyFilters : SearchUiEvent
     data object SortClicked : SearchUiEvent
+    data object SortDismissed : SearchUiEvent
+    data class SortSelected(val sortBy: String, val sortOrder: String) : SearchUiEvent
     data class ProductClicked(val productId: String) : SearchUiEvent
     data object BackToHomeClick : SearchUiEvent
+    data object BackClick : SearchUiEvent
 }
 
 sealed interface SearchUiEffect {
     data class NavigateToProductDetails(val productId: String) : SearchUiEffect
     data object NavigateToHome : SearchUiEffect
+    data object NavigateBack : SearchUiEffect
     data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : SearchUiEffect
 }

@@ -26,6 +26,8 @@ import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun ProductListRoute(
@@ -77,44 +79,50 @@ fun ProductListScreen(
             )
         }
     ) {
-        when {
-            uiState.isLoading && uiState.products.isEmpty() -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Theme.color.blue
-                )
-            }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(Theme.space.large)
+        ) {
+            when {
+                uiState.isLoading && uiState.products.isEmpty() -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Theme.color.blue
+                    )
+                }
 
-            uiState.products.isEmpty() -> {
-                InfoStateContent(
-                    errorMessage = uiState.error ?: "No products found",
-                    onRetryClick = { onEvent(ProductListUiEvent.RetryClicked) },
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
+                uiState.products.isEmpty() -> {
+                    InfoStateContent(
+                        errorMessage = uiState.error ?: "No products found",
+                        onRetryClick = { onEvent(ProductListUiEvent.RetryClicked) },
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
 
-            else -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = Theme.space.large),
-                    horizontalArrangement = Arrangement.spacedBy(Theme.space.medium),
-                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
-                ) {
-                    items(uiState.products, key = { it.id }) { product ->
-                        ProductCard(
-                            imageUrl = product.coverPictureUrl,
-                            name = product.name,
-                            price = "$${String.format("%.2f", product.price)}",
-                            originalPrice = product.originalPrice?.let {
-                                "$${String.format("%.2f", it)}"
-                            },
-                            discountLabel = if ((product.discountPercentage
-                                    ?: 0.0) > 0.0
-                            ) "${product.discountPercentage!!.toInt()}% OFF" else null,
-                            rating = product.rating,
-                            onClick = { onEvent(ProductListUiEvent.ProductClicked(product.id)) }
-                        )
+                else -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = Theme.space.large),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium),
+                        verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                    ) {
+                        items(uiState.products, key = { it.id }) { product ->
+                            ProductCard(
+                                imageUrl = product.coverPictureUrl,
+                                name = product.name,
+                                price = "$${String.format(Locale.US, "%.2f", product.price)}",
+                                originalPrice = product.originalPrice?.let {
+                                    "$${String.format(Locale.US, "%.2f", it)}"
+                                },
+                                discountLabel = if ((product.discountPercentage
+                                        ?: 0.0) > 0.0
+                                ) "${product.discountPercentage!!.toInt()}% OFF" else null,
+                                rating = product.rating,
+                                onClick = { onEvent(ProductListUiEvent.ProductClicked(product.id)) }
+                            )
+                        }
                     }
                 }
             }

@@ -2,7 +2,7 @@ package com.elhady.lafyuu.feature.cart.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.NetworkError
+import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.cart.data.mapper.*
 import com.elhady.lafyuu.feature.cart.data.remote.CartApi
 import com.elhady.lafyuu.feature.cart.data.remote.model.ApplyCouponRequestDto
@@ -11,6 +11,7 @@ import com.elhady.lafyuu.feature.cart.data.remote.model.DeleteItemFromCartReques
 import com.elhady.lafyuu.feature.cart.data.remote.model.UpdateItemRequestDto
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
 import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,10 +44,12 @@ class CartRepositoryImpl @Inject constructor(
                     AppResult.Error(message = "Empty response body")
                 }
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -57,10 +60,12 @@ class CartRepositoryImpl @Inject constructor(
                 refreshCartUnlocked()
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -71,24 +76,28 @@ class CartRepositoryImpl @Inject constructor(
                 refreshCartUnlocked()
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
     override suspend fun removeItem(itemId: String): AppResult<Unit> = mutex.withLock {
         return try {
-            val response = cartApi.deleteCartItem(itemId, DeleteItemFromCartRequestDto(itemId))
+            val response = cartApi.deleteCartItem(itemId)
             if (response.isSuccessful) {
                 refreshCartUnlocked()
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -109,13 +118,15 @@ class CartRepositoryImpl @Inject constructor(
             } else {
                 val networkError = apiErrorParser.parseError(response)
                 if (response.code() == 400) {
-                    AppResult.Error(message = "Your Cupon Is Not Correct")
+                    AppResult.Error(message = "* Your Coupon Is Not Correct ")
                 } else {
-                    mapError(networkError)
+                    networkError.toAppResultError()
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -127,26 +138,8 @@ class CartRepositoryImpl @Inject constructor(
                     _cartFlow.value = body.toDomain()
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) {}
-    }
-
-    private fun mapError(networkError: NetworkError): AppResult.Error {
-        return when (networkError) {
-            is NetworkError.ApiError -> {
-                val details = networkError.details
-                val errorMessage = details.detail
-                    ?: details.title
-                    ?: details.errors?.values?.flatten()?.firstOrNull()
-                    ?: "Request failed"
-                AppResult.Error(message = errorMessage)
-            }
-            is NetworkError.Connectivity -> AppResult.Error(message = "No internet connection")
-            is NetworkError.Serialization -> AppResult.Error(message = "Server error (Parsing)")
-            is NetworkError.Server -> AppResult.Error(message = "Internal server error")
-            is NetworkError.Unknown -> AppResult.Error(
-                message = networkError.throwable.localizedMessage ?: "An unexpected error occurred",
-                throwable = networkError.throwable
-            )
-        }
     }
 }

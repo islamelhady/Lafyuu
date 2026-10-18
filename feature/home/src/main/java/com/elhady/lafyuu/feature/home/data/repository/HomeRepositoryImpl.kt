@@ -2,13 +2,14 @@ package com.elhady.lafyuu.feature.home.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.NetworkError
+import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.home.data.mapper.toDomain
 import com.elhady.lafyuu.feature.home.data.remote.HomeApi
 import com.elhady.lafyuu.feature.home.domain.model.Category
 import com.elhady.lafyuu.feature.home.domain.model.Offer
 import com.elhady.lafyuu.feature.home.domain.model.Product
 import com.elhady.lafyuu.feature.home.domain.repository.HomeRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class HomeRepositoryImpl @Inject constructor(
@@ -24,11 +25,13 @@ class HomeRepositoryImpl @Inject constructor(
                 val list = body?.allCategories ?: emptyList()
                 AppResult.Success(list.map { it.toDomain() })
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("HomeRepository", "getCategories parsing/network failure: ${e.message}", e)
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -40,11 +43,13 @@ class HomeRepositoryImpl @Inject constructor(
                 val list = body?.allOffers ?: emptyList()
                 AppResult.Success(list.map { it.toDomain() })
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("HomeRepository", "getOffers parsing/network failure: ${e.message}", e)
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -70,31 +75,13 @@ class HomeRepositoryImpl @Inject constructor(
                 val list = body?.allProducts ?: emptyList()
                 AppResult.Success(list.map { it.toDomain() })
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("HomeRepository", "getProducts parsing/network failure: ${e.message}", e)
-            mapError(apiErrorParser.parseException(e))
-        }
-    }
-
-    private fun mapError(networkError: NetworkError): AppResult.Error {
-        return when (networkError) {
-            is NetworkError.ApiError -> {
-                val details = networkError.details
-                val errorMessage = details.detail
-                    ?: details.title
-                    ?: details.errors?.values?.flatten()?.firstOrNull()
-                    ?: "Request failed"
-                AppResult.Error(message = errorMessage)
-            }
-            is NetworkError.Connectivity -> AppResult.Error(message = "No internet connection")
-            is NetworkError.Serialization -> AppResult.Error(message = "Server error (Parsing)")
-            is NetworkError.Server -> AppResult.Error(message = "Internal server error")
-            is NetworkError.Unknown -> AppResult.Error(
-                message = networkError.throwable.localizedMessage ?: "An unexpected error occurred",
-                throwable = networkError.throwable
-            )
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 }

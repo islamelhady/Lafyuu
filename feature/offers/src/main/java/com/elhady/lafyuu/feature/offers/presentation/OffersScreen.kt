@@ -31,6 +31,7 @@ import com.elhady.lafyuu.core.designsystem.theme.Theme
 fun OffersRoute(
     onNavigateToTab: (String) -> Unit,
     modifier: Modifier = Modifier,
+    selectedTab: String = "offer",
     viewModel: OffersViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -56,7 +57,8 @@ fun OffersRoute(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
-        modifier = modifier
+        modifier = modifier,
+        selectedTab = selectedTab
     )
 }
 
@@ -65,7 +67,8 @@ fun OffersScreen(
     uiState: OffersUiState,
     snackbarHostState: SnackbarHostState,
     onEvent: (OffersUiEvent) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedTab: String = "offer"
 ) {
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
@@ -78,7 +81,7 @@ fun OffersScreen(
         bottomBar = {
             NavigationBottomBar(
                 tabs = defaultTabBarItems,
-                selectedTab = "offer",
+                selectedTab = selectedTab,
                 onTabSelected = { onEvent(OffersUiEvent.BottomTabSelected(it)) }
             )
         }

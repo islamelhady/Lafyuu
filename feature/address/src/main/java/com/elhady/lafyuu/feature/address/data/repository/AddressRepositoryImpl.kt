@@ -2,7 +2,7 @@ package com.elhady.lafyuu.feature.address.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.NetworkError
+import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.address.data.mapper.toDomain
 import com.elhady.lafyuu.feature.address.data.remote.AddressApi
 import com.elhady.lafyuu.feature.address.data.remote.model.CreateAddressRequestDto
@@ -24,11 +24,11 @@ class AddressRepositoryImpl @Inject constructor(
                 val list = response.body().orEmpty().map { it.toDomain() }
                 AppResult.Success(list)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -43,11 +43,11 @@ class AddressRepositoryImpl @Inject constructor(
                     AppResult.Error(message = "Address not found")
                 }
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -78,11 +78,11 @@ class AddressRepositoryImpl @Inject constructor(
                     AppResult.Error(message = "Failed to create address")
                 }
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -116,11 +116,11 @@ class AddressRepositoryImpl @Inject constructor(
                     AppResult.Error(message = "Failed to update address")
                 }
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -130,31 +130,11 @@ class AddressRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            mapError(apiErrorParser.parseException(e))
-        }
-    }
-
-    private fun mapError(networkError: NetworkError): AppResult.Error {
-        return when (networkError) {
-            is NetworkError.ApiError -> {
-                val details = networkError.details
-                val errorMessage = details.detail
-                    ?: details.title
-                    ?: details.errors?.values?.flatten()?.firstOrNull()
-                    ?: "Request failed"
-                AppResult.Error(message = errorMessage)
-            }
-            is NetworkError.Connectivity -> AppResult.Error(message = "No internet connection")
-            is NetworkError.Serialization -> AppResult.Error(message = "Server error (Parsing)")
-            is NetworkError.Server -> AppResult.Error(message = "Internal server error")
-            is NetworkError.Unknown -> AppResult.Error(
-                message = networkError.throwable.localizedMessage ?: "An unexpected error occurred",
-                throwable = networkError.throwable
-            )
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 }

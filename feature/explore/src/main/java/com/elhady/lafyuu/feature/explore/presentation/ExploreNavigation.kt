@@ -15,16 +15,18 @@ fun NavGraphBuilder.exploreScreen(
     onNavigateToCategoryProducts: (String, String) -> Unit,
     onNavigateToSearch: () -> Unit,
     onNavigateToNotifications: () -> Unit,
-    onNavigateToWishlist: () -> Unit,
-    onNavigateToTab: (String) -> Unit
+    onNavigateToFavorites: () -> Unit,
+    onNavigateToTab: (String) -> Unit,
+    selectedTab: String = "explore"
 ) {
     composable(route = EXPLORE_ROUTE) {
         ExploreRoute(
             onNavigateToCategoryProducts = onNavigateToCategoryProducts,
             onNavigateToSearch = onNavigateToSearch,
             onNavigateToNotifications = onNavigateToNotifications,
-            onNavigateToWishlist = onNavigateToWishlist,
-            onNavigateToTab = onNavigateToTab
+            onNavigateToWishlist = onNavigateToFavorites,
+            onNavigateToTab = onNavigateToTab,
+            selectedTab = selectedTab
         )
     }
 }

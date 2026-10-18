@@ -1,7 +1,6 @@
 package com.elhady.lafyuu.feature.home.presentation
 
 import Left
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,6 +25,9 @@ import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import kotlinx.coroutines.flow.collectLatest
+import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun CategoryProductsRoute(
@@ -38,10 +40,10 @@ fun CategoryProductsRoute(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { effect ->
+        viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
-                CategoryProductsUiEffect.NavigateBack -> onNavigateBack()
                 is CategoryProductsUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
+                CategoryProductsUiEffect.NavigateBack -> onNavigateBack()
                 is CategoryProductsUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
@@ -56,18 +58,17 @@ fun CategoryProductsRoute(
 
     CategoryProductsScreen(
         uiState = uiState,
-        snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
+        snackbarHostState = snackbarHostState,
         modifier = modifier
     )
 }
 
-@SuppressLint("DefaultLocale")
 @Composable
 fun CategoryProductsScreen(
     uiState: CategoryProductsUiState,
-    snackbarHostState: SnackbarHostState,
     onEvent: (CategoryProductsUiEvent) -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
     LafyuuScaffold(
@@ -86,16 +87,24 @@ fun CategoryProductsScreen(
                 .padding(Theme.space.large)
         ) {
             when {
-                uiState.isLoading && uiState.products.isEmpty() -> {
+                uiState.isLoading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
                         color = Theme.color.blue
                     )
                 }
 
+                uiState.error != null && uiState.products.isEmpty() -> {
+                    InfoStateContent(
+                        errorMessage = uiState.error!!,
+                        onRetryClick = { onEvent(CategoryProductsUiEvent.RetryClicked) },
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
                 uiState.products.isEmpty() -> {
                     InfoStateContent(
-                        errorMessage = uiState.error ?: "No products found in this category",
+                        errorMessage = "No products found in this category",
                         onRetryClick = { onEvent(CategoryProductsUiEvent.RetryClicked) },
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -113,9 +122,9 @@ fun CategoryProductsScreen(
                             ProductCard(
                                 imageUrl = product.coverPictureUrl,
                                 name = product.name,
-                                price = "$${String.format("%.2f", product.price)}",
+                                price = "$${String.format(Locale.US, "%.2f", product.price)}",
                                 originalPrice = product.originalPrice?.let {
-                                    "$${String.format("%.2f", it)}"
+                                    "$${String.format(Locale.US, "%.2f", it)}"
                                 },
                                 discountLabel = if ((product.discountPercentage
                                         ?: 0.0) > 0.0

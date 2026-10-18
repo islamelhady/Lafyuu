@@ -1,10 +1,15 @@
 package com.elhady.lafyuu.core.designsystem.components.button
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
+import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.google.android.material.loadingindicator.LoadingIndicator
 
 @Composable
 fun DefaultButton(
@@ -19,6 +24,13 @@ fun DefaultButton(
         onClick = onClick,
         caption = caption,
         isLoading = isLoading,
+        loading = {
+            CircularProgressIndicator(
+                modifier = Modifier.size(Theme.size.buttonHeight),
+                color = Theme.color.backgroundWhite,
+                strokeWidth = 2.dp
+            )
+        },
         isEnabled = isEnabled,
         hasShadow = true
     )
@@ -46,6 +58,7 @@ private fun PreviewDefaultButtonDisable(){
             caption = "Default Button",
             onClick = {},
             isEnabled = false,
+            isLoading = true
         )
     }
 }

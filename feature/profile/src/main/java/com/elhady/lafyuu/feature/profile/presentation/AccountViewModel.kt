@@ -2,8 +2,7 @@ package com.elhady.lafyuu.feature.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elhady.lafyuu.feature.auth.domain.usecase.LogoutUseCase
-import com.elhady.lafyuu.feature.profile.domain.usecase.GetUserProfileUseCase
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +30,8 @@ class AccountViewModel @Inject constructor() : ViewModel() {
             AccountUiEvent.ProfileClicked -> sendEffect(AccountUiEffect.NavigateToProfile)
             AccountUiEvent.OrdersClicked -> sendEffect(AccountUiEffect.NavigateToOrders)
             AccountUiEvent.AddressClicked -> sendEffect(AccountUiEffect.NavigateToAddress)
-            AccountUiEvent.PaymentClicked -> sendEffect(AccountUiEffect.NavigateToPayment)
+            AccountUiEvent.PaymentClicked -> sendEffect(AccountUiEffect.ShowSnackbar("Payment feature is coming soon", AlertType.Warning))
+            is AccountUiEvent.BottomTabSelected -> sendEffect(AccountUiEffect.NavigateToTab(event.tab.route))
         }
     }
 

@@ -18,9 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.feature.address.presentation.addAddressScreen
+import com.elhady.lafyuu.feature.address.presentation.addressScreen
+import com.elhady.lafyuu.feature.address.presentation.editAddressScreen
+import com.elhady.lafyuu.feature.address.presentation.navigateToAddAddress
+import com.elhady.lafyuu.feature.address.presentation.navigateToAddress
+import com.elhady.lafyuu.feature.address.presentation.navigateToEditAddress
 import com.elhady.lafyuu.feature.auth.presentation.navigation.AUTH_GRAPH_ROUTE
 import com.elhady.lafyuu.feature.auth.presentation.navigation.authGraph
 import com.elhady.lafyuu.feature.cart.navigation.cartScreen
@@ -28,39 +35,37 @@ import com.elhady.lafyuu.feature.checkout.presentation.checkoutScreen
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToCheckout
 import com.elhady.lafyuu.feature.checkout.presentation.navigateToPayment
 import com.elhady.lafyuu.feature.checkout.presentation.paymentScreen
-import com.elhady.lafyuu.feature.address.presentation.navigateToAddress
-import com.elhady.lafyuu.feature.address.presentation.navigateToAddAddress
-import com.elhady.lafyuu.feature.address.presentation.navigateToEditAddress
-import com.elhady.lafyuu.feature.address.presentation.addressScreen
-import com.elhady.lafyuu.feature.address.presentation.addAddressScreen
-import com.elhady.lafyuu.feature.address.presentation.editAddressScreen
 import com.elhady.lafyuu.feature.explore.presentation.exploreScreen
+import com.elhady.lafyuu.feature.favorites.navigation.favoritesScreen
+import com.elhady.lafyuu.feature.favorites.navigation.navigateToFavorites
 import com.elhady.lafyuu.feature.home.navigation.HOME_ROUTE
 import com.elhady.lafyuu.feature.home.navigation.categoriesScreen
 import com.elhady.lafyuu.feature.home.navigation.categoryProductsScreen
 import com.elhady.lafyuu.feature.home.navigation.homeScreen
 import com.elhady.lafyuu.feature.home.navigation.navigateToCategories
 import com.elhady.lafyuu.feature.home.navigation.navigateToCategoryProducts
+import com.elhady.lafyuu.feature.home.navigation.navigateToProductList
+import com.elhady.lafyuu.feature.home.navigation.productListScreen
 import com.elhady.lafyuu.feature.notifications.presentation.navigateToNotifications
-import com.elhady.lafyuu.feature.orders.presentation.navigateToOrders
+import com.elhady.lafyuu.feature.notifications.presentation.notificationsScreen
+import com.elhady.lafyuu.feature.offers.presentation.offersScreen
 import com.elhady.lafyuu.feature.orders.presentation.navigateToOrderDetails
-import com.elhady.lafyuu.feature.orders.presentation.ordersScreen
+import com.elhady.lafyuu.feature.orders.presentation.navigateToOrders
 import com.elhady.lafyuu.feature.orders.presentation.orderDetailsScreen
-import com.elhady.lafyuu.feature.profile.presentation.navigateToAccount
-import com.elhady.lafyuu.feature.profile.presentation.navigateToProfile
-import com.elhady.lafyuu.feature.profile.presentation.navigateToChangePassword
-import com.elhady.lafyuu.feature.profile.presentation.accountScreen
-import com.elhady.lafyuu.feature.profile.presentation.profileScreen
-import com.elhady.lafyuu.feature.profile.presentation.changePasswordScreen
+import com.elhady.lafyuu.feature.orders.presentation.ordersScreen
 import com.elhady.lafyuu.feature.product.navigation.navigateToProductDetails
 import com.elhady.lafyuu.feature.product.navigation.productDetailsScreen
+import com.elhady.lafyuu.feature.profile.presentation.accountScreen
+import com.elhady.lafyuu.feature.profile.presentation.changePasswordScreen
+import com.elhady.lafyuu.feature.profile.presentation.navigateToChangePassword
+import com.elhady.lafyuu.feature.profile.presentation.navigateToProfile
+import com.elhady.lafyuu.feature.profile.presentation.profileScreen
 import com.elhady.lafyuu.feature.review.navigation.navigateToReviews
 import com.elhady.lafyuu.feature.review.navigation.navigateToWriteReview
 import com.elhady.lafyuu.feature.review.navigation.reviewsScreen
 import com.elhady.lafyuu.feature.review.navigation.writeReviewScreen
-import com.elhady.lafyuu.feature.favorites.navigation.navigateToFavorites
-import com.elhady.lafyuu.feature.favorites.navigation.favoritesScreen
 import com.elhady.lafyuu.feature.search.presentation.navigateToSearch
+import com.elhady.lafyuu.feature.search.presentation.searchScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -110,6 +115,28 @@ fun MainApp(
     val navController = rememberNavController()
     val context = LocalContext.current
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val selectedTab = when {
+        currentRoute == null -> "home"
+        currentRoute.startsWith("home") || currentRoute.startsWith("categories") || currentRoute.startsWith("category_products") || currentRoute.startsWith("product_list") -> "home"
+        currentRoute.startsWith("explore") -> "explore"
+        currentRoute.startsWith("cart") -> "cart"
+        currentRoute.startsWith("offer") -> "offer"
+        currentRoute.startsWith("account") || currentRoute.startsWith("profile") || currentRoute.startsWith("change_password") -> "account"
+        else -> "home"
+    }
+
+    val onNavigateToTab: (String) -> Unit = { tabId ->
+        navController.navigate(tabId) {
+            popUpTo(navController.graph.startDestinationId) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = if (isAuthenticated) HOME_ROUTE else AUTH_GRAPH_ROUTE
@@ -128,10 +155,10 @@ fun MainApp(
                 navController.navigateToProductDetails(productId)
             },
             onNavigateToFlashSale = {
-                // Handle navigation to flash sale
+                navController.navigateToProductList("Flash Sale")
             },
             onNavigateToMegaSale = {
-                // Handle navigation to mega sale
+                navController.navigateToProductList("Mega Sale")
             },
             onNavigateToMoreCategories = {
                 navController.navigateToCategories()
@@ -148,20 +175,14 @@ fun MainApp(
             onNavigateToWishlist = {
                 navController.navigateToFavorites()
             },
-            onNavigateToTab = { tabId ->
-                if (tabId == "account" || tabId == "Account") {
-                    navController.navigateToAccount()
-                } else if (navController.graph.findNode(tabId) != null) {
-                    navController.navigate(tabId) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            },
-            cartItemCount = cartItemCount
+            onNavigateToTab = onNavigateToTab,
+            cartItemCount = cartItemCount,
+            selectedTab = selectedTab
+        )
+
+        offersScreen(
+            onNavigateToTab = onNavigateToTab,
+            selectedTab = selectedTab
         )
 
         categoriesScreen(
@@ -196,25 +217,16 @@ fun MainApp(
                 navController.navigateToCategoryProducts(categoryName)
             },
             onNavigateToSearch = {
-                // Handle navigation to search
+                navController.navigateToSearch()
             },
-            onNavigateToNotifications = {},
-            onNavigateToWishlist = {
+            onNavigateToNotifications = {
+                navController.navigateToNotifications()
+            },
+            onNavigateToFavorites = {
                 navController.navigateToFavorites()
             },
-            onNavigateToTab = { tabId ->
-                if (tabId == "account" || tabId == "Account") {
-                    navController.navigateToAccount()
-                } else if (navController.graph.findNode(tabId) != null) {
-                    navController.navigate(tabId) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            }
+            onNavigateToTab = onNavigateToTab,
+            selectedTab = selectedTab
         )
 
         productDetailsScreen(
@@ -222,7 +234,7 @@ fun MainApp(
                 navController.popBackStack()
             },
             onNavigateToSearch = {
-                // Handle navigation to search
+                navController.navigateToSearch()
             },
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
@@ -250,6 +262,24 @@ fun MainApp(
             }
         )
 
+        notificationsScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            }
+        )
+
+        searchScreen(
+            onNavigateToHome = {
+                navController.popBackStack()
+            },
+            onNavigateToProductDetails = { productId ->
+                navController.navigateToProductDetails(productId)
+            },
+            onNavigateBack = {
+                navController.popBackStack()
+            }
+        )
+
         cartScreen(
             onNavigateToCheckout = {
                 navController.navigateToCheckout()
@@ -257,19 +287,8 @@ fun MainApp(
             onNavigateToProductDetails = { productId ->
                 navController.navigateToProductDetails(productId)
             },
-            onNavigateToTab = { tabId ->
-                if (tabId == "account" || tabId == "Account") {
-                    navController.navigateToAccount()
-                } else if (navController.graph.findNode(tabId) != null) {
-                    navController.navigate(tabId) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            }
+            onNavigateToTab = onNavigateToTab,
+            selectedTab = selectedTab
         )
 
         checkoutScreen(
@@ -339,7 +358,8 @@ fun MainApp(
             onNavigateToAddress = {
                 navController.navigateToAddress()
             },
-            onNavigateToPayment = {}
+            onNavigateToTab = onNavigateToTab,
+            selectedTab = selectedTab
         )
 
         addressScreen(
@@ -363,6 +383,15 @@ fun MainApp(
         editAddressScreen(
             onNavigateBack = {
                 navController.popBackStack()
+            }
+        )
+
+        productListScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToProductDetails = { productId ->
+                navController.navigateToProductDetails(productId)
             }
         )
 

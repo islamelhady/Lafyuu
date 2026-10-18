@@ -40,11 +40,12 @@ interface CartApi {
         @Body request: DecrementItemRequestDto
     ): Response<DecrementItemResponseDto>
 
+//    @HTTP(method = "DELETE", path = "api/cart/items/{Id}", hasBody = true)
     @DELETE("api/cart/items/{Id}")
     suspend fun deleteCartItem(
         @Path("Id") id: String,
-        @Body request: DeleteItemFromCartRequestDto
-    ): Response<Any>
+//        @Body request: DeleteItemFromCartRequestDto
+    ): Response<Unit>
 
     @POST("api/cart/apply-coupon")
     suspend fun applyCoupon(

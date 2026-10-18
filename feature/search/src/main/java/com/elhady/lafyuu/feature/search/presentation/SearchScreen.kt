@@ -1,5 +1,6 @@
 package com.elhady.lafyuu.feature.search.presentation
 
+import Left
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,13 +45,14 @@ import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisual
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.DefaultTextField
 import com.elhady.lafyuu.core.designsystem.icons.Filter
-import com.elhady.lafyuu.core.designsystem.icons.Short
+import com.elhady.lafyuu.core.designsystem.icons.Sort
 import com.elhady.lafyuu.core.designsystem.icons.X
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 
 @Composable
 fun SearchRoute(
     onNavigateToHome: () -> Unit,
+    onNavigateBack: () -> Unit,
     onNavigateToProductDetails: (String) -> Unit,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
@@ -62,6 +64,7 @@ fun SearchRoute(
             when (effect) {
                 is SearchUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
                 SearchUiEffect.NavigateToHome -> onNavigateToHome()
+                is SearchUiEffect.NavigateBack -> onNavigateBack()
                 is SearchUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
@@ -90,6 +93,7 @@ fun SearchScreen(
     onEvent: (SearchUiEvent) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
+    val sortSheetState = rememberModalBottomSheetState()
 
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
@@ -98,7 +102,9 @@ fun SearchScreen(
                 searchValue = uiState.query,
                 onSearchValueChange = { onEvent(SearchUiEvent.QueryChanged(it)) },
                 onClearSearchClick = { onEvent(SearchUiEvent.QueryChanged("")) },
-                trailingIcon = Short,
+                leadingIcon = Left,
+                onLeadingClick = { onEvent(SearchUiEvent.BackClick) },
+                trailingIcon = Sort,
                 onTrailingClick = { onEvent(SearchUiEvent.SortClicked) },
                 filterIcon = Filter,
                 onFilterClick = { onEvent(SearchUiEvent.FilterClicked) },
@@ -179,37 +185,6 @@ fun SearchScreen(
                     verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
                 ) {
                     LafyuuText(
-                        text = "Category",
-                        style = Theme.typography.heading5,
-                        color = Theme.color.neutralDark
-                    )
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(Theme.space.small),
-                        verticalArrangement = Arrangement.spacedBy(Theme.space.small)
-                    ) {
-                        val isAllSelected = uiState.tempCategory == null
-                        LabelButton(
-                            caption = "All",
-                            onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(null)) },
-                            containerColor = if (isAllSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
-                            contentColor = if (isAllSelected) Theme.color.blue else Theme.color.neutralGrey,
-                            style = if (isAllSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
-                            hasBorder = true
-                        )
-                        uiState.categories.forEach { cat ->
-                            val isSelected = uiState.tempCategory == cat.name || uiState.tempCategory == cat.id
-                            LabelButton(
-                                caption = cat.name,
-                                onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(cat.name)) },
-                                containerColor = if (isSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
-                                contentColor = if (isSelected) Theme.color.blue else Theme.color.neutralGrey,
-                                style = if (isSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
-                                hasBorder = true
-                            )
-                        }
-                    }
-
-                    LafyuuText(
                         text = "Price Range",
                         style = Theme.typography.heading5,
                         color = Theme.color.neutralDark
@@ -257,33 +232,113 @@ fun SearchScreen(
                         valueRange = 0f..2000f,
                         modifier = Modifier.fillMaxWidth()
                     )
+                    LafyuuText(
+                        text = "Category",
+                        style = Theme.typography.heading5,
+                        color = Theme.color.neutralDark
+                    )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(Theme.space.small),
+                        verticalArrangement = Arrangement.spacedBy(Theme.space.small)
+                    ) {
+                        val isAllSelected = uiState.tempCategory == null
+                        LabelButton(
+                            caption = "All",
+                            onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(null)) },
+                            containerColor = if (isAllSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                            contentColor = if (isAllSelected) Theme.color.blue else Theme.color.neutralGrey,
+                            style = if (isAllSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                            hasBorder = true
+                        )
+                        uiState.categories.forEach { cat ->
+                            val isSelected = uiState.tempCategory == cat.name || uiState.tempCategory == cat.id
+                            LabelButton(
+                                caption = cat.name,
+                                onClick = { onEvent(SearchUiEvent.CategoryFilterChanged(cat.name)) },
+                                containerColor = if (isSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                                contentColor = if (isSelected) Theme.color.blue else Theme.color.neutralGrey,
+                                style = if (isSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                                hasBorder = true
+                            )
+                        }
+                    }
+                    LafyuuText(
+                        text = "Availability",
+                        style = Theme.typography.heading5,
+                        color = Theme.color.neutralDark
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                    ) {
+                        val isAllAvailability = uiState.tempIsInStock == null
+                        LabelButton(
+                            caption = "All",
+                            onClick = { onEvent(SearchUiEvent.InStockChanged(null)) },
+                            containerColor = if (isAllAvailability) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                            contentColor = if (isAllAvailability) Theme.color.blue else Theme.color.neutralGrey,
+                            style = if (isAllAvailability) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                            hasBorder = true
+                        )
+                        val isInStockSelected = uiState.tempIsInStock == true
+                        LabelButton(
+                            caption = "In Stock Only",
+                            onClick = { onEvent(SearchUiEvent.InStockChanged(true)) },
+                            containerColor = if (isInStockSelected) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                            contentColor = if (isInStockSelected) Theme.color.blue else Theme.color.neutralGrey,
+                            style = if (isInStockSelected) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                            hasBorder = true
+                        )
+                    }
 
-//                    LafyuuText(
-//                        text = "Availability",
-//                        style = Theme.typography.heading5,
-//                        color = Theme.color.neutralDark)
-//                    Row(
-//                        horizontalArrangement = Arrangement.spacedBy(Theme.space.medium)
-//                    ) {
-//                        LabelButton(
-//                            caption = "All",
-//                            isEnabled = uiState.tempIsInStock == null,
-//                            onClick = { onEvent(SearchUiEvent.InStockChanged(null)) },
-//                            hasBorder = true
-//                        )
-//                        LabelButton(
-//                            caption = "In Stock",
-//                            isEnabled = uiState.tempIsInStock == true,
-//                            onClick = { onEvent(SearchUiEvent.InStockChanged(true)) },
-//                            hasBorder = true
-//                        )
-//                    }
                     DefaultButton(
                         caption = "Apply",
                         onClick = { onEvent(SearchUiEvent.ApplyFilters) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = Theme.space.large)
+                    )
+                    VerticalSpacerMedium()
+                }
+            }
+        }
+
+        if (uiState.isSortSheetOpen) {
+            ModalBottomSheet(
+                onDismissRequest = { onEvent(SearchUiEvent.SortDismissed) },
+                sheetState = sortSheetState
+            ) {
+                SingleTopAppBar(
+                    title = "Sort By",
+                    leadingIcon = X,
+                    onLeadingClick = { onEvent(SearchUiEvent.SortDismissed) }
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = Theme.space.large, vertical = Theme.space.medium),
+                    verticalArrangement = Arrangement.spacedBy(Theme.space.medium)
+                ) {
+                    val isLowToHigh = uiState.sortBy == "price" && uiState.sortOrder == "asc"
+                    val isHighToLow = uiState.sortBy == "price" && uiState.sortOrder == "desc"
+
+                    LabelButton(
+                        caption = "Price: Low to High",
+                        onClick = { onEvent(SearchUiEvent.SortSelected("price", "asc")) },
+                        containerColor = if (isLowToHigh) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                        contentColor = if (isLowToHigh) Theme.color.blue else Theme.color.neutralDark,
+                        style = if (isLowToHigh) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                        hasBorder = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    LabelButton(
+                        caption = "Price: High to Low",
+                        onClick = { onEvent(SearchUiEvent.SortSelected("price", "desc")) },
+                        containerColor = if (isHighToLow) Theme.color.blue.copy(alpha = 0.1f) else Color.Transparent,
+                        contentColor = if (isHighToLow) Theme.color.blue else Theme.color.neutralDark,
+                        style = if (isHighToLow) Theme.typography.normalCaptionBold else Theme.typography.normalCaptionRegular,
+                        hasBorder = true,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     VerticalSpacerMedium()
                 }

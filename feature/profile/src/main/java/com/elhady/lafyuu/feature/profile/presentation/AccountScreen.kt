@@ -15,6 +15,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
+import com.elhady.lafyuu.core.designsystem.components.element.NavigationBottomBar
+import com.elhady.lafyuu.core.designsystem.components.element.defaultTabBarItems
 import com.elhady.lafyuu.core.designsystem.components.list.SingleListItem
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.icons.Bag
@@ -28,7 +30,8 @@ fun AccountRoute(
     onNavigateToProfile: () -> Unit,
     onNavigateToOrders: () -> Unit,
     onNavigateToAddress: () -> Unit,
-    onNavigateToPayment: () -> Unit,
+    onNavigateToTab: (String) -> Unit,
+    selectedTab: String = "account",
     viewModel: AccountViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -40,7 +43,7 @@ fun AccountRoute(
                 AccountUiEffect.NavigateToProfile -> onNavigateToProfile()
                 AccountUiEffect.NavigateToOrders -> onNavigateToOrders()
                 AccountUiEffect.NavigateToAddress -> onNavigateToAddress()
-                AccountUiEffect.NavigateToPayment -> onNavigateToPayment()
+                is AccountUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
                 is AccountUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
@@ -57,6 +60,7 @@ fun AccountRoute(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
+        selectedTab = selectedTab
     )
 }
 
@@ -65,6 +69,7 @@ fun AccountScreen(
     uiState: AccountUiState,
     snackbarHostState: SnackbarHostState,
     onEvent: (AccountUiEvent) -> Unit,
+    selectedTab: String = "account"
 ) {
     LafyuuScaffold(
         snackbarHostState = snackbarHostState,
@@ -73,6 +78,13 @@ fun AccountScreen(
                 title = "Account",
                 leadingIcon = null,
                 onLeadingClick = {}
+            )
+        },
+        bottomBar = {
+            NavigationBottomBar(
+                tabs = defaultTabBarItems,
+                selectedTab = selectedTab,
+                onTabSelected = { onEvent(AccountUiEvent.BottomTabSelected(it)) }
             )
         }
     ) {

@@ -10,7 +10,7 @@ enum class AddressField {
 data class CheckoutUiState(
     val isLoading: Boolean = false,
     val addresses: List<Address> = emptyList(),
-    val selectedAddress: Address? = null,
+    val selectedAddressId: String? = null,
     val selectedPaymentMethod: String = "Credit Card",
     val paymentMethods: List<String> = listOf("Credit Card", "Cash on Delivery", "Bank Transfer"),
     val error: String? = null
@@ -18,7 +18,7 @@ data class CheckoutUiState(
 
 sealed interface CheckoutUiEvent {
     data object LoadAddresses : CheckoutUiEvent
-    data class SelectAddress(val address: Address) : CheckoutUiEvent
+    data class SelectAddress(val addressId: String) : CheckoutUiEvent
     data class SelectPaymentMethod(val method: String) : CheckoutUiEvent
     data object OpenAddAddress : CheckoutUiEvent
     data class OpenEditAddress(val addressId: String) : CheckoutUiEvent

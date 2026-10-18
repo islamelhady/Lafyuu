@@ -6,12 +6,13 @@ import com.elhady.lafyuu.core.common.domain.model.ProductDetails
 import com.elhady.lafyuu.core.common.domain.model.ProductReview
 import com.elhady.lafyuu.core.common.domain.repository.ProductRepository
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.NetworkError
+import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.product.data.mapper.toDomain
 import com.elhady.lafyuu.feature.product.data.mapper.toProductDetailsDomain
 import com.elhady.lafyuu.feature.product.data.mapper.toProductSummaryDomain
 import com.elhady.lafyuu.feature.product.data.remote.ProductApi
 import com.elhady.lafyuu.feature.product.data.remote.model.AddItemToCartRequestDto
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class ProductRepositoryImpl @Inject constructor(
@@ -30,11 +31,13 @@ class ProductRepositoryImpl @Inject constructor(
                     AppResult.Error(message = "Product details not found")
                 }
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("ProductRepository", "getProductDetails failure: ${e.message}", e)
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -54,11 +57,13 @@ class ProductRepositoryImpl @Inject constructor(
                 val reviews = body?.reviews?.items.orEmpty().map { it.toDomain() }
                 AppResult.Success(reviews)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("ProductRepository", "getProductReviews failure: ${e.message}", e)
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -70,11 +75,13 @@ class ProductRepositoryImpl @Inject constructor(
                 val list = body?.allProducts.orEmpty().map { it.toProductSummaryDomain() }
                 AppResult.Success(list)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("ProductRepository", "getRecommendedProducts failure: ${e.message}", e)
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -89,31 +96,13 @@ class ProductRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             android.util.Log.e("ProductRepository", "addToCart failure: ${e.message}", e)
-            mapError(apiErrorParser.parseException(e))
-        }
-    }
-
-    private fun mapError(networkError: NetworkError): AppResult.Error {
-        return when (networkError) {
-            is NetworkError.ApiError -> {
-                val details = networkError.details
-                val errorMessage = details.detail
-                    ?: details.title
-                    ?: details.errors?.values?.flatten()?.firstOrNull()
-                    ?: "Request failed"
-                AppResult.Error(message = errorMessage)
-            }
-            is NetworkError.Connectivity -> AppResult.Error(message = "No internet connection")
-            is NetworkError.Serialization -> AppResult.Error(message = "Server error (Parsing)")
-            is NetworkError.Server -> AppResult.Error(message = "Internal server error")
-            is NetworkError.Unknown -> AppResult.Error(
-                message = networkError.throwable.localizedMessage ?: "An unexpected error occurred",
-                throwable = networkError.throwable
-            )
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 }

@@ -45,11 +45,5 @@ fun CartSummarySection(
             totalPrice = "$${String.format("%.2f", finalTotal)}"
         )
         VerticalSpacerLarge()
-        DefaultButton(
-            caption = "Check Out",
-            isLoading = false,
-            onClick = { onEvent(CartUiEvent.CheckoutClicked) },
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }

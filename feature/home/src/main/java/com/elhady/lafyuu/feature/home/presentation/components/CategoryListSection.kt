@@ -13,7 +13,6 @@ import com.elhady.lafyuu.core.designsystem.components.other.ProductCategory
 import com.elhady.lafyuu.core.designsystem.components.text.SectionTitle
 import com.elhady.lafyuu.core.designsystem.icons.Bikini
 import com.elhady.lafyuu.core.designsystem.icons.Dress
-import com.elhady.lafyuu.core.designsystem.icons.ManPants
 import com.elhady.lafyuu.core.designsystem.icons.ManShoes
 import com.elhady.lafyuu.core.designsystem.icons.ManUnderwear
 import com.elhady.lafyuu.core.designsystem.icons.Shirt
@@ -23,7 +22,6 @@ import com.elhady.lafyuu.core.designsystem.icons.WomanBag
 import com.elhady.lafyuu.core.designsystem.icons.WomanPants
 import com.elhady.lafyuu.core.designsystem.icons.WomanShoes
 import com.elhady.lafyuu.core.designsystem.icons.WomanTshirt
-import com.elhady.lafyuu.core.designsystem.icons.Short as ShortIcon
 import com.elhady.lafyuu.core.designsystem.theme.Theme
 import com.elhady.lafyuu.feature.home.domain.model.Category
 

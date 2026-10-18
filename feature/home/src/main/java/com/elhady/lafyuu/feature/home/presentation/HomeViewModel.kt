@@ -173,7 +173,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun onBottomTabSelected(event: HomeUiEvent.BottomTabSelected) {
-        _uiState.update { it.copy(selectedTab = event.tab.label) }
         sendEffect(HomeUiEffect.NavigateToTab(event.tab.route))
     }
 

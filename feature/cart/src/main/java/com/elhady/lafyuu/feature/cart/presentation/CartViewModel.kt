@@ -3,18 +3,19 @@ package com.elhady.lafyuu.feature.cart.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.feature.cart.domain.usecase.ApplyCouponUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.DecreaseCartItemUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.GetCartUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.IncreaseCartItemQuantityUseCase
 import com.elhady.lafyuu.feature.cart.domain.usecase.RemoveCartItemUseCase
-import com.elhady.lafyuu.feature.cart.domain.usecase.UpdateCartItemQuantityUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,7 +27,8 @@ class CartViewModel @Inject constructor(
     private val increaseCartItemQuantityUseCase: IncreaseCartItemQuantityUseCase,
     private val decreaseCartItemUseCase: DecreaseCartItemUseCase,
     private val removeCartItemUseCase: RemoveCartItemUseCase,
-    private val applyCouponUseCase: ApplyCouponUseCase
+    private val applyCouponUseCase: ApplyCouponUseCase,
+    private val favoritesRepository: FavoritesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CartUiState())
@@ -37,6 +39,15 @@ class CartViewModel @Inject constructor(
 
     init {
         loadCart()
+        observeFavorites()
+    }
+
+    private fun observeFavorites() {
+        viewModelScope.launch {
+            favoritesRepository.observeFavoriteIds().collectLatest { ids ->
+                _uiState.update { it.copy(favoriteProductIds = ids.toSet()) }
+            }
+        }
     }
 
     fun onEvent(event: CartUiEvent) {
@@ -45,6 +56,7 @@ class CartViewModel @Inject constructor(
             is CartUiEvent.IncreaseQuantity -> increaseQuantity(event.itemId)
             is CartUiEvent.DecreaseQuantity -> decreaseQuantity(event.itemId)
             is CartUiEvent.RemoveItem -> removeItem(event.itemId)
+            is CartUiEvent.FavoriteClicked -> toggleFavorite(event.productId)
             is CartUiEvent.CouponCodeChanged -> {
                 _uiState.update { it.copy(couponCodeInput = event.code, couponError = null) }
             }
@@ -54,6 +66,19 @@ class CartViewModel @Inject constructor(
             CartUiEvent.RetryClicked -> loadCart()
             is CartUiEvent.ProductClicked -> sendEffect(CartUiEffect.NavigateToProductDetails(event.productId))
             is CartUiEvent.BottomTabSelected -> sendEffect(CartUiEffect.NavigateToTab(event.tab.route))
+        }
+    }
+
+    private fun toggleFavorite(productId: String) {
+        viewModelScope.launch {
+            val isFavorite = _uiState.value.favoriteProductIds.contains(productId)
+            if (isFavorite) {
+                favoritesRepository.removeFavorite(productId)
+                sendEffect(CartUiEffect.ShowSnackbar("Removed from Favorite", AlertType.Error))
+            } else {
+                favoritesRepository.addFavorite(productId)
+                sendEffect(CartUiEffect.ShowSnackbar("Added to Favorite", AlertType.Success))
+            }
         }
     }
 
@@ -169,7 +194,10 @@ class CartViewModel @Inject constructor(
 
     private fun applyCoupon() {
         val code = _uiState.value.couponCodeInput
-        if (code.isBlank()) return
+        if (code.isBlank()) {
+            _uiState.update { it.copy(couponError = "Please enter a coupon code") }
+            return
+        }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isApplyingCoupon = true, couponError = null) }

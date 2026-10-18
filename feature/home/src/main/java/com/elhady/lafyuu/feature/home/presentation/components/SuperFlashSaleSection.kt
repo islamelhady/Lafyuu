@@ -16,39 +16,20 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.elhady.lafyuu.core.designsystem.components.card.Banner
 import com.elhady.lafyuu.core.designsystem.components.other.SlideShowIndicator
+import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
-import com.elhady.lafyuu.feature.home.domain.model.Offer
+import com.elhady.lafyuu.feature.home.domain.model.Product
 import kotlinx.coroutines.delay
+import java.util.Locale
 
 @Composable
 fun SuperFlashSaleSection(
-    offers: List<Offer>,
-    onOfferClick: (offerId: String) -> Unit,
-    onSeeMoreClick: () -> Unit,
+    products: List<Product>,
+    onProductClick: (productId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val items = offers.ifEmpty {
-        listOf(
-            Offer(
-                id = "1",
-                name = "Super Flash Sale",
-                description = "50% Off",
-                coverUrl = null
-            ),
-            Offer(
-                id = "2",
-                name = "Mega Sale",
-                description = "70% Off",
-                coverUrl = null
-            ),
-            Offer(
-                id = "3",
-                name = "Super Flash Sale",
-                description = "30% Off",
-                coverUrl = null
-            )
-        )
-    }
+    val items = products.take(5)
+    if (items.isEmpty()) return
 
     val pagerState = rememberPagerState(pageCount = { items.size })
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -78,44 +59,49 @@ fun SuperFlashSaleSection(
                 .fillMaxWidth()
                 .padding(horizontal = Theme.space.large)
         ) { page ->
-            val offer = items[page]
-            val title = offer.name.ifBlank { "Super Flash Sale" }
-            val subtitle = offer.description?.ifBlank { "50% Off" } ?: "50% Off"
+            val product = items[page]
+            val title = product.name.ifBlank { "Super Flash Sale" }
+            val subtitle = product.discountLabel ?: String.format(Locale.US, "$%.2f", product.price)
 
             Banner(
                 title = title,
                 subtitle = subtitle,
-                imageUrl = offer.coverUrl,
+                imageUrl = product.coverPictureUrl,
                 onClick = {
-                    if (offer.id.isNotBlank()) {
-                        onOfferClick(offer.id)
-                    } else {
-                        onSeeMoreClick()
+                    if (product.id.isNotBlank()) {
+                        onProductClick(product.id)
                     }
                 }
             )
         }
 
-        SlideShowIndicator(
-            pageCount = items.size,
-            currentPage = pagerState.currentPage
-        )
+        if (items.size > 1) {
+            SlideShowIndicator(
+                pageCount = items.size,
+                currentPage = pagerState.currentPage
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 fun SuperFlashSaleSectionPreview() {
-    SuperFlashSaleSection(
-        offers = listOf(
-            Offer(
-                id = "1",
-                name = "Super Flash Sale",
-                description = "50% Off",
-                coverUrl = null
-            )
-        ),
-        onOfferClick = {},
-        onSeeMoreClick = {}
-    )
+    LafyuuTheme {
+        SuperFlashSaleSection(
+            products = listOf(
+                Product(
+                    id = "1",
+                    name = "FS - Nike Air Max 270",
+                    coverPictureUrl = null,
+                    price = 299.43,
+                    originalPrice = 399.0,
+                    discountPercentage = 25.0,
+                    discountLabel = "24% OFF",
+                    rating = 4
+                )
+            ),
+            onProductClick = {}
+        )
+    }
 }

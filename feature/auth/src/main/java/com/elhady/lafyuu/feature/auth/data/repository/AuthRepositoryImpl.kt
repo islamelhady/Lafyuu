@@ -4,7 +4,7 @@ import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.datastore.LafyuuDataStore
 import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.NetworkError
+import com.elhady.lafyuu.core.network.error.toAppResultError
 import com.elhady.lafyuu.feature.auth.data.mapper.toDomain
 import com.elhady.lafyuu.feature.auth.data.remote.AuthApi
 import com.elhady.lafyuu.feature.auth.data.remote.model.ChangePasswordRequest
@@ -19,6 +19,7 @@ import com.elhady.lafyuu.feature.auth.data.remote.model.VerifyEmailRequest
 import com.elhady.lafyuu.feature.auth.domain.model.AuthToken
 import com.elhady.lafyuu.feature.auth.domain.model.User
 import com.elhady.lafyuu.feature.auth.domain.repository.AuthRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -38,10 +39,12 @@ class AuthRepositoryImpl @Inject constructor(
                 dataStore.saveTokens(body.accessToken, body.refreshToken)
                 AppResult.Success(body.toDomain())
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -51,10 +54,12 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -64,10 +69,12 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(Unit)
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -79,10 +86,12 @@ class AuthRepositoryImpl @Inject constructor(
                 dataStore.saveTokens(body.accessToken, body.refreshToken)
                 AppResult.Success(body.toDomain())
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
@@ -96,6 +105,8 @@ class AuthRepositoryImpl @Inject constructor(
             } else {
                 AppResult.Success(Unit)
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             dataStore.clearSession()
             favoritesRepository.clearFavorites()
@@ -109,39 +120,49 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 AppResult.Success(response.body()!!.toDomain())
             } else {
-                mapError(apiErrorParser.parseError(response))
+                apiErrorParser.parseError(response).toAppResultError()
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
     override suspend fun forgotPassword(email: String): AppResult<Unit> {
         return try {
             val response = authApi.forgotPassword(ForgotPasswordRequest(email))
-            if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
-        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
+            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
     }
 
     override suspend fun resetPassword(email: String, otp: String, password: String): AppResult<Unit> {
         return try {
             val response = authApi.resetPassword(ResetPasswordRequest(email, otp, password))
-            if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
-        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
+            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
     }
 
     override suspend fun resendOtp(email: String): AppResult<Unit> {
         return try {
             val response = authApi.resendOtp(ResendOtpRequest(email))
-            if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
-        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
+            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
     }
 
     override suspend fun validateOtp(email: String, otp: String): AppResult<Unit> {
         return try {
             val response = authApi.validateOtp(ValidateOtpRequest(email, otp))
-            if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
-        } catch (e: Exception) { mapError(apiErrorParser.parseException(e)) }
+            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
     }
 
     override suspend fun changePassword(
@@ -151,33 +172,16 @@ class AuthRepositoryImpl @Inject constructor(
     ): AppResult<Unit> {
         return try {
             val response = authApi.changePassword(ChangePasswordRequest(currentPassword, newPassword, confirmNewPassword))
-            if (response.isSuccessful) AppResult.Success(Unit) else mapError(apiErrorParser.parseError(response))
-        } catch (e: Exception) {
-            mapError(apiErrorParser.parseException(e))
+            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
+        }catch (e: CancellationException) {
+            throw e
+        }
+        catch (e: Exception) {
+            apiErrorParser.parseException(e).toAppResultError()
         }
     }
 
     override fun getAccessToken(): Flow<String?> = dataStore.accessToken
 
     override fun isAuthenticated(): Flow<Boolean> = dataStore.accessToken.map { !it.isNullOrBlank() }
-
-    private fun mapError(networkError: NetworkError): AppResult.Error {
-        return when (networkError) {
-            is NetworkError.ApiError -> {
-                val details = networkError.details
-                val errorMessage = details.detail
-                    ?: details.title
-                    ?: details.errors?.values?.flatten()?.firstOrNull()
-                    ?: "Request failed"
-                AppResult.Error(message = errorMessage)
-            }
-            is NetworkError.Connectivity -> AppResult.Error(message = "No internet connection")
-            is NetworkError.Serialization -> AppResult.Error(message = "Server error (Parsing)")
-            is NetworkError.Server -> AppResult.Error(message = "Internal server error")
-            is NetworkError.Unknown -> AppResult.Error(
-                message = networkError.throwable.localizedMessage ?: "An unexpected error occurred",
-                throwable = networkError.throwable
-            )
-        }
-    }
 }
