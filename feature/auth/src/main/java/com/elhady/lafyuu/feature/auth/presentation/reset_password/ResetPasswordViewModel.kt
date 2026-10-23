@@ -84,7 +84,7 @@ class ResetPasswordViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, generalError = null) }
-            when (val result = resetPasswordUseCase(email, otp, state.newPassword)) {
+            when (val result = resetPasswordUseCase(state.email.trim(), state.otp.trim(), state.newPassword)) {
                 is AppResult.Success<*> -> {
                     _uiState.update { it.copy(isLoading = false) }
                     _uiEffect.send(ResetPasswordUiEffect.NavigateToLogin)

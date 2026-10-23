@@ -20,48 +20,76 @@ class AuthAuthenticator @Inject constructor(
 
     private val mutex = Mutex()
 
-    override fun authenticate(route: Route?, response: Response): Request? {
-        // 0. Explicit retry protection: only attempt refresh/retry once per original request.
+    override fun authenticate(
+        route: Route?,
+        response: Response
+    ): Request? {
+        // Prevent retry loops.
         if (response.priorResponse != null) {
             return null
         }
 
-        // 1. Get the access token used in the failed request
-        val currentAccessToken = response.request.header("Authorization")?.removePrefix("Bearer ")
+        val currentAccessToken = response.request
+            .header("Authorization")
+            ?.removePrefix("Bearer ")
 
         return runBlocking {
             mutex.withLock {
-                // 2. Check if the token has already been refreshed by another concurrent request
-                val latestAccessToken = tokenProvider.getAccessToken().firstOrNull()
+                // Another request may already have refreshed the token.
+                val latestAccessToken =
+                    tokenProvider.getAccessToken().firstOrNull()
 
-                if (!latestAccessToken.isNullOrBlank() && latestAccessToken != currentAccessToken) {
-                    // Token was already refreshed, retry with the latest one
-                    return@runBlocking response.request.newBuilder()
-                        .header("Authorization", "Bearer $latestAccessToken")
+                if (
+                    !latestAccessToken.isNullOrBlank() &&
+                    latestAccessToken != currentAccessToken
+                ) {
+                    return@withLock response.request.newBuilder()
+                        .header(
+                            "Authorization",
+                            "Bearer $latestAccessToken"
+                        )
                         .build()
                 }
 
-                // 3. Obtain refresh token
-                val refreshToken = tokenProvider.getRefreshToken().firstOrNull()
+                val refreshToken =
+                    tokenProvider.getRefreshToken().firstOrNull()
+
                 if (refreshToken.isNullOrBlank()) {
+                    // There is no refresh credential to recover the session.
                     tokenProvider.clearSession()
-                    return@runBlocking null
+                    return@withLock null
                 }
 
-                // 4. Perform refresh
-                when (val result = tokenRemoteDataSource.refreshToken(refreshToken)) {
+                when (
+                    val result = tokenRemoteDataSource.refreshToken(
+                        refreshToken
+                    )
+                ) {
                     is RefreshTokenResult.Success -> {
-                        // 5. Update tokens atomically
-                        tokenProvider.updateTokens(result.accessToken, result.refreshToken)
+                        tokenProvider.updateTokens(
+                            accessToken = result.accessToken,
+                            refreshToken = result.refreshToken
+                        )
 
-                        // 6. Retry original request with new token
                         response.request.newBuilder()
-                            .header("Authorization", "Bearer ${result.accessToken}")
+                            .header(
+                                "Authorization",
+                                "Bearer ${result.accessToken}"
+                            )
                             .build()
                     }
-                    RefreshTokenResult.Failure -> {
-                        // 7. Refresh failed, clear session
+
+                    RefreshTokenResult.Rejected -> {
+                        // Clear only when the refresh credential is
+                        // explicitly rejected by the server.
                         tokenProvider.clearSession()
+                        null
+                    }
+
+                    RefreshTokenResult.TemporaryFailure -> {
+                        // Preserve the session. The original request
+                        // remains unauthorized, but refresh can be retried
+                        // by a later request.
                         null
                     }
                 }

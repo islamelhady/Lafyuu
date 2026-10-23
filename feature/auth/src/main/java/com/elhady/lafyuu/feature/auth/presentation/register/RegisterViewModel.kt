@@ -62,9 +62,13 @@ class RegisterViewModel @Inject constructor(
         if (_uiState.value.isLoading) return
 
         val state = _uiState.value
-        val firstNameResult = validateName(state.firstName)
-        val lastNameResult = validateName(state.lastName)
-        val emailResult = validateEmail(state.email)
+        val trimmedFirstName = state.firstName.trim()
+        val trimmedLastName = state.lastName.trim()
+        val trimmedEmail = state.email.trim()
+
+        val firstNameResult = validateName(trimmedFirstName)
+        val lastNameResult = validateName(trimmedLastName)
+        val emailResult = validateEmail(trimmedEmail)
         val passwordResult = validatePassword(state.password)
         val confirmPasswordResult = validateConfirmPassword(state.password, state.confirmPassword)
 
@@ -80,7 +84,7 @@ class RegisterViewModel @Inject constructor(
                         ValidationResult.Error.EmailRequired -> UiText.Resource(R.string.email_is_required)
                         ValidationResult.Error.InvalidEmailFormat -> UiText.Resource(R.string.invalid_email_format)
                         else -> null
-                    } as UiText,
+                    },
                     passwordError = when (passwordResult) {
                         ValidationResult.Error.PasswordRequired -> UiText.Resource(R.string.password_is_required)
                         ValidationResult.Error.PasswordMissingDigit -> UiText.Resource(R.string.password_must_contain_at_least_one_digit)
@@ -101,10 +105,10 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, generalError = null) }
 
-            when (val result = registerUseCase(state.email, state.password, state.firstName, state.lastName)) {
+            when (val result = registerUseCase(trimmedEmail, state.password, trimmedFirstName, trimmedLastName)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _uiEffect.send(RegisterUiEffect.NavigateToEmailVerification(state.email))
+                    _uiEffect.send(RegisterUiEffect.NavigateToEmailVerification(trimmedEmail))
                 }
                 is AppResult.Failure -> {
                     val message = result.error.toUiText()

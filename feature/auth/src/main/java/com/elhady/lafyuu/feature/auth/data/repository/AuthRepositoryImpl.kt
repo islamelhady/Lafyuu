@@ -28,7 +28,15 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
 
     override suspend fun login(email: String, password: String): AppResult<AuthToken> {
-        return safeApiCaller.call { authApi.login(LoginRequest(email, password)).toDomain() }
+        return safeApiCaller.call {
+            val token = authApi.login(LoginRequest(email, password)).toDomain()
+
+            dataStore.saveTokens(
+                accessToken = token.accessToken,
+                refreshToken = token.refreshToken
+            )
+            token
+        }
     }
 
     override suspend fun register(email: String, password: String, firstName: String, lastName: String): AppResult<Unit> {
@@ -40,7 +48,15 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun googleLogin(idToken: String): AppResult<AuthToken> {
-        return safeApiCaller.call { authApi.googleLogin(MobileLoginRequest(idToken)).toDomain() }
+        return safeApiCaller.call {
+           val token = authApi.googleLogin(MobileLoginRequest(idToken)).toDomain()
+
+            dataStore.saveTokens(
+                accessToken = token.accessToken,
+                refreshToken = token.refreshToken
+            )
+            token
+        }
     }
 
 

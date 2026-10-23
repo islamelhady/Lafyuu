@@ -5,9 +5,9 @@ import javax.inject.Inject
 
 class ValidateOtp @Inject constructor() {
     operator fun invoke(otp: String): ValidationResult {
-        if (otp.isBlank()) {
-            return ValidationResult.Error.OtpRequired
+        return when{
+            otp.isBlank() -> ValidationResult.Error.OtpRequired
+            else -> ValidationResult.Success
         }
-        return ValidationResult.Success
     }
 }
