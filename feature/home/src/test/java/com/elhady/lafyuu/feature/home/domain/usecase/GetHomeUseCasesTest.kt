@@ -181,7 +181,7 @@ class GetHomeUseCasesTest {
         val result = getHomeContentUseCase()
 
         assertTrue(result is AppResult.Failure)
-        assertEquals("Network Error", (result as AppResult.Failure).error)
+        assertEquals(AppError.Validation("Network Error"), (result as AppResult.Failure).error)
     }
 
     @Test

@@ -17,7 +17,7 @@ class HomeRepositoryImpl @Inject constructor(
 
     override suspend fun getCategories(): AppResult<List<Category>> {
         return safeApiCaller.call {
-            homeApi.getCategories().categories?.map { it.toDomain() }.orEmpty()
+            homeApi.getCategories().allCategories.map { it.toDomain() }
         }
     }
 
@@ -41,7 +41,7 @@ class HomeRepositoryImpl @Inject constructor(
                 sortOrder = sortOrder,
                 page = page,
                 pageSize = pageSize
-            ).products?.map { it.toDomain() }.orEmpty()
+            ).allProducts.map { it.toDomain() }
         }
     }
 }
