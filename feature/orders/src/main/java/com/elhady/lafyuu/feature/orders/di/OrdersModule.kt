@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.orders.di
 
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.orders.data.remote.OrdersApi
 import com.elhady.lafyuu.feature.orders.data.repository.OrdersRepositoryImpl
 import com.elhady.lafyuu.feature.orders.domain.repository.OrdersRepository
@@ -25,8 +25,8 @@ object OrdersModule {
     @Singleton
     fun provideOrdersRepository(
         ordersApi: OrdersApi,
-        apiErrorParser: ApiErrorParser
+        safeApiCaller: SafeApiCaller
     ): OrdersRepository {
-        return OrdersRepositoryImpl(ordersApi, apiErrorParser)
+        return OrdersRepositoryImpl(ordersApi, safeApiCaller)
     }
 }

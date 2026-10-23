@@ -17,12 +17,10 @@ class ValidateEmail @Inject constructor() {
     )
 
     operator fun invoke(email: String): ValidationResult {
-        if (email.isBlank()) {
-            return ValidationResult.Error.EmailRequired
+        return when{
+            email.isBlank() -> ValidationResult.Error.EmailRequired
+            !emailPattern.matcher(email.trim()).matches() -> ValidationResult.Error.InvalidEmailFormat
+            else -> ValidationResult.Success
         }
-        if (!emailPattern.matcher(email.trim()).matches()) {
-            return ValidationResult.Error.InvalidEmailFormat
-        }
-        return ValidationResult.Success
     }
 }

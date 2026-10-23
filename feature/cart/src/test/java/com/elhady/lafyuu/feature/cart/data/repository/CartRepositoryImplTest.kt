@@ -1,7 +1,7 @@
 package com.elhady.lafyuu.feature.cart.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.cart.data.remote.CartApi
 import com.elhady.lafyuu.feature.cart.data.remote.model.ApplyCouponResponseDto
 import com.elhady.lafyuu.feature.cart.data.remote.model.GetCartResponseDto
@@ -13,24 +13,27 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import retrofit2.Response
 
 class CartRepositoryImplTest {
 
     private val cartApi: CartApi = mockk()
-    private val apiErrorParser: ApiErrorParser = mockk(relaxed = true)
+    private val safeApiCaller: SafeApiCaller = mockk {
+        coEvery { call<Any>(any()) } coAnswers {
+            AppResult.Success((firstArg() as suspend () -> Any).invoke())
+        }
+    }
 
     private lateinit var repository: CartRepositoryImpl
 
     @Before
     fun setUp() {
-        repository = CartRepositoryImpl(cartApi, apiErrorParser)
+        repository = CartRepositoryImpl(cartApi, safeApiCaller)
     }
 
     @Test
     fun `getCart returns success when response is successful`() = runTest {
         val dto = GetCartResponseDto(cartId = "c-1", cartItems = emptyList())
-        coEvery { cartApi.getCart() } returns Response.success(dto)
+        coEvery { cartApi.getCart() } returns dto
 
         val result = repository.getCart()
 
@@ -47,7 +50,7 @@ class CartRepositoryImplTest {
 
     @Test(expected = CancellationException::class)
     fun `updateItemQuantity rethrows CancellationException from refreshCartUnlocked`() = runTest {
-        coEvery { cartApi.updateCartItem(any(), any()) } returns Response.success(mockk(relaxed = true))
+        coEvery { cartApi.updateCartItem(any(), any()) } returns Unit
         coEvery { cartApi.getCart() } throws CancellationException("Coroutine cancelled")
 
         repository.updateItemQuantity("i-1", 2)
@@ -56,7 +59,7 @@ class CartRepositoryImplTest {
     @Test
     fun `applyCoupon returns success when response is successful`() = runTest {
         val dto = ApplyCouponResponseDto(cartId = "c-1", finalTotal = 50.0)
-        coEvery { cartApi.applyCoupon(any()) } returns Response.success(dto)
+        coEvery { cartApi.applyCoupon(any()) } returns dto
 
         val result = repository.applyCoupon("SUMMER")
 
@@ -66,8 +69,8 @@ class CartRepositoryImplTest {
 
     @Test
     fun `removeItem returns success when response is successful`() = runTest {
-        coEvery { cartApi.deleteCartItem(any()) } returns Response.success(Unit)
-        coEvery { cartApi.getCart() } returns Response.success(GetCartResponseDto(cartId = "c-1", cartItems = emptyList()))
+        coEvery { cartApi.deleteCartItem(any()) } returns Unit
+        coEvery { cartApi.getCart() } returns GetCartResponseDto(cartId = "c-1", cartItems = emptyList())
 
         val result = repository.removeItem("i-1")
 

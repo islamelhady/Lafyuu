@@ -3,7 +3,6 @@ package com.elhady.lafyuu.feature.profile.presentation
 import Left
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
@@ -26,6 +26,7 @@ import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.LafyuuFieldState
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
 
 @Composable
 fun ChangePasswordRoute(
@@ -34,6 +35,7 @@ fun ChangePasswordRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -42,7 +44,7 @@ fun ChangePasswordRoute(
                 is ChangePasswordUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
-                            message = effect.message,
+                            message = effect.message.asString(context),
                             type = effect.type
                         )
                     )
@@ -105,8 +107,8 @@ fun ChangePasswordScreen(
                 value = uiState.currentPassword,
                 onValueChange = { onEvent(ChangePasswordUiEvent.CurrentPasswordChanged(it)) },
                 placeholder = "Old Password",
-                state = if (!uiState.error.isNullOrBlank()) LafyuuFieldState.Error else LafyuuFieldState.Default,
-                errorMessage = uiState.error,
+                state = if (uiState.error != null) LafyuuFieldState.Error else LafyuuFieldState.Default,
+                errorMessage = uiState.error?.asString(),
                 modifier = Modifier.padding(bottom = Theme.space.extraLarge)
             )
             LafyuuText(
@@ -118,8 +120,8 @@ fun ChangePasswordScreen(
                 value = uiState.newPassword,
                 onValueChange = { onEvent(ChangePasswordUiEvent.NewPasswordChanged(it)) },
                 placeholder = "New Password",
-                state = if (!uiState.error.isNullOrBlank()) LafyuuFieldState.Error else LafyuuFieldState.Default,
-                errorMessage = uiState.error,
+                state = if (uiState.error != null) LafyuuFieldState.Error else LafyuuFieldState.Default,
+                errorMessage = uiState.error?.asString(),
                 modifier = Modifier.padding(bottom = Theme.space.extraLarge)
             )
             LafyuuText(
@@ -131,8 +133,8 @@ fun ChangePasswordScreen(
                 value = uiState.confirmNewPassword,
                 onValueChange = { onEvent(ChangePasswordUiEvent.ConfirmNewPasswordChanged(it)) },
                 placeholder = "New Password Again",
-                state = if (!uiState.error.isNullOrBlank()) LafyuuFieldState.Error else LafyuuFieldState.Default,
-                errorMessage = uiState.error
+                state = if (uiState.error != null) LafyuuFieldState.Error else LafyuuFieldState.Default,
+                errorMessage = uiState.error?.asString()
             )
         }
     }

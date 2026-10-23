@@ -8,27 +8,30 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SearchTopBarWithNotification
+import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.element.NavigationBottomBar
 import com.elhady.lafyuu.core.designsystem.components.element.defaultTabBarItems
+import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.icons.Love
-import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
-import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
+import com.elhady.lafyuu.core.ui.text.asString
 import com.elhady.lafyuu.feature.home.presentation.components.CategoryListSection
-import com.elhady.lafyuu.feature.home.presentation.components.SaleProductSection
 import com.elhady.lafyuu.feature.home.presentation.components.RecommendedProductsSection
+import com.elhady.lafyuu.feature.home.presentation.components.SaleProductSection
 import com.elhady.lafyuu.feature.home.presentation.components.SuperFlashSaleSection
 import kotlinx.coroutines.flow.collectLatest
 
@@ -48,12 +51,18 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is HomeUiEffect.NavigateToProductDetails -> onNavigateToProductDetails(effect.productId)
-                is HomeUiEffect.NavigateToCategoryProducts -> onNavigateToCategoryProducts(effect.categoryId, effect.categoryName)
+                is HomeUiEffect.NavigateToCategoryProducts -> onNavigateToCategoryProducts(
+                    effect.categoryId,
+                    effect.categoryName
+                )
+
                 is HomeUiEffect.NavigateToFlashSale -> onNavigateToFlashSale()
                 is HomeUiEffect.NavigateToMegaSale -> onNavigateToMegaSale()
                 is HomeUiEffect.NavigateToMoreCategories -> onNavigateToMoreCategories()
@@ -61,7 +70,14 @@ fun HomeRoute(
                 is HomeUiEffect.NavigateToWishlist -> onNavigateToWishlist()
                 is HomeUiEffect.NavigateToTab -> onNavigateToTab(effect.tabRoute)
                 HomeUiEffect.NavigateToSearch -> onNavigateToSearch()
-                is HomeUiEffect.ShowSnackbar -> {}
+                is HomeUiEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        visuals = LafyuuSnackBarVisuals(
+                            message = effect.message.asString(context),
+                            type = effect.type
+                        )
+                    )
+                }
             }
         }
     }
@@ -70,7 +86,8 @@ fun HomeRoute(
         uiState = uiState,
         onEvent = viewModel::onEvent,
         cartItemCount = cartItemCount,
-        selectedTab = selectedTab
+        selectedTab = selectedTab,
+        snackbarHostState = snackbarHostState
     )
 }
 
@@ -78,14 +95,14 @@ fun HomeRoute(
 internal fun HomeScreen(
     uiState: HomeUiState,
     onEvent: (HomeUiEvent) -> Unit,
+    snackbarHostState: SnackbarHostState,
     cartItemCount: Int = 0,
     selectedTab: String = "home"
 ) {
     LafyuuScaffold(
+        snackbarHostState = snackbarHostState,
         topBar = {
             SearchTopBarWithNotification(
-//                searchValue = uiState.searchQuery,
-//                onSearchValueChange = { onEvent(HomeUiEvent.SearchQueryChanged(it)) },
                 onSearchClick = { onEvent(HomeUiEvent.SearchClicked) },
                 trailingIcon = Love,
                 onLeadingClick = {},
@@ -124,7 +141,7 @@ internal fun HomeScreen(
 
                 uiState.errorMessage != null && uiState.isContentEmpty -> {
                     InfoStateContent(
-                        errorMessage = uiState.errorMessage,
+                        errorMessage = uiState.errorMessage.asString(),
                         onRetryClick = { onEvent(HomeUiEvent.RetryClicked) },
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -220,16 +237,5 @@ internal fun HomeScreen(
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun HomeScreenPreview() {
-    LafyuuTheme {
-        HomeScreen(
-            uiState = HomeUiState(),
-            onEvent = {}
-        )
     }
 }

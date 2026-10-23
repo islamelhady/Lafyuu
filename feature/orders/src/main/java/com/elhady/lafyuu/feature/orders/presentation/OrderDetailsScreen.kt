@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -52,6 +53,7 @@ fun OrderDetailsRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -60,7 +62,7 @@ fun OrderDetailsRoute(
                 is OrderDetailsUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
-                            message = effect.message,
+                            message = effect.message.asString(context),
                             type = effect.type
                         )
                     )
@@ -108,7 +110,7 @@ fun OrderDetailsScreen(
                 }
 
                 uiState.orderHistory != null -> {
-                    val history = uiState.orderHistory!!
+                    val history = uiState.orderHistory
                     val steps = listOf("Packing", "Shipping", "Arriving", "Success")
                     val currentStatus = history.history.lastOrNull()?.status ?: "Packing"
                     val currentStep = when {
@@ -303,39 +305,4 @@ fun OrderPaymentDetailsSection(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun OrderDetailsScreenPreview() {
-    val uiState = OrderDetailsUiState(
-        isLoading = false,
-        orderHistory = OrderHistory(
-            orderId = "123456",
-            orderCode = "ABC123",
-            totalPrice = 150.75,
-            paymentMethod = "Credit Card",
-            createdAt = "2023-08-01",
-            updatedAt = "2023-08-02",
-            history = listOf(
-                OrderHistoryEntry(
-                    status = "Packing",
-                    changeDate = "2023-08-01",
-                    notes = "Preparing for shipping"
-                ),
-                OrderHistoryEntry(
-                    status = "Shipping",
-                    changeDate = "2023-08-02",
-                    notes = "In transit"
-                )
-            )
-        ),
-        error = null
-    )
-    val snackbarHostState = remember { SnackbarHostState() }
-    OrderDetailsScreen(
-        uiState = uiState,
-        snackbarHostState = snackbarHostState,
-        onEvent = {}
-    )
 }

@@ -17,19 +17,19 @@ interface ProductApi {
     @GET("api/products/{Id}")
     suspend fun getProductDetails(
         @Path("Id") id: String
-    ): Response<ProductDto>
+    ): ProductDto
 
     @GET("api/reviews/{productId}")
     suspend fun getProductReviews(
         @Path("productId") productId: String,
         @Query("page") page: Int? = 1,
         @Query("pageSize") pageSize: Int? = 10
-    ): Response<GetProductReviewsResponseDto>
+    ): GetProductReviewsResponseDto
 
     @POST("api/cart/items")
     suspend fun addItemToCart(
         @Body request: AddItemToCartRequestDto
-    ): Response<AddItemToCartResponseDto>
+    ): AddItemToCartResponseDto
 
     @GET("api/products")
     suspend fun getProducts(
@@ -39,5 +39,5 @@ interface ProductApi {
         @Query("sortOrder") sortOrder: String? = null,
         @Query("page") page: Int? = 1,
         @Query("pageSize") pageSize: Int? = 10
-    ): Response<PagedListOfProductDto>
+    ): PagedListOfProductDto
 }

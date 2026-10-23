@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
@@ -25,9 +26,9 @@ import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
 import kotlinx.coroutines.flow.collectLatest
 import java.util.Locale
-import kotlin.math.roundToInt
 
 @Composable
 fun CategoryProductsRoute(
@@ -38,6 +39,7 @@ fun CategoryProductsRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
@@ -47,7 +49,7 @@ fun CategoryProductsRoute(
                 is CategoryProductsUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
-                            message = effect.message,
+                            message = effect.message.asString(context),
                             type = effect.type
                         )
                     )
@@ -96,7 +98,7 @@ fun CategoryProductsScreen(
 
                 uiState.error != null && uiState.products.isEmpty() -> {
                     InfoStateContent(
-                        errorMessage = uiState.error!!,
+                        errorMessage = uiState.error.asString(),
                         onRetryClick = { onEvent(CategoryProductsUiEvent.RetryClicked) },
                         modifier = Modifier.align(Alignment.Center)
                     )

@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.ProductTopBar
@@ -25,6 +26,7 @@ import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisual
 import com.elhady.lafyuu.core.designsystem.icons.More
 import com.elhady.lafyuu.core.designsystem.icons.Search
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
 import com.elhady.lafyuu.feature.product.presentation.components.ProductDetailsContent
 
 @Composable
@@ -40,6 +42,7 @@ fun ProductDetailsRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -55,7 +58,7 @@ fun ProductDetailsRoute(
                 is ProductDetailsUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
-                            message = effect.message,
+                            message = effect.message.asString(context),
                             type = AlertType.Success
                         )
                     )
@@ -124,7 +127,7 @@ fun ProductDetailsScreen(
 
                 uiState.error != null && uiState.product == null -> {
                     InfoStateContent(
-                        errorMessage = uiState.error,
+                        errorMessage = uiState.error.asString(),
                         onRetryClick = { onEvent(ProductDetailsUiEvent.RetryClicked) },
                         errorType = AlertType.Error,
                     )

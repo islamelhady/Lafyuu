@@ -4,6 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.auth.R
 import com.elhady.lafyuu.feature.auth.domain.model.ValidationResult
 import com.elhady.lafyuu.feature.auth.domain.usecase.ResetPasswordUseCase
 import com.elhady.lafyuu.feature.auth.domain.validator.ValidateConfirmPassword
@@ -63,15 +66,15 @@ class ResetPasswordViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     newPasswordError = when (passwordResult) {
-                        ValidationResult.Error.PasswordRequired -> "New password is required"
-                        ValidationResult.Error.PasswordMissingDigit -> "Password must contain at least one digit"
-                        ValidationResult.Error.PasswordMissingUppercase -> "Password must contain at least one uppercase letter"
-                        ValidationResult.Error.PasswordMissingSpecialChar -> "Password must contain at least one special character"
+                        ValidationResult.Error.PasswordRequired -> UiText.Resource(R.string.new_password_is_required)
+                        ValidationResult.Error.PasswordMissingDigit -> UiText.Resource(R.string.password_must_contain_at_least_one_digit)
+                        ValidationResult.Error.PasswordMissingUppercase -> UiText.Resource(R.string.password_must_contain_at_least_one_uppercase_letter)
+                        ValidationResult.Error.PasswordMissingSpecialChar -> UiText.Resource(R.string.password_must_contain_at_least_one_special_character)
                         else -> null
                     },
                     confirmPasswordError = when (confirmPasswordResult) {
-                        ValidationResult.Error.ConfirmPasswordRequired -> "Confirm password is required"
-                        ValidationResult.Error.PasswordMismatch -> "Passwords do not match"
+                        ValidationResult.Error.ConfirmPasswordRequired -> UiText.Resource(R.string.confirm_password_is_required)
+                        ValidationResult.Error.PasswordMismatch -> UiText.Resource(R.string.passwords_do_not_match)
                         else -> null
                     }
                 )
@@ -81,17 +84,16 @@ class ResetPasswordViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, generalError = null) }
-            when (val result = resetPasswordUseCase(email, otp, state.newPassword)) {
+            when (val result = resetPasswordUseCase(state.email.trim(), state.otp.trim(), state.newPassword)) {
                 is AppResult.Success<*> -> {
                     _uiState.update { it.copy(isLoading = false) }
                     _uiEffect.send(ResetPasswordUiEffect.NavigateToLogin)
                 }
-                is AppResult.Error -> {
-                    val errorMessage = result.message ?: "Reset failed"
-                    _uiState.update { it.copy(isLoading = false, generalError = errorMessage) }
-                    _uiEffect.send(ResetPasswordUiEffect.ShowError(errorMessage))
+                is AppResult.Failure -> {
+                    val message = result.error.toUiText()
+                    _uiState.update { it.copy(isLoading = false, generalError = message) }
+                    _uiEffect.send(ResetPasswordUiEffect.ShowSnackbar(message))
                 }
-                AppResult.Loading -> {}
             }
         }
     }

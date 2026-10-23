@@ -3,6 +3,7 @@ package com.elhady.lafyuu.feature.home.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.home.domain.model.Product
 import com.elhady.lafyuu.feature.home.domain.usecase.GetHomeContentUseCase
 import com.elhady.lafyuu.feature.home.domain.usecase.SearchProductsUseCase
@@ -78,15 +79,14 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }
-                is AppResult.Error -> {
+                is AppResult.Failure -> {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = result.message
+                            errorMessage = result.error.toUiText()
                         )
                     }
                 }
-                is AppResult.Loading -> {}
             }
         }
     }
@@ -116,7 +116,7 @@ class HomeViewModel @Inject constructor(
                                     )
                                 }
                             }
-                            is AppResult.Error -> {
+                            is AppResult.Failure -> {
                                 _uiState.update {
                                     it.copy(
                                         isSearching = false,
@@ -124,7 +124,6 @@ class HomeViewModel @Inject constructor(
                                     )
                                 }
                             }
-                            is AppResult.Loading -> {}
                         }
                     }
                 }

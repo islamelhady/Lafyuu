@@ -1,13 +1,14 @@
 package com.elhady.lafyuu.feature.profile.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
 
 data class ChangePasswordUiState(
     val isLoading: Boolean = false,
     val currentPassword: String = "",
     val newPassword: String = "",
     val confirmNewPassword: String = "",
-    val error: String? = null
+    val error: UiText? = null
 )
 
 sealed interface ChangePasswordUiEvent {
@@ -20,5 +21,5 @@ sealed interface ChangePasswordUiEvent {
 
 sealed interface ChangePasswordUiEffect {
     data object NavigateBack : ChangePasswordUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Success) : ChangePasswordUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Success) : ChangePasswordUiEffect
 }

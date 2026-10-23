@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.R
@@ -43,6 +44,7 @@ fun ReviewsRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
@@ -52,7 +54,7 @@ fun ReviewsRoute(
                 is ReviewsUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
-                            message = effect.message,
+                            message = effect.message.asString(context),
                             type = effect.type
                         )
                     )
@@ -79,7 +81,7 @@ fun ReviewsScreen(
     val filteredReviews = if (uiState.selectedRatingFilter == 0) {
         uiState.reviews
     } else {
-        uiState.reviews.filter { it.rating.toInt() == uiState.selectedRatingFilter }
+        uiState.reviews.filter { it.rating == uiState.selectedRatingFilter }
     }
 
     LafyuuScaffold(
@@ -122,7 +124,6 @@ fun ReviewsScreen(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(Theme.space.large)
                     ) {
-                        // Summary Header
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
@@ -144,13 +145,11 @@ fun ReviewsScreen(
                             )
                         }
 
-                        // Rating Filter Bar
                         FilterReviewBar(
                             selectedStars = uiState.selectedRatingFilter,
                             onFilterSelected = { onEvent(ReviewsUiEvent.FilterRating(it)) }
                         )
 
-                        // Reviews List
                         if (filteredReviews.isEmpty()) {
                             InfoStateContent(
                                 errorMessage = "No reviews found for this filter",

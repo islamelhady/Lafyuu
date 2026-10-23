@@ -3,6 +3,9 @@ package com.elhady.lafyuu.feature.auth.presentation.register
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.auth.R
 import com.elhady.lafyuu.feature.auth.domain.model.ValidationResult
 import com.elhady.lafyuu.feature.auth.domain.usecase.RegisterUseCase
 import com.elhady.lafyuu.feature.auth.domain.validator.ValidateConfirmPassword
@@ -59,9 +62,13 @@ class RegisterViewModel @Inject constructor(
         if (_uiState.value.isLoading) return
 
         val state = _uiState.value
-        val firstNameResult = validateName(state.firstName)
-        val lastNameResult = validateName(state.lastName)
-        val emailResult = validateEmail(state.email)
+        val trimmedFirstName = state.firstName.trim()
+        val trimmedLastName = state.lastName.trim()
+        val trimmedEmail = state.email.trim()
+
+        val firstNameResult = validateName(trimmedFirstName)
+        val lastNameResult = validateName(trimmedLastName)
+        val emailResult = validateEmail(trimmedEmail)
         val passwordResult = validatePassword(state.password)
         val confirmPasswordResult = validateConfirmPassword(state.password, state.confirmPassword)
 
@@ -71,23 +78,23 @@ class RegisterViewModel @Inject constructor(
         if (hasError) {
             _uiState.update {
                 it.copy(
-                    firstNameError = if (firstNameResult is ValidationResult.Error.NameRequired) "First name is required" else null,
-                    lastNameError = if (lastNameResult is ValidationResult.Error.NameRequired) "Last name is required" else null,
+                    firstNameError = if (firstNameResult is ValidationResult.Error.NameRequired) UiText.Resource(R.string.first_name_is_required) else null,
+                    lastNameError = if (lastNameResult is ValidationResult.Error.NameRequired) UiText.Resource(R.string.last_name_is_required) else null,
                     emailError = when (emailResult) {
-                        ValidationResult.Error.EmailRequired -> "Email is required"
-                        ValidationResult.Error.InvalidEmailFormat -> "Invalid email format"
+                        ValidationResult.Error.EmailRequired -> UiText.Resource(R.string.email_is_required)
+                        ValidationResult.Error.InvalidEmailFormat -> UiText.Resource(R.string.invalid_email_format)
                         else -> null
                     },
                     passwordError = when (passwordResult) {
-                        ValidationResult.Error.PasswordRequired -> "Password is required"
-                        ValidationResult.Error.PasswordMissingDigit -> "Password must contain at least one digit"
-                        ValidationResult.Error.PasswordMissingUppercase -> "Password must contain at least one uppercase letter"
-                        ValidationResult.Error.PasswordMissingSpecialChar -> "Password must contain at least one special character"
+                        ValidationResult.Error.PasswordRequired -> UiText.Resource(R.string.password_is_required)
+                        ValidationResult.Error.PasswordMissingDigit -> UiText.Resource(R.string.password_must_contain_at_least_one_digit)
+                        ValidationResult.Error.PasswordMissingUppercase -> UiText.Resource(R.string.password_must_contain_at_least_one_uppercase_letter)
+                        ValidationResult.Error.PasswordMissingSpecialChar -> UiText.Resource(R.string.password_must_contain_at_least_one_special_character)
                         else -> null
                     },
                     confirmPasswordError = when (confirmPasswordResult) {
-                        ValidationResult.Error.ConfirmPasswordRequired -> "Confirm password is required"
-                        ValidationResult.Error.PasswordMismatch -> "Passwords do not match"
+                        ValidationResult.Error.ConfirmPasswordRequired -> UiText.Resource(R.string.confirm_password_is_required)
+                        ValidationResult.Error.PasswordMismatch -> UiText.Resource(R.string.passwords_do_not_match)
                         else -> null
                     }
                 )
@@ -98,17 +105,16 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, generalError = null) }
 
-            when (val result = registerUseCase(state.email, state.password, state.firstName, state.lastName)) {
+            when (val result = registerUseCase(trimmedEmail, state.password, trimmedFirstName, trimmedLastName)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _uiEffect.send(RegisterUiEffect.NavigateToEmailVerification(state.email))
+                    _uiEffect.send(RegisterUiEffect.NavigateToEmailVerification(trimmedEmail))
                 }
-                is AppResult.Error -> {
-                    val errorMessage = result.message ?: "Registration failed"
-                    _uiState.update { it.copy(isLoading = false, generalError = errorMessage) }
-                    _uiEffect.send(RegisterUiEffect.ShowError(errorMessage))
+                is AppResult.Failure -> {
+                    val message = result.error.toUiText()
+                    _uiState.update { it.copy(isLoading = false, generalError = message) }
+                    _uiEffect.send(RegisterUiEffect.ShowSnackbar(message))
                 }
-                AppResult.Loading -> {}
             }
         }
     }

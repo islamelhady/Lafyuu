@@ -1,5 +1,8 @@
 package com.elhady.lafyuu.feature.auth.presentation.register
 
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+
 data class RegisterUiState(
     val firstName: String = "",
     val lastName: String = "",
@@ -7,12 +10,12 @@ data class RegisterUiState(
     val password: String = "",
     val confirmPassword: String = "",
     val isLoading: Boolean = false,
-    val firstNameError: String? = null,
-    val lastNameError: String? = null,
-    val emailError: String? = null,
-    val passwordError: String? = null,
-    val confirmPasswordError: String? = null,
-    val generalError: String? = null
+    val firstNameError: UiText? = null,
+    val lastNameError: UiText? = null,
+    val emailError: UiText? = null,
+    val passwordError: UiText? = null,
+    val confirmPasswordError: UiText? = null,
+    val generalError: UiText? = null
 )
 
 sealed interface RegisterUiEvent {
@@ -27,5 +30,5 @@ sealed interface RegisterUiEvent {
 sealed interface RegisterUiEffect {
     data object NavigateToLogin : RegisterUiEffect
     data class NavigateToEmailVerification(val email: String) : RegisterUiEffect
-    data class ShowError(val message: String) : RegisterUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Success) : RegisterUiEffect
 }

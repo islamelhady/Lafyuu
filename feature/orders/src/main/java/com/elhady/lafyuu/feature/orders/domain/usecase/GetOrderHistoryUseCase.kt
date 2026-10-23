@@ -9,9 +9,6 @@ class GetOrderHistoryUseCase @Inject constructor(
     private val repository: OrdersRepository
 ) {
     suspend operator fun invoke(orderId: String): AppResult<OrderHistory> {
-        if (orderId.isBlank()) {
-            return AppResult.Error("Invalid order ID")
-        }
         return repository.getOrderHistory(orderId)
     }
 }

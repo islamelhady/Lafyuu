@@ -8,7 +8,5 @@ import javax.inject.Inject
 class GetCartUseCase @Inject constructor(
     private val repository: CartRepository
 ) {
-    suspend operator fun invoke(): AppResult<Cart> {
-        return repository.getCart()
-    }
+    suspend operator fun invoke(): AppResult<Cart> = repository.getCart()
 }

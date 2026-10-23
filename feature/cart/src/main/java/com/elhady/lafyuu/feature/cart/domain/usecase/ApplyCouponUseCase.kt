@@ -8,10 +8,6 @@ import javax.inject.Inject
 class ApplyCouponUseCase @Inject constructor(
     private val repository: CartRepository
 ) {
-    suspend operator fun invoke(couponCode: String): AppResult<Cart> {
-        if (couponCode.isBlank()) {
-            return AppResult.Error("Please enter a coupon code")
-        }
-        return repository.applyCoupon(couponCode)
-    }
+    suspend operator fun invoke(couponCode: String): AppResult<Cart> =
+        repository.applyCoupon(couponCode.trim())
 }

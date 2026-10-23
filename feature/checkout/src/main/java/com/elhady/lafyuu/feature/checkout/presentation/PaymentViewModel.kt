@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.cart.domain.usecase.GetCartUseCase
+import com.elhady.lafyuu.feature.checkout.R
 import com.elhady.lafyuu.feature.checkout.domain.usecase.CheckoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -46,11 +49,13 @@ class PaymentViewModel @Inject constructor(
             is PaymentUiEvent.SelectPaymentMethod -> {
                 _uiState.update { it.copy(selectedPaymentMethod = event.method) }
             }
+
             is PaymentUiEvent.PayClicked -> executeCheckout(event.couponCode)
             PaymentUiEvent.DismissSuccess -> {
                 _uiState.update { it.copy(isSuccess = false) }
                 sendEffect(PaymentUiEffect.NavigateBack)
             }
+
             PaymentUiEvent.BackClicked -> sendEffect(PaymentUiEffect.NavigateBack)
         }
     }
@@ -64,6 +69,7 @@ class PaymentViewModel @Inject constructor(
                     val coupon = cart.appliedCoupon?.code
                     _uiState.update { it.copy(checkoutTotal = total, couponCode = coupon) }
                 }
+
                 else -> {}
             }
         }
@@ -77,7 +83,12 @@ class PaymentViewModel @Inject constructor(
         val couponCode = customCouponCode ?: _uiState.value.couponCode
 
         if (addressId.isBlank()) {
-            sendEffect(PaymentUiEffect.ShowSnackBar("Shipping address is missing", AlertType.Error))
+            sendEffect(
+                PaymentUiEffect.ShowSnackBar(
+                    UiText.Resource(R.string.shipping_address_missing),
+                    AlertType.Error
+                )
+            )
             return
         }
 
@@ -85,27 +96,34 @@ class PaymentViewModel @Inject constructor(
             _uiState.update { it.copy(isCheckingOut = true) }
             when (val result = checkoutUseCase(addressId, paymentMethod, couponCode)) {
                 is AppResult.Success -> {
-                    val res = result.data
-                    val hasExternalFlow = !res.unifiedCheckoutUrl.isNullOrBlank() || !res.paymentClientSecret.isNullOrBlank()
+                    val checkoutResult = result.data
+                    val hasExternalFlow =
+                        !checkoutResult.unifiedCheckoutUrl.isNullOrBlank() || !checkoutResult.paymentClientSecret.isNullOrBlank()
 
                     _uiState.update {
                         it.copy(
                             isCheckingOut = false,
-                            checkoutResult = res,
+                            checkoutResult = checkoutResult,
                             isSuccess = !hasExternalFlow
                         )
                     }
-                    res.unifiedCheckoutUrl?.let { url ->
+                    checkoutResult.unifiedCheckoutUrl?.let { url ->
                         sendEffect(PaymentUiEffect.OpenExternalUrl(url))
                     }
-                    val msg = res.message.ifBlank { if (hasExternalFlow) "Please complete payment" else "Checkout successful!" }
-                    sendEffect(PaymentUiEffect.ShowSnackBar(msg, if (hasExternalFlow) AlertType.Warning else AlertType.Success))
+                    val msg = checkoutResult.message.ifBlank { if (hasExternalFlow) "Please complete payment" else "Checkout successful!" }
+                    sendEffect(
+                        PaymentUiEffect.ShowSnackBar(
+                            message = UiText.Dynamic(msg),
+                            type = if (hasExternalFlow) AlertType.Warning else AlertType.Success
+                        )
+                    )
                 }
-                is AppResult.Error -> {
+
+                is AppResult.Failure -> {
                     _uiState.update { it.copy(isCheckingOut = false) }
-                    sendEffect(PaymentUiEffect.ShowSnackBar(result.message ?: "Checkout failed", AlertType.Error))
+                    val errorMessage = result.error.toUiText()
+                    sendEffect(PaymentUiEffect.ShowSnackBar(errorMessage, type = AlertType.Error))
                 }
-                is AppResult.Loading -> {}
             }
         }
     }

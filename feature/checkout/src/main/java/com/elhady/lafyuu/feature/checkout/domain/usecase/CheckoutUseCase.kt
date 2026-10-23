@@ -13,12 +13,6 @@ class CheckoutUseCase @Inject constructor(
         paymentMethod: String,
         couponCode: String?
     ): AppResult<CheckoutResult> {
-        if (shippingAddressId.isBlank()) {
-            return AppResult.Error("Please select a shipping address")
-        }
-        if (paymentMethod.isBlank()) {
-            return AppResult.Error("Please select a payment method")
-        }
         return repository.checkout(shippingAddressId, paymentMethod, couponCode)
     }
 }

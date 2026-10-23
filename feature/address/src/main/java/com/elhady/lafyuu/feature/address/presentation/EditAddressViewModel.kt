@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.address.R
 import com.elhady.lafyuu.feature.address.domain.usecase.GetAddressUseCase
 import com.elhady.lafyuu.feature.address.domain.usecase.UpdateAddressUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,12 +70,11 @@ class EditAddressViewModel @Inject constructor(
                         )
                     }
                 }
-                is AppResult.Error -> {
-                    val msg = result.message ?: "Failed to load address"
-                    _uiState.update { it.copy(isFetching = false, error = msg) }
-                    sendEffect(EditAddressUiEffect.ShowSnackBar(msg, AlertType.Error))
+                is AppResult.Failure -> {
+                    val errorMessage = result.error.toUiText()
+                    _uiState.update { it.copy(isFetching = false, error = errorMessage) }
+                    sendEffect(EditAddressUiEffect.ShowSnackBar(errorMessage, AlertType.Error))
                 }
-                is AppResult.Loading -> {}
             }
         }
     }
@@ -92,27 +94,27 @@ class EditAddressViewModel @Inject constructor(
 
     private fun updateAddress() {
         val id = _uiState.value.addressId
-        val s = _uiState.value.state
-        val c = _uiState.value.city
-        val st = _uiState.value.street
-        val apt = _uiState.value.apartment
-        val phone = _uiState.value.phoneNumber
+        val state = _uiState.value.state
+        val city = _uiState.value.city
+        val street = _uiState.value.street
+        val apartment = _uiState.value.apartment
+        val phoneNumber = _uiState.value.phoneNumber
         val notes = _uiState.value.notes
 
-        val stateErr = if (s.isBlank()) "Please Fill The Form" else null
-        val cityErr = if (c.isBlank()) "Please Fill The Form" else null
-        val streetErr = if (st.isBlank()) "Please Fill The Form" else null
-        val aptErr = if (apt.isBlank()) "Please Fill The Form" else null
-        val phoneErr = if (phone.isBlank()) "Please Fill The Form" else null
+        val stateError = if (state.isBlank()) UiText.Resource(R.string.error_empty_field) else null
+        val cityError = if (city.isBlank()) UiText.Resource(R.string.error_empty_field) else null
+        val streetError = if (street.isBlank()) UiText.Resource(R.string.error_empty_field) else null
+        val apartmentError = if (apartment.isBlank()) UiText.Resource(R.string.error_empty_field) else null
+        val phoneNumberError = if (phoneNumber.isBlank()) UiText.Resource(R.string.error_empty_field) else null
 
-        if (stateErr != null || cityErr != null || streetErr != null || aptErr != null || phoneErr != null) {
+        if (stateError != null || cityError != null || streetError != null || apartmentError != null || phoneNumberError != null) {
             _uiState.update {
                 it.copy(
-                    stateError = stateErr,
-                    cityError = cityErr,
-                    streetError = streetErr,
-                    apartmentError = aptErr,
-                    phoneError = phoneErr
+                    stateError = stateError,
+                    cityError = cityError,
+                    streetError = streetError,
+                    apartmentError = apartmentError,
+                    phoneError = phoneNumberError
                 )
             }
             return
@@ -120,17 +122,16 @@ class EditAddressViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            when (val result = updateAddressUseCase(id, s, c, st, apt, phone, notes)) {
+            when (val result = updateAddressUseCase(id, state, city, street, apartment, phoneNumber, notes)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
                     sendEffect(EditAddressUiEffect.NavigateBack)
                 }
-                is AppResult.Error -> {
-                    val msg = result.message ?: "Failed to update address"
-                    _uiState.update { it.copy(isLoading = false, error = msg) }
-                    sendEffect(EditAddressUiEffect.ShowSnackBar(msg, AlertType.Error))
+                is AppResult.Failure -> {
+                    val errorMessage = result.error.toUiText()
+                    _uiState.update { it.copy(isLoading = false, error = errorMessage) }
+                    sendEffect(EditAddressUiEffect.ShowSnackBar(message = errorMessage, type = AlertType.Error))
                 }
-                is AppResult.Loading -> {}
             }
         }
     }

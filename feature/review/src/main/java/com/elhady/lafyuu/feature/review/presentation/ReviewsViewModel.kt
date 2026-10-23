@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.review.domain.usecase.GetProductReviewsInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -68,13 +69,10 @@ class ReviewsViewModel @Inject constructor(
                         )
                     }
                 }
-                is AppResult.Error -> {
-                    val msg = result.message ?: "Failed to load reviews"
-                    _uiState.update { it.copy(isLoading = false, error = msg) }
-                    sendEffect(ReviewsUiEffect.ShowSnackbar(msg, AlertType.Error))
-                }
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isLoading = true) }
+                is AppResult.Failure -> {
+                    val message = result.error.toUiText()
+                    _uiState.update { it.copy(isLoading = false, error = message) }
+                    sendEffect(ReviewsUiEffect.ShowSnackbar(message, type = AlertType.Error))
                 }
             }
         }

@@ -44,7 +44,7 @@ class HomeMappersTest {
         assertEquals(80.0, domain.price, 0.001)
         assertEquals(100.0, domain.originalPrice!!, 0.001)
         assertEquals("20% OFF", domain.discountLabel)
-        assertEquals(4.5f, domain.rating)
+        assertEquals(4, domain.rating)
     }
 
     @Test

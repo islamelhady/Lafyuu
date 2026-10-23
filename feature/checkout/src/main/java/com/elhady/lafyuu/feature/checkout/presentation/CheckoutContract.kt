@@ -1,11 +1,8 @@
 package com.elhady.lafyuu.feature.checkout.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.feature.address.domain.model.Address
-
-enum class AddressField {
-    STATE, CITY, STREET, APARTMENT, PHONE, NOTES
-}
 
 data class CheckoutUiState(
     val isLoading: Boolean = false,
@@ -13,7 +10,7 @@ data class CheckoutUiState(
     val selectedAddressId: String? = null,
     val selectedPaymentMethod: String = "Credit Card",
     val paymentMethods: List<String> = listOf("Credit Card", "Cash on Delivery", "Bank Transfer"),
-    val error: String? = null
+    val error: UiText? = null
 )
 
 sealed interface CheckoutUiEvent {
@@ -33,5 +30,5 @@ sealed interface CheckoutUiEffect {
     data class NavigateToPayment(val shippingAddressId: String, val paymentMethod: String) : CheckoutUiEffect
     data object NavigateToAddAddress : CheckoutUiEffect
     data class NavigateToEditAddress(val addressId: String) : CheckoutUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Success) : CheckoutUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Success) : CheckoutUiEffect
 }

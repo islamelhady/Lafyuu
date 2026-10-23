@@ -25,16 +25,16 @@ class AddToCartUseCaseTest {
     fun `returns error when productId is blank`() = runTest {
         val result = useCase("", 1)
 
-        assertTrue(result is AppResult.Error)
-        assertEquals("Invalid product ID", (result as AppResult.Error).message)
+        assertTrue(result is AppResult.Failure)
+        assertEquals("Invalid product ID", (result as AppResult.Failure).error)
     }
 
     @Test
     fun `returns error when quantity is zero or negative`() = runTest {
         val result = useCase("p-1", 0)
 
-        assertTrue(result is AppResult.Error)
-        assertEquals("Quantity must be greater than zero", (result as AppResult.Error).message)
+        assertTrue(result is AppResult.Failure)
+        assertEquals("Quantity must be greater than zero", (result as AppResult.Failure).error)
     }
 
     @Test

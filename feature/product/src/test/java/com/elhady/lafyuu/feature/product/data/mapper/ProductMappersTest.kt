@@ -18,7 +18,6 @@ class ProductMappersTest {
             coverPictureUrl = "https://example.com/cover.jpg",
             productPictures = listOf("https://example.com/pic1.jpg", "https://example.com/pic2.jpg"),
             price = 100.0,
-            originalPrice = 150.0,
             discountPercentage = 33.0,
             stock = 10,
             color = "Red",
@@ -50,7 +49,7 @@ class ProductMappersTest {
         val dto = ProductDto(
             id = "prod-2",
             title = "Summary Shoe",
-            coverUrl = "https://example.com/summary.jpg",
+            coverPictureUrl = "https://example.com/summary.jpg",
             price = 50.0,
             discountPercentage = 20.0,
             rating = 4.0

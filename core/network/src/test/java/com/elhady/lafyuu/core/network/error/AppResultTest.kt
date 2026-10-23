@@ -12,10 +12,10 @@ import org.junit.Test
 import retrofit2.Response
 import java.io.IOException
 
-class ApiErrorParserTest {
+class AppResultTest {
 
     private val json = Json { ignoreUnknownKeys = true }
-    private val parser = ApiErrorParser(json)
+    private val parser = AppResult(json)
 
     @Test
     fun `parseError handles valid ProblemDetails response and preserves status`() {

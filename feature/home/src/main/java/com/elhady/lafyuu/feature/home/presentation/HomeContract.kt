@@ -1,6 +1,27 @@
 package com.elhady.lafyuu.feature.home.presentation
 
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.TabBarItem
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.feature.home.domain.model.Category
+import com.elhady.lafyuu.feature.home.domain.model.Offer
+import com.elhady.lafyuu.feature.home.domain.model.Product
+
+data class HomeUiState(
+    val searchQuery: String = "",
+    val isLoading: Boolean = true,
+    val isSearching: Boolean = false,
+    val categories: List<Category> = emptyList(),
+    val offers: List<Offer> = emptyList(),
+    val flashSaleProducts: List<Product> = emptyList(),
+    val megaSaleProducts: List<Product> = emptyList(),
+    val recommendedProducts: List<Product> = emptyList(),
+    val searchResults: List<Product> = emptyList(),
+    val errorMessage: UiText? = null
+) {
+    val isContentEmpty: Boolean
+        get() = !isLoading && categories.isEmpty() && flashSaleProducts.isEmpty() && megaSaleProducts.isEmpty() && recommendedProducts.isEmpty()
+}
 
 sealed interface HomeUiEvent {
     data class SearchQueryChanged(val query: String) : HomeUiEvent
@@ -28,5 +49,5 @@ sealed interface HomeUiEffect {
     data object NavigateToNotifications : HomeUiEffect
     data object NavigateToWishlist : HomeUiEffect
     data class NavigateToTab(val tabRoute: String) : HomeUiEffect
-    data class ShowSnackbar(val message: String) : HomeUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Error) : HomeUiEffect
 }

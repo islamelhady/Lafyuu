@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="address_deleted">Address deleted !</string>
+    <string name="please_select_shipping_address">Please select a shipping address</string>
+    <string name="shipping_address_missing">Shipping address is missing</string>
+</resources>

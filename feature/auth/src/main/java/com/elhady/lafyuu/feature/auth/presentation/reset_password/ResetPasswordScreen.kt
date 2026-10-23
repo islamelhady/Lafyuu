@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,10 +28,12 @@ import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerExtraLarge
 import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerLarge
 import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerSmall
+import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.PasswordTextField
 import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -40,12 +43,18 @@ fun ResetPasswordScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
                 ResetPasswordUiEffect.NavigateToLogin -> onNavigateToLogin()
-                is ResetPasswordUiEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
+                is ResetPasswordUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(
+                    visuals = LafyuuSnackBarVisuals(
+                        message = effect.message.asString(context),
+                        type = effect.type
+                    )
+                )
             }
         }
     }
@@ -100,7 +109,7 @@ private fun ResetPasswordContent(
                 value = uiState.newPassword,
                 onValueChange = { onEvent(ResetPasswordUiEvent.NewPasswordChanged(it)) },
                 placeholder = "New Password",
-                errorMessage = uiState.newPasswordError,
+                errorMessage = uiState.newPasswordError?.asString(),
                 modifier = Modifier.fillMaxWidth()
             )
             VerticalSpacerSmall()
@@ -108,7 +117,7 @@ private fun ResetPasswordContent(
                 value = uiState.confirmPassword,
                 onValueChange = { onEvent(ResetPasswordUiEvent.ConfirmPasswordChanged(it)) },
                 placeholder = "Confirm Password",
-                errorMessage = uiState.confirmPasswordError,
+                errorMessage = uiState.confirmPasswordError?.asString(),
                 modifier = Modifier.fillMaxWidth()
             )
 

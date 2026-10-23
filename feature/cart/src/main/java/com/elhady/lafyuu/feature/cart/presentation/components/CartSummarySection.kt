@@ -12,6 +12,7 @@ import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerLarg
 import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerMedium
 import com.elhady.lafyuu.core.designsystem.components.textfield.CouponTextField
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
 import com.elhady.lafyuu.feature.cart.presentation.CartUiEvent
 import com.elhady.lafyuu.feature.cart.presentation.CartUiState
 
@@ -29,7 +30,7 @@ fun CartSummarySection(
             value = uiState.couponCodeInput,
             onValueChange = { onEvent(CartUiEvent.CouponCodeChanged(it)) },
             onApplyClick = { onEvent(CartUiEvent.ApplyCouponClicked) },
-            errorMessage = uiState.couponError,
+            errorMessage = uiState.couponError?.asString(),
         )
         VerticalSpacerMedium()
         val itemsTotal = uiState.items.sumOf { it.totalPrice }

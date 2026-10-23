@@ -2,6 +2,7 @@ package com.elhady.lafyuu.feature.cart.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.TabBarItem
+import com.elhady.lafyuu.core.ui.text.UiText
 import com.elhady.lafyuu.feature.cart.domain.model.Cart
 import com.elhady.lafyuu.feature.cart.domain.model.CartItem
 
@@ -10,10 +11,10 @@ data class CartUiState(
     val cart: Cart? = null,
     val couponCodeInput: String = "",
     val isApplyingCoupon: Boolean = false,
-    val couponError: String? = null,
+    val couponError: UiText? = null,
     val updatingItemIds: Set<String> = emptySet(),
     val favoriteProductIds: Set<String> = emptySet(),
-    val error: String? = null,
+    val error: UiText? = null,
     val originalTotal: Double? = null,
     val discountAmount: Double? = null,
     val finalTotal: Double? = null,
@@ -41,5 +42,5 @@ sealed interface CartUiEffect {
     data object NavigateToCheckout : CartUiEffect
     data class NavigateToProductDetails(val productId: String) : CartUiEffect
     data class NavigateToTab(val tabRoute: String) : CartUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Success) : CartUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Success) : CartUiEffect
 }

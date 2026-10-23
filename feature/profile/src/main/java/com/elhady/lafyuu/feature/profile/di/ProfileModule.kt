@@ -1,6 +1,8 @@
 package com.elhady.lafyuu.feature.profile.di
 
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
+import com.elhady.lafyuu.core.database.repository.FavoritesRepository
+import com.elhady.lafyuu.core.datastore.LafyuuDataStore
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.profile.data.remote.ProfileApi
 import com.elhady.lafyuu.feature.profile.data.repository.ProfileRepositoryImpl
 import com.elhady.lafyuu.feature.profile.domain.repository.ProfileRepository
@@ -25,8 +27,10 @@ object ProfileModule {
     @Singleton
     fun provideProfileRepository(
         profileApi: ProfileApi,
-        apiErrorParser: ApiErrorParser
+        safeApiCaller: SafeApiCaller,
+        dataStore: LafyuuDataStore,
+        favoritesRepository: FavoritesRepository
     ): ProfileRepository {
-        return ProfileRepositoryImpl(profileApi, apiErrorParser)
+        return ProfileRepositoryImpl(profileApi, safeApiCaller, dataStore, favoritesRepository)
     }
 }

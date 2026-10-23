@@ -70,7 +70,7 @@ class AuthAuthenticatorTest {
 
         every { tokenProvider.getAccessToken() } returns flowOf(oldToken)
         every { tokenProvider.getRefreshToken() } returns flowOf(refreshToken)
-        coEvery { tokenRemoteDataSource.refreshToken(refreshToken) } returns RefreshTokenResult.Failure
+        coEvery { tokenRemoteDataSource.refreshToken(refreshToken) } returns RefreshTokenResult.Rejected
 
         // When
         val resultRequest = authenticator.authenticate(null, response)

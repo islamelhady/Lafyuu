@@ -16,9 +16,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.R
@@ -32,8 +32,8 @@ import com.elhady.lafyuu.core.designsystem.components.element.VerticalSpacerSmal
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.components.text.LafyuuText
 import com.elhady.lafyuu.core.designsystem.components.textfield.OtpCodeTextField
-import com.elhady.lafyuu.core.designsystem.theme.LafyuuTheme
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.core.ui.text.asString
 import kotlinx.coroutines.flow.collectLatest
 import java.util.Locale
 
@@ -44,21 +44,15 @@ fun EmailVerificationScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
                 EmailVerificationUiEffect.NavigateToLogin -> onNavigateToLogin()
-                is EmailVerificationUiEffect.ShowError -> snackBarHostState.showSnackbar(
+                is EmailVerificationUiEffect.ShowSnackbar -> snackBarHostState.showSnackbar(
                     visuals = LafyuuSnackBarVisuals(
-                        message = effect.message,
-                        type = AlertType.Error
-                    )
-                )
-
-                is EmailVerificationUiEffect.ShowSuccessMessage -> snackBarHostState.showSnackbar(
-                    visuals = LafyuuSnackBarVisuals(
-                        message = effect.message,
+                        message = effect.message.asString(context),
                         type = AlertType.Success
                     )
                 )
@@ -124,28 +118,28 @@ private fun EmailVerificationContent(
                 value = uiState.otp,
                 onValueChange = { onEvent(EmailVerificationUiEvent.OtpChanged(it)) },
                 isError = uiState.otpError != null,
-                errorMessage = uiState.otpError,
+                errorMessage = uiState.otpError?.asString(),
             )
             VerticalSpacerLarge()
 
-                LafyuuText(
-                    text = "Didn't receive code? ",
-                    color = Theme.color.neutralGrey,
-                    style = Theme.typography.normalTextRegular
-                )
-                val resendText = if (uiState.isResendEnabled) {
-                    "Resend Code"
-                } else {
-                    "Resend Code (${formatTimer(uiState.timerSeconds)})"
-                }
-                LafyuuText(
-                    text = resendText,
-                    style = Theme.typography.normalTextBold,
-                    color = if (uiState.isResendEnabled) Theme.color.blue else Theme.color.neutralGrey,
-                    onClick = if (uiState.isResendEnabled) {
-                        { onEvent(EmailVerificationUiEvent.ResendOtpClicked) }
-                    } else null
-                )
+            LafyuuText(
+                text = "Didn't receive code? ",
+                color = Theme.color.neutralGrey,
+                style = Theme.typography.normalTextRegular
+            )
+            val resendText = if (uiState.isResendEnabled) {
+                "Resend Code"
+            } else {
+                "Resend Code (${formatTimer(uiState.timerSeconds)})"
+            }
+            LafyuuText(
+                text = resendText,
+                style = Theme.typography.normalTextBold,
+                color = if (uiState.isResendEnabled) Theme.color.blue else Theme.color.neutralGrey,
+                onClick = if (uiState.isResendEnabled) {
+                    { onEvent(EmailVerificationUiEvent.ResendOtpClicked) }
+                } else null
+            )
 
             VerticalSpacerExtraLarge()
             DefaultButton(
@@ -169,20 +163,4 @@ private fun formatTimer(totalSeconds: Int): String {
     val minutes = totalSeconds / 60
     val seconds = totalSeconds % 60
     return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
-}
-
-@Preview
-@Composable
-private fun EmailVerificationContentPreview() {
-    LafyuuTheme {
-        EmailVerificationContent(
-            uiState = EmailVerificationUiState(
-                email = "example@gmail.com",
-                timerSeconds = 45,
-                isResendEnabled = false
-            ),
-            onEvent = {},
-            onNavigateToLogin = {}
-        )
-    }
 }

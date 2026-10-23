@@ -4,6 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.auth.R
 import com.elhady.lafyuu.feature.auth.domain.model.ValidationResult
 import com.elhady.lafyuu.feature.auth.domain.usecase.ResendOtpUseCase
 import com.elhady.lafyuu.feature.auth.domain.usecase.VerifyEmailUseCase
@@ -56,7 +60,7 @@ class EmailVerificationViewModel @Inject constructor(
     fun onEvent(event: EmailVerificationUiEvent) {
         when (event) {
             is EmailVerificationUiEvent.OtpChanged -> {
-                _uiState.update { it.copy(otp = event.otp, otpError = null, generalError = null) }
+                _uiState.update { it.copy(otp = event.otp, otpError = null, error = null) }
             }
             EmailVerificationUiEvent.VerifyClicked -> verify()
             EmailVerificationUiEvent.ResendOtpClicked -> resendOtp()
@@ -70,24 +74,23 @@ class EmailVerificationViewModel @Inject constructor(
         val otpResult = validateOtp(otp)
 
         if (otpResult is ValidationResult.Error) {
-            _uiState.update { it.copy(otpError = "OTP is required") }
+            _uiState.update { it.copy(otpError = UiText.Resource(R.string.otp_is_required)) }
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, generalError = null) }
+            _uiState.update { it.copy(isLoading = true, error = null) }
 
             when (val result = verifyEmailUseCase(email, otp)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
                     _uiEffect.send(EmailVerificationUiEffect.NavigateToLogin)
                 }
-                is AppResult.Error -> {
-                    val errorMessage = result.message ?: "Verification failed"
-                    _uiState.update { it.copy(isLoading = false, generalError = errorMessage) }
-                    _uiEffect.send(EmailVerificationUiEffect.ShowError(errorMessage))
+                is AppResult.Failure -> {
+                    val errorMessage = result.error.toUiText()
+                    _uiState.update { it.copy(isLoading = false, error = errorMessage) }
+                    _uiEffect.send(EmailVerificationUiEffect.ShowSnackbar(errorMessage, type = AlertType.Error))
                 }
-                AppResult.Loading -> {}
             }
         }
     }
@@ -96,20 +99,19 @@ class EmailVerificationViewModel @Inject constructor(
         if (_uiState.value.isLoading || !_uiState.value.isResendEnabled) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, generalError = null) }
+            _uiState.update { it.copy(isLoading = true, error = null) }
 
             when (val result = resendOtpUseCase(email)) {
                 is AppResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _uiEffect.send(EmailVerificationUiEffect.ShowSuccessMessage("OTP resent successfully"))
+                    _uiEffect.send(EmailVerificationUiEffect.ShowSnackbar(message = UiText.Resource(R.string.otp_resent_successfully), type = AlertType.Success))
                     startResendTimer(45)
                 }
-                is AppResult.Error -> {
-                    val errorMessage = result.message ?: "Resend failed"
-                    _uiState.update { it.copy(isLoading = false, generalError = errorMessage) }
-                    _uiEffect.send(EmailVerificationUiEffect.ShowError(errorMessage))
+                is AppResult.Failure -> {
+                    val errorMessage = result.error.toUiText()
+                    _uiState.update { it.copy(isLoading = false, error = errorMessage) }
+                    _uiEffect.send(EmailVerificationUiEffect.ShowSnackbar(errorMessage, type = AlertType.Error))
                 }
-                AppResult.Loading -> {}
             }
         }
     }

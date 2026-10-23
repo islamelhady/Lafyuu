@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
+import com.elhady.lafyuu.feature.address.R
 import com.elhady.lafyuu.feature.address.domain.usecase.CreateAddressUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -55,11 +58,11 @@ class AddAddressViewModel @Inject constructor(
         val phoneNumber = _uiState.value.phoneNumber
         val notes = _uiState.value.notes
 
-        val stateError = if (state.isBlank()) "Please Fill The Form" else null
-        val cityError = if (city.isBlank()) "Please Fill The Form" else null
-        val streetError = if (street.isBlank()) "Please Fill The Form" else null
-        val aptError = if (apartment.isBlank()) "Please Fill The Form" else null
-        val phoneError = if (phoneNumber.isBlank()) "Please Fill The Form" else null
+        val stateError = if (state.isBlank()) UiText.Resource(R.string.error_empty_field) else null
+        val cityError = if (city.isBlank()) UiText.Resource(R.string.error_empty_field) else null
+        val streetError = if (street.isBlank()) UiText.Resource(R.string.error_empty_field) else null
+        val aptError = if (apartment.isBlank()) UiText.Resource(R.string.error_empty_field) else null
+        val phoneError = if (phoneNumber.isBlank()) UiText.Resource(R.string.error_empty_field) else null
 
         if (stateError != null || cityError != null || streetError != null || aptError != null || phoneError != null) {
             _uiState.update {
@@ -82,13 +85,11 @@ class AddAddressViewModel @Inject constructor(
                     sendEffect(AddAddressUiEffect.NavigateBack)
                 }
 
-                is AppResult.Error -> {
-                    val msg = result.message ?: "Failed to create address"
-                    _uiState.update { it.copy(isLoading = false, error = msg) }
-                    sendEffect(AddAddressUiEffect.ShowSnackBar(msg, AlertType.Error))
+                is AppResult.Failure -> {
+                    val errorMessage = result.error.toUiText()
+                    _uiState.update { it.copy(isLoading = false, error = errorMessage) }
+                    sendEffect(AddAddressUiEffect.ShowSnackBar(errorMessage, type = AlertType.Error))
                 }
-
-                is AppResult.Loading -> {}
             }
         }
     }

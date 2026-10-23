@@ -2,11 +2,12 @@ package com.elhady.lafyuu.feature.favorites.presentation
 
 import com.elhady.lafyuu.core.common.domain.model.ProductDetails
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
 
 data class FavoritesUiState(
     val isLoading: Boolean = false,
     val favoriteProducts: List<ProductDetails> = emptyList(),
-    val error: String? = null
+    val error: UiText? = null
 )
 
 sealed interface FavoritesUiEvent {
@@ -19,5 +20,5 @@ sealed interface FavoritesUiEvent {
 sealed interface FavoritesUiEffect {
     data object NavigateBack : FavoritesUiEffect
     data class NavigateToProductDetails(val productId: String) : FavoritesUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : FavoritesUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Error) : FavoritesUiEffect
 }

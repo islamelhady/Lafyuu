@@ -7,14 +7,14 @@ import com.elhady.lafyuu.feature.product.data.remote.model.ProductDto
 import com.elhady.lafyuu.feature.product.data.remote.model.UserReviewDto
 
 fun ProductDto.toProductDetailsDomain(): ProductDetails {
-    val cover = coverPictureUrl ?: coverUrl ?: imageUrl ?: image ?: productPictures?.firstOrNull() ?: ""
+    val cover = coverPictureUrl ?: productPictures?.firstOrNull() ?: ""
     val picturesList = productPictures?.filter { it.isNotBlank() }
         ?.ifEmpty { if (cover.isNotBlank()) listOf(cover) else emptyList() }
         ?: if (cover.isNotBlank()) listOf(cover) else emptyList()
 
     val currentPrice = price ?: 0.0
     val discount = discountPercentage?.toInt() ?: 0
-    val origPrice = originalPrice ?: if (discount > 0 && currentPrice > 0.0) {
+    val origPrice =  if (discount > 0 && currentPrice > 0.0) {
         currentPrice / (1.0 - (discount / 100.0))
     } else null
 
@@ -45,10 +45,10 @@ fun ProductDto.toProductDetailsDomain(): ProductDetails {
 }
 
 fun ProductDto.toProductSummaryDomain(): Product {
-    val cover = coverPictureUrl ?: coverUrl ?: imageUrl ?: image ?: productPictures?.firstOrNull()
+    val cover = coverPictureUrl ?: productPictures?.firstOrNull()
     val currentPrice = price ?: 0.0
     val discount = discountPercentage?.toInt() ?: 0
-    val origPrice = originalPrice ?: if (discount > 0 && currentPrice > 0.0) {
+    val origPrice = if (discount > 0 && currentPrice > 0.0) {
         currentPrice / (1.0 - (discount / 100.0))
     } else null
 
@@ -66,7 +66,7 @@ fun ProductDto.toProductSummaryDomain(): Product {
 fun UserReviewDto.toDomain(): ProductReview {
     return ProductReview(
         comment = comment.orEmpty(),
-        rating = rating?.toInt() ?: 0,
+        rating = rating ?: 0,
         createdAt = createdAt.orEmpty(),
         userName = userName.orEmpty(),
         userPicture = userPicture

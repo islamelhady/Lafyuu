@@ -8,12 +8,6 @@ class CreateReviewUseCase @Inject constructor(
     private val repository: ReviewRepository
 ) {
     suspend operator fun invoke(productId: String, rating: Int, comment: String): AppResult<Unit> {
-        if (productId.isBlank()) {
-            return AppResult.Error("Invalid product ID")
-        }
-        if (rating !in 1..5) {
-            return AppResult.Error("Rating must be between 1 and 5")
-        }
         return repository.createReview(productId, rating, comment.trim())
     }
 }

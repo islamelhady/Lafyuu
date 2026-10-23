@@ -19,12 +19,12 @@ class CheckoutUseCasesTest {
         val useCase = CheckoutUseCase(repository)
 
         val resultBlankAddress = useCase("", "Credit Card Or Debit", null)
-        assertTrue(resultBlankAddress is AppResult.Error)
-        assertEquals("Please select a shipping address", (resultBlankAddress as AppResult.Error).message)
+        assertTrue(resultBlankAddress is AppResult.Failure)
+        assertEquals("Please select a shipping address", (resultBlankAddress as AppResult.Failure).error)
 
         val resultBlankPayment = useCase("addr-1", "", null)
-        assertTrue(resultBlankPayment is AppResult.Error)
-        assertEquals("Please select a payment method", (resultBlankPayment as AppResult.Error).message)
+        assertTrue(resultBlankPayment is AppResult.Failure)
+        assertEquals("Please select a payment method", (resultBlankPayment as AppResult.Failure).error)
     }
 
     @Test

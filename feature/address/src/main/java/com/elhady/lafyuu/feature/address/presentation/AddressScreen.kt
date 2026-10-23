@@ -19,6 +19,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.elhady.lafyuu.core.designsystem.components.appbar.SingleTopAppBar
@@ -28,6 +30,7 @@ import com.elhady.lafyuu.core.designsystem.components.element.InfoStateContent
 import com.elhady.lafyuu.core.designsystem.components.element.LafyuuScaffold
 import com.elhady.lafyuu.core.designsystem.components.other.LafyuuSnackBarVisuals
 import com.elhady.lafyuu.core.designsystem.theme.Theme
+import com.elhady.lafyuu.feature.address.R
 
 @Composable
 fun AddressRoute(
@@ -39,6 +42,7 @@ fun AddressRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.loadAddresses()
@@ -50,7 +54,7 @@ fun AddressRoute(
                 is AddressUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(
                         visuals = LafyuuSnackBarVisuals(
-                            message = effect.message,
+                            message = effect.message.asString(context),
                             type = effect.type
                         )
                     )
@@ -113,7 +117,7 @@ fun AddressScreen(
 
                 uiState.addresses.isEmpty() -> {
                     InfoStateContent(
-                        errorMessage = "No addresses found. Please add one",
+                        errorMessage = stringResource(id = R.string.no_addresses_found_please_add_one),
                         onRetryClick = { onEvent(AddressUiEvent.LoadAddresses) },
                         modifier = Modifier.align(Alignment.Center)
                     )

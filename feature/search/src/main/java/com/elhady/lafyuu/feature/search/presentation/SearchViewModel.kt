@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.search.domain.usecase.GetCategoriesUseCase
 import com.elhady.lafyuu.feature.search.domain.usecase.SearchProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -191,18 +192,15 @@ class SearchViewModel @Inject constructor(
                         )
                     }
                 }
-                is AppResult.Error -> {
-                    val message = result.message ?: "Failed to search products"
+                is AppResult.Failure -> {
+                    val message = result.error.toUiText()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             error = message
                         )
                     }
-                    sendEffect(SearchUiEffect.ShowSnackbar(message, AlertType.Error))
-                }
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isLoading = true) }
+                    sendEffect(SearchUiEffect.ShowSnackbar(message, type = AlertType.Error))
                 }
             }
         }

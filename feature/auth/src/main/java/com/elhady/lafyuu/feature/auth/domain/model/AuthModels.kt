@@ -13,15 +13,6 @@ data class AuthToken(
     val expiresAtUtc: String
 )
 
-sealed interface AuthError {
-    data object InvalidCredentials : AuthError
-    data object EmailAlreadyExists : AuthError
-    data object InvalidOtp : AuthError
-    data object Unauthorized : AuthError
-    data object Network : AuthError
-    data object Unknown : AuthError
-}
-
 sealed interface ValidationResult {
     data object Success : ValidationResult
     sealed interface Error : ValidationResult {

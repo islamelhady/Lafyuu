@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="failed_to_load_favorite_products">Failed to load favorite products</string>
+    <string name="removed_from_favorite">Removed from Favorite</string>
+</resources>

@@ -7,3 +7,9 @@ data class ProductReview(
     val userName: String,
     val userPicture: String?
 )
+
+data class ProductReviewsInfo(
+    val averageRating: Double,
+    val reviewsCount: Int,
+    val reviews: List<ProductReview>
+)

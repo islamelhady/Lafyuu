@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.orders.domain.usecase.GetOrderHistoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -57,18 +58,15 @@ class OrderDetailsViewModel @Inject constructor(
                         )
                     }
                 }
-                is AppResult.Error -> {
-                    val msg = result.message ?: "Failed to load order details"
+                is AppResult.Failure -> {
+                    val message = result.error.toUiText()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = msg
+                            error = message
                         )
                     }
-                    sendEffect(OrderDetailsUiEffect.ShowSnackbar(msg, AlertType.Error))
-                }
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isLoading = true) }
+                    sendEffect(OrderDetailsUiEffect.ShowSnackbar(message, type = AlertType.Error))
                 }
             }
         }

@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.review.di
 
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.review.data.remote.ReviewApi
 import com.elhady.lafyuu.feature.review.data.repository.ReviewRepositoryImpl
 import com.elhady.lafyuu.feature.review.domain.repository.ReviewRepository
@@ -25,8 +25,8 @@ object ReviewModule {
     @Singleton
     fun provideReviewRepository(
         reviewApi: ReviewApi,
-        apiErrorParser: ApiErrorParser
+        safeApiCaller: SafeApiCaller
     ): ReviewRepository {
-        return ReviewRepositoryImpl(reviewApi, apiErrorParser)
+        return ReviewRepositoryImpl(reviewApi, safeApiCaller)
     }
 }

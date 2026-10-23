@@ -5,7 +5,7 @@ import com.elhady.lafyuu.feature.offers.domain.model.Offer
 
 fun OfferDto.toDomain() = Offer(
     id = id.orEmpty(),
-    name = name ?: title.orEmpty(),
-    description = description,
-    coverUrl = coverUrl ?: coverPictureUrl ?: imageUrl
+    name = name.orEmpty(),
+    description = description.orEmpty(),
+    coverUrl = coverUrl.orEmpty()
 )

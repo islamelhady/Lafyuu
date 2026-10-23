@@ -8,10 +8,10 @@ import retrofit2.http.Path
 
 interface OrdersApi {
     @GET("api/orders")
-    suspend fun getOrders(): Response<GetAllOrdersResponseDto>
+    suspend fun getOrders(): GetAllOrdersResponseDto
 
     @GET("api/orders/history/{orderId}")
     suspend fun getOrderHistory(
         @Path("orderId") orderId: String
-    ): Response<GetOrdersHistoryResponseDto>
+    ): GetOrdersHistoryResponseDto
 }

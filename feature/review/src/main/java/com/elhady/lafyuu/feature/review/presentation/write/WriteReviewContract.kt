@@ -1,13 +1,14 @@
 package com.elhady.lafyuu.feature.review.presentation.write
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
 
 data class WriteReviewUiState(
     val productId: String = "",
     val rating: Int = 0,
     val comment: String = "",
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: UiText? = null
 )
 
 sealed interface WriteReviewUiEvent {
@@ -19,5 +20,5 @@ sealed interface WriteReviewUiEvent {
 
 sealed interface WriteReviewUiEffect {
     data object NavigateBack : WriteReviewUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : WriteReviewUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Error) : WriteReviewUiEffect
 }

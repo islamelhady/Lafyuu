@@ -1,10 +1,8 @@
 package com.elhady.lafyuu.feature.auth.data.repository
 
 import com.elhady.lafyuu.core.common.AppResult
-import com.elhady.lafyuu.core.database.repository.FavoritesRepository
 import com.elhady.lafyuu.core.datastore.LafyuuDataStore
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
-import com.elhady.lafyuu.core.network.error.toAppResultError
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.auth.data.mapper.toDomain
 import com.elhady.lafyuu.feature.auth.data.remote.AuthApi
 import com.elhady.lafyuu.feature.auth.data.remote.model.ChangePasswordRequest
@@ -19,7 +17,6 @@ import com.elhady.lafyuu.feature.auth.data.remote.model.VerifyEmailRequest
 import com.elhady.lafyuu.feature.auth.domain.model.AuthToken
 import com.elhady.lafyuu.feature.auth.domain.model.User
 import com.elhady.lafyuu.feature.auth.domain.repository.AuthRepository
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -27,142 +24,60 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val authApi: AuthApi,
     private val dataStore: LafyuuDataStore,
-    private val apiErrorParser: ApiErrorParser,
-    private val favoritesRepository: FavoritesRepository
+    private val safeApiCaller: SafeApiCaller,
 ) : AuthRepository {
 
     override suspend fun login(email: String, password: String): AppResult<AuthToken> {
-        return try {
-            val response = authApi.login(LoginRequest(email, password))
-            if (response.isSuccessful) {
-                val body = response.body()!!
-                dataStore.saveTokens(body.accessToken, body.refreshToken)
-                AppResult.Success(body.toDomain())
-            } else {
-                apiErrorParser.parseError(response).toAppResultError()
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
+        return safeApiCaller.call {
+            val token = authApi.login(LoginRequest(email, password)).toDomain()
+
+            dataStore.saveTokens(
+                accessToken = token.accessToken,
+                refreshToken = token.refreshToken
+            )
+            token
         }
     }
 
     override suspend fun register(email: String, password: String, firstName: String, lastName: String): AppResult<Unit> {
-        return try {
-            val response = authApi.register(RegisterRequest(email, password, firstName, lastName))
-            if (response.isSuccessful) {
-                AppResult.Success(Unit)
-            } else {
-                apiErrorParser.parseError(response).toAppResultError()
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
-        }
+        return safeApiCaller.call { authApi.register(RegisterRequest(email, password, firstName, lastName)) }
     }
 
     override suspend fun verifyEmail(email: String, otp: String): AppResult<Unit> {
-        return try {
-            val response = authApi.verifyEmail(VerifyEmailRequest(email, otp))
-            if (response.isSuccessful) {
-                AppResult.Success(Unit)
-            } else {
-                apiErrorParser.parseError(response).toAppResultError()
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
-        }
+        return safeApiCaller.call { authApi.verifyEmail(VerifyEmailRequest(email, otp)) }
     }
 
     override suspend fun googleLogin(idToken: String): AppResult<AuthToken> {
-        return try {
-            val response = authApi.googleLogin(MobileLoginRequest(idToken))
-            if (response.isSuccessful) {
-                val body = response.body()!!
-                dataStore.saveTokens(body.accessToken, body.refreshToken)
-                AppResult.Success(body.toDomain())
-            } else {
-                apiErrorParser.parseError(response).toAppResultError()
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
+        return safeApiCaller.call {
+           val token = authApi.googleLogin(MobileLoginRequest(idToken)).toDomain()
+
+            dataStore.saveTokens(
+                accessToken = token.accessToken,
+                refreshToken = token.refreshToken
+            )
+            token
         }
     }
 
-    override suspend fun logout(): AppResult<Unit> {
-        return try {
-            val response = authApi.logout()
-            dataStore.clearSession()
-            favoritesRepository.clearFavorites()
-            if (response.isSuccessful) {
-                AppResult.Success(Unit)
-            } else {
-                AppResult.Success(Unit)
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            dataStore.clearSession()
-            favoritesRepository.clearFavorites()
-            AppResult.Success(Unit)
-        }
-    }
 
     override suspend fun getCurrentUser(): AppResult<User> {
-        return try {
-            val response = authApi.getCurrentUser()
-            if (response.isSuccessful) {
-                AppResult.Success(response.body()!!.toDomain())
-            } else {
-                apiErrorParser.parseError(response).toAppResultError()
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
-        }
+        return safeApiCaller.call { authApi.getCurrentUser().toDomain() }
     }
 
     override suspend fun forgotPassword(email: String): AppResult<Unit> {
-        return try {
-            val response = authApi.forgotPassword(ForgotPasswordRequest(email))
-            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
+        return safeApiCaller.call { authApi.forgotPassword(ForgotPasswordRequest(email)) }
     }
 
     override suspend fun resetPassword(email: String, otp: String, password: String): AppResult<Unit> {
-        return try {
-            val response = authApi.resetPassword(ResetPasswordRequest(email, otp, password))
-            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
+        return safeApiCaller.call { authApi.resetPassword(ResetPasswordRequest(email, otp, password)) }
     }
 
     override suspend fun resendOtp(email: String): AppResult<Unit> {
-        return try {
-            val response = authApi.resendOtp(ResendOtpRequest(email))
-            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
+        return safeApiCaller.call { authApi.resendOtp(ResendOtpRequest(email)) }
     }
 
     override suspend fun validateOtp(email: String, otp: String): AppResult<Unit> {
-        return try {
-            val response = authApi.validateOtp(ValidateOtpRequest(email, otp))
-            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) { apiErrorParser.parseException(e).toAppResultError() }
+        return safeApiCaller.call { authApi.validateOtp(ValidateOtpRequest(email, otp)) }
     }
 
     override suspend fun changePassword(
@@ -170,15 +85,7 @@ class AuthRepositoryImpl @Inject constructor(
         newPassword: String,
         confirmNewPassword: String
     ): AppResult<Unit> {
-        return try {
-            val response = authApi.changePassword(ChangePasswordRequest(currentPassword, newPassword, confirmNewPassword))
-            if (response.isSuccessful) AppResult.Success(Unit) else apiErrorParser.parseError(response).toAppResultError()
-        }catch (e: CancellationException) {
-            throw e
-        }
-        catch (e: Exception) {
-            apiErrorParser.parseException(e).toAppResultError()
-        }
+        return safeApiCaller.call { authApi.changePassword(ChangePasswordRequest(currentPassword, newPassword, confirmNewPassword)) }
     }
 
     override fun getAccessToken(): Flow<String?> = dataStore.accessToken

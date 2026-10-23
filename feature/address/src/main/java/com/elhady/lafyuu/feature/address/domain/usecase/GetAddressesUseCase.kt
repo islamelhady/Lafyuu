@@ -8,7 +8,5 @@ import javax.inject.Inject
 class GetAddressesUseCase @Inject constructor(
     private val repository: AddressRepository
 ) {
-    suspend operator fun invoke(): AppResult<List<Address>> {
-        return repository.getAddresses()
-    }
+    suspend operator fun invoke(): AppResult<List<Address>> = repository.getAddresses()
 }

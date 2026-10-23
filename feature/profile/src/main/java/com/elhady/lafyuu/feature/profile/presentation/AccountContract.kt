@@ -2,11 +2,11 @@ package com.elhady.lafyuu.feature.profile.presentation
 
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
 import com.elhady.lafyuu.core.designsystem.components.element.TabBarItem
-import com.elhady.lafyuu.feature.profile.domain.model.UserProfile
+import com.elhady.lafyuu.core.ui.text.UiText
 
 data class AccountUiState(
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: UiText? = null
 )
 
 sealed interface AccountUiEvent {
@@ -22,5 +22,5 @@ sealed interface AccountUiEffect {
     data object NavigateToOrders : AccountUiEffect
     data object NavigateToAddress : AccountUiEffect
     data class NavigateToTab(val tabRoute: String) : AccountUiEffect
-    data class ShowSnackbar(val message: String, val type: AlertType = AlertType.Error) : AccountUiEffect
+    data class ShowSnackbar(val message: UiText, val type: AlertType = AlertType.Error) : AccountUiEffect
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.offers.domain.usecase.GetOffersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -33,16 +34,6 @@ class OffersViewModel @Inject constructor(
     fun onEvent(event: OffersUiEvent) {
         when (event) {
             OffersUiEvent.LoadOffers -> loadOffers()
-            is OffersUiEvent.OfferClicked -> {
-                val message = buildString {
-                    append(event.offer.name)
-                    if (!event.offer.description.isNullOrBlank()) {
-                        append(" - ")
-                        append(event.offer.description)
-                    }
-                }
-                sendEffect(OffersUiEffect.ShowSnackbar(message, AlertType.Success))
-            }
             OffersUiEvent.RetryClicked -> loadOffers()
             is OffersUiEvent.BottomTabSelected -> {
                 sendEffect(OffersUiEffect.NavigateToTab(event.tab.route))
@@ -63,18 +54,16 @@ class OffersViewModel @Inject constructor(
                         )
                     }
                 }
-                is AppResult.Error -> {
-                    val message = result.message ?: "Failed to load offers"
+
+                is AppResult.Failure -> {
+                    val message = result.error.toUiText()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             error = message
                         )
                     }
-                    sendEffect(OffersUiEffect.ShowSnackbar(message, AlertType.Error))
-                }
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isLoading = true) }
+                    sendEffect(OffersUiEffect.ShowSnackbar(message, type = AlertType.Error))
                 }
             }
         }

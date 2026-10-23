@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.notifications.di
 
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.notifications.data.remote.NotificationApi
 import com.elhady.lafyuu.feature.notifications.data.repository.NotificationRepositoryImpl
 import com.elhady.lafyuu.feature.notifications.domain.repository.NotificationRepository
@@ -25,8 +25,8 @@ object NotificationModule {
     @Singleton
     fun provideNotificationRepository(
         notificationApi: NotificationApi,
-        apiErrorParser: ApiErrorParser
+        safeApiCaller: SafeApiCaller
     ): NotificationRepository {
-        return NotificationRepositoryImpl(notificationApi, apiErrorParser)
+        return NotificationRepositoryImpl(notificationApi, safeApiCaller)
     }
 }

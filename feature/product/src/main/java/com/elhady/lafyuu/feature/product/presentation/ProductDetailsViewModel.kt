@@ -6,8 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.elhady.lafyuu.core.common.AppResult
 import com.elhady.lafyuu.core.common.domain.usecase.GetProductDetailsUseCase
 import com.elhady.lafyuu.core.database.repository.FavoritesRepository
+import com.elhady.lafyuu.core.designsystem.components.element.AlertType
+import com.elhady.lafyuu.core.ui.text.UiText
+import com.elhady.lafyuu.core.ui.text.toUiText
 import com.elhady.lafyuu.feature.cart.domain.repository.CartRepository
 import com.elhady.lafyuu.feature.cart.domain.usecase.RemoveCartItemUseCase
+import com.elhady.lafyuu.feature.product.R
 import com.elhady.lafyuu.feature.product.domain.usecase.AddToCartUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -60,13 +64,16 @@ class ProductDetailsViewModel @Inject constructor(
                 val currentId = _uiState.value.product?.id ?: productIdFromNav
                 currentId?.let { loadProductDetails(it) }
             }
+
             is ProductDetailsUiEvent.RecommendedProductClicked -> sendEffect(
                 ProductDetailsUiEffect.NavigateToProductDetails(event.productId)
             )
+
             ProductDetailsUiEvent.SeeMoreReviewsClicked -> {
                 val productId = _uiState.value.product?.id ?: return
                 sendEffect(ProductDetailsUiEffect.NavigateToReviews(productId))
             }
+
             ProductDetailsUiEvent.WriteReviewClicked -> {
                 val productId = _uiState.value.product?.id ?: return
                 sendEffect(ProductDetailsUiEffect.NavigateToWriteReview(productId))
@@ -114,16 +121,14 @@ class ProductDetailsViewModel @Inject constructor(
                         )
                     }
                 }
-                is AppResult.Error -> {
+
+                is AppResult.Failure -> {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = result.message ?: "Failed to load product details"
+                            error = result.error.toUiText()
                         )
                     }
-                }
-                is AppResult.Loading -> {
-                    _uiState.update { it.copy(isLoading = true) }
                 }
             }
         }
@@ -149,10 +154,20 @@ class ProductDetailsViewModel @Inject constructor(
             val currentFav = _uiState.value.isFavorite
             if (currentFav) {
                 favoritesRepository.removeFavorite(product.id)
-                sendEffect(ProductDetailsUiEffect.ShowSnackbar("Removed from Wishlist"))
+                sendEffect(
+                    ProductDetailsUiEffect.ShowSnackbar(
+                        message = UiText.Resource(R.string.removed_from_favorite),
+                        type = AlertType.Success
+                    )
+                )
             } else {
                 favoritesRepository.addFavorite(product.id)
-                sendEffect(ProductDetailsUiEffect.ShowSnackbar("Added to Wishlist"))
+                sendEffect(
+                    ProductDetailsUiEffect.ShowSnackbar(
+                        message = UiText.Resource(R.string.added_to_favorite),
+                        type = AlertType.Success
+                    )
+                )
             }
         }
     }
@@ -168,14 +183,22 @@ class ProductDetailsViewModel @Inject constructor(
                 when (val result = removeCartItemUseCase(cartItemId)) {
                     is AppResult.Success -> {
                         _uiState.update { it.copy(isAddingToCart = false, isInCart = false) }
-                        sendEffect(ProductDetailsUiEffect.ShowSnackbar("Removed from cart"))
+                        sendEffect(
+                            ProductDetailsUiEffect.ShowSnackbar(
+                                message = UiText.Resource(R.string.removed_from_cart),
+                                type = AlertType.Success
+                            )
+                        )
                     }
-                    is AppResult.Error -> {
+
+                    is AppResult.Failure -> {
                         _uiState.update { it.copy(isAddingToCart = false) }
-                        sendEffect(ProductDetailsUiEffect.ShowSnackbar(result.message ?: "Failed to remove item"))
-                    }
-                    is AppResult.Loading -> {
-                        _uiState.update { it.copy(isAddingToCart = true) }
+                        sendEffect(
+                            ProductDetailsUiEffect.ShowSnackbar(
+                                message = UiText.Resource(R.string.failed_to_remove_item),
+                                type = AlertType.Error
+                            )
+                        )
                     }
                 }
             } else {
@@ -183,14 +206,22 @@ class ProductDetailsViewModel @Inject constructor(
                 when (val result = addToCartUseCase(product.id, qty)) {
                     is AppResult.Success -> {
                         _uiState.update { it.copy(isAddingToCart = false, isInCart = true) }
-                        sendEffect(ProductDetailsUiEffect.ShowSnackbar("Added to cart successfully!"))
+                        sendEffect(
+                            ProductDetailsUiEffect.ShowSnackbar(
+                                message = UiText.Resource(R.string.added_to_cart_successfully),
+                                type = AlertType.Success
+                            )
+                        )
                     }
-                    is AppResult.Error -> {
+
+                    is AppResult.Failure -> {
                         _uiState.update { it.copy(isAddingToCart = false) }
-                        sendEffect(ProductDetailsUiEffect.ShowSnackbar(result.message ?: "Failed to add to cart"))
-                    }
-                    is AppResult.Loading -> {
-                        _uiState.update { it.copy(isAddingToCart = true) }
+                        sendEffect(
+                            ProductDetailsUiEffect.ShowSnackbar(
+                                message = UiText.Resource(R.string.failed_to_add_to_cart),
+                                type = AlertType.Error
+                            )
+                        )
                     }
                 }
             }

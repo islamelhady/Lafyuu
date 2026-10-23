@@ -1,6 +1,6 @@
 package com.elhady.lafyuu.feature.offers.di
 
-import com.elhady.lafyuu.core.network.error.ApiErrorParser
+import com.elhady.lafyuu.core.network.error.SafeApiCaller
 import com.elhady.lafyuu.feature.offers.data.remote.OffersApi
 import com.elhady.lafyuu.feature.offers.data.repository.OffersRepositoryImpl
 import com.elhady.lafyuu.feature.offers.domain.repository.OffersRepository
@@ -25,8 +25,8 @@ object OffersModule {
     @Singleton
     fun provideOffersRepository(
         offersApi: OffersApi,
-        apiErrorParser: ApiErrorParser
+        safeApiCaller: SafeApiCaller
     ): OffersRepository {
-        return OffersRepositoryImpl(offersApi, apiErrorParser)
+        return OffersRepositoryImpl(offersApi, safeApiCaller)
     }
 }
